@@ -2,49 +2,68 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
 import { Role, UserStatus } from "../../generated/prisma/enums";
-
-
 import { prisma } from "./prisma";
-
 import env from "src/config/env";
 import { sendEmail } from "../utils/email";
-
-// If your Prisma file is located elsewhere, you can change the path
 
 export const auth = betterAuth({
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
-        provider: "postgresql", // or "mysql", "postgresql", ...etc
+        provider: "postgresql",
     }),
+
+    // ✅ ডাটাসোর্স হুক: ইউজার তৈরি হওয়ার সাথে সাথে প্রোফাইল তৈরি করবে
+    databaseHooks: {
+        user: {
+            create: {
+                after: async (user) => {
+                    console.log(`👤 User created with ID: ${user.id}. Creating profile...`);
+                    
+                    if (user.role === Role.PARTICIPANT) {
+                        await prisma.participant.create({
+                            data: {
+                                userId: user.id,
+                                email: user.email,
+                                name: user.name,
+                            },
+                        });
+                        console.log("✅ Participant profile linked.");
+                    } else if (user.role === Role.ORGANIZER) {
+                        await prisma.organizer.create({
+                            data: {
+                                userId: user.id,
+                                email: user.email,
+                                name: user.name,
+                                contactNumber: "N/A", 
+                            },
+                        });
+                        console.log("✅ Organizer profile linked.");
+                    }
+                },
+            },
+        },
+    },
 
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
     },
 
-    socialProviders:{
-        google:{
+    socialProviders: {
+        google: {
             clientId: env.GOOGLE_CLIENT_ID,
             clientSecret: env.GOOGLE_CLIENT_SECRET,
-            // callbackUrl: envVars.GOOGLE_CALLBACK_URL,
-            mapProfileToUser: ()=>{
+            mapProfileToUser: (profile) => {
                 return {
-                    role : Role.USER,
-                    status : UserStatus.ACTIVE,
-                    needPasswordChange : false,
-                    emailVerified : true,
-                    isDeleted : false,
-                    deletedAt : null,
+                    role: Role.PARTICIPANT,
+                    status: UserStatus.ACTIVE,
+                    needPasswordChange: false,
+                    emailVerified: true,
+                    isDeleted: false,
                 }
             }
         }
-    },
-
-    emailVerification:{
-        sendOnSignUp: true,
-        sendOnSignIn: true,
-        autoSignInAfterVerification: true,
     },
 
     user: {
@@ -52,119 +71,62 @@ export const auth = betterAuth({
             role: {
                 type: "string",
                 required: true,
-                defaultValue: Role.USER
+                defaultValue: Role.PARTICIPANT
             },
-
             status: {
                 type: "string",
                 required: true,
                 defaultValue: UserStatus.ACTIVE
             },
-
             needPasswordChange: {
                 type: "boolean",
                 required: true,
                 defaultValue: false
             },
-
             isDeleted: {
                 type: "boolean",
                 required: true,
                 defaultValue: false
-            },
-
-            deletedAt: {
-                type: "date",
-                required: false,
-                defaultValue: null
-            },
+            }
         }
     },
 
     plugins: [
         bearer(),
         emailOTP({
-            overrideDefaultEmailVerification: true,
-            async sendVerificationOTP({email, otp, type}) {
-                if(type === "email-verification"){
-                  const user = await prisma.user.findUnique({
-                    where : {
-                        email,
-                    }
-                  })
-                  
-                  if(user && !user.emailVerified){
-                    sendEmail({
-                        to : email,
-                        subject : "Verify your email",
-                        templateName : "otp",
-                        templateData :{
-                            name : user.name,
-                            otp,
-                        }
-                    })
-                  }
-                }else if(type === "forget-password"){
-                    const user = await prisma.user.findUnique({
-                        where : {
-                            email,
-                        }
-                    })
+            // ✅ ডিফল্ট ইমেইল ভেরিফিকেশন ওভাররাইড করা হয়েছে
+            async sendVerificationOTP({ email, otp, type }) {
+                // টার্মিনালে ওটিপি প্রিন্ট করা (ব্যাকআপ হিসেবে)
+                console.log("-------------------------------");
+                console.log(`📩 OTP for ${email}: ${otp}`);
+                console.log(`-------------------------------`);
 
-                    if(user){
-                        sendEmail({
-                            to : email,
-                            subject : "Password Reset OTP",
-                            templateName : "otp",
-                            templateData :{
-                                name : user.name,
-                                otp,
-                            }
-                        })
-                    }
+                /**
+                 * 🛠️ Fix: নতুন ইউজারের ক্ষেত্রে findUnique অনেক সময় তৎক্ষণাৎ ডাটা পায় না।
+                 * তাই আমরা সরাসরি ইমেইল পাঠানোর চেষ্টা করব।
+                 */
+                try {
+                    await sendEmail({
+                        to: email,
+                        subject: type === "email-verification" ? "Verify your email" : "Password Reset OTP",
+                        templateName: "otp",
+                        templateData: { 
+                            name: "User", // যেহেতু রেজিস্ট্রেশন প্রসেসে নাম পাঠানো হয়, এখানে জেনেরিক নাম রাখা নিরাপদ
+                            otp: otp 
+                        }
+                    });
+                    console.log(`✅ Email sent to ${email}`);
+                } catch (error) {
+                    console.error("❌ Failed to send email via sendEmail util:", error);
                 }
             },
-            expiresIn : 2 * 60, // 2 minutes in seconds
-            otpLength : 6,
+            expiresIn: 2 * 60,
+            otpLength: 6,
         })
     ],
 
-    session: {
-        expiresIn: 60 * 60 * 60 * 24, // 1 day in seconds
-        updateAge: 60 * 60 * 60 * 24, // 1 day in seconds
-        cookieCache: {
-            enabled: true,
-            maxAge: 60 * 60 * 60 * 24, // 1 day in seconds
-        }
-    },
-
-    redirectURLs:{
-        signIn : `${env.BETTER_AUTH_URL}/api/v1/auth/google/success`,
-    },
-
-    trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:5000", env.FRONTEND_URL],
-
+    trustedOrigins: [env.BETTER_AUTH_URL || "http://localhost:5000", env.FRONTEND_URL],
     advanced: {
-        // disableCSRFCheck: true,
-        useSecureCookies : false,
-        cookies:{
-            state:{
-                attributes:{
-                    sameSite: "none",
-                    secure: true,
-                    httpOnly: true,
-                    path: "/",
-                }
-            },
-            sessionToken:{
-                attributes:{
-                    sameSite: "none",
-                    secure: true,
-                    httpOnly: true,
-                    path: "/",
-                }
-            }
-        }
+        useSecureCookies: false, 
     }
-
 });

@@ -58,6 +58,8 @@ export const ModelName = {
   Verification: 'Verification',
   Booking: 'Booking',
   Event: 'Event',
+  Organizer: 'Organizer',
+  Participant: 'Participant',
   Review: 'Review'
 } as const
 
@@ -100,12 +102,14 @@ export const UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   password: 'password',
   needPasswordReset: 'needPasswordReset',
+  needPasswordChange: 'needPasswordChange',
   image: 'image',
   gender: 'gender',
   role: 'role',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  isDeleted: 'isDeleted',
   deletedAt: 'deletedAt'
 } as const
 
@@ -119,7 +123,10 @@ export const AccountScalarFieldEnum = {
   providerId: 'providerId',
   accessToken: 'accessToken',
   refreshToken: 'refreshToken',
-  expiresAt: 'expiresAt'
+  password: 'password',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
@@ -129,7 +136,9 @@ export const SessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   token: 'token',
-  expiresAt: 'expiresAt'
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -141,6 +150,7 @@ export const VerificationScalarFieldEnum = {
   value: 'value',
   expiresAt: 'expiresAt',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   userId: 'userId'
 } as const
 
@@ -183,6 +193,38 @@ export const EventScalarFieldEnum = {
 } as const
 
 export type EventScalarFieldEnum = (typeof EventScalarFieldEnum)[keyof typeof EventScalarFieldEnum]
+
+
+export const OrganizerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  email: 'email',
+  organizationName: 'organizationName',
+  contactNumber: 'contactNumber',
+  website: 'website',
+  bio: 'bio',
+  isVerified: 'isVerified',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OrganizerScalarFieldEnum = (typeof OrganizerScalarFieldEnum)[keyof typeof OrganizerScalarFieldEnum]
+
+
+export const ParticipantScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  email: 'email',
+  contactNumber: 'contactNumber',
+  address: 'address',
+  interests: 'interests',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ParticipantScalarFieldEnum = (typeof ParticipantScalarFieldEnum)[keyof typeof ParticipantScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {

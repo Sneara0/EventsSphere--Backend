@@ -31,12 +31,14 @@ export type UserMinAggregateOutputType = {
   emailVerified: boolean | null
   password: string | null
   needPasswordReset: boolean | null
+  needPasswordChange: boolean | null
   image: string | null
   gender: $Enums.Gender | null
   role: $Enums.Role | null
   status: $Enums.UserStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  isDeleted: boolean | null
   deletedAt: Date | null
 }
 
@@ -47,12 +49,14 @@ export type UserMaxAggregateOutputType = {
   emailVerified: boolean | null
   password: string | null
   needPasswordReset: boolean | null
+  needPasswordChange: boolean | null
   image: string | null
   gender: $Enums.Gender | null
   role: $Enums.Role | null
   status: $Enums.UserStatus | null
   createdAt: Date | null
   updatedAt: Date | null
+  isDeleted: boolean | null
   deletedAt: Date | null
 }
 
@@ -63,12 +67,14 @@ export type UserCountAggregateOutputType = {
   emailVerified: number
   password: number
   needPasswordReset: number
+  needPasswordChange: number
   image: number
   gender: number
   role: number
   status: number
   createdAt: number
   updatedAt: number
+  isDeleted: number
   deletedAt: number
   _all: number
 }
@@ -81,12 +87,14 @@ export type UserMinAggregateInputType = {
   emailVerified?: true
   password?: true
   needPasswordReset?: true
+  needPasswordChange?: true
   image?: true
   gender?: true
   role?: true
   status?: true
   createdAt?: true
   updatedAt?: true
+  isDeleted?: true
   deletedAt?: true
 }
 
@@ -97,12 +105,14 @@ export type UserMaxAggregateInputType = {
   emailVerified?: true
   password?: true
   needPasswordReset?: true
+  needPasswordChange?: true
   image?: true
   gender?: true
   role?: true
   status?: true
   createdAt?: true
   updatedAt?: true
+  isDeleted?: true
   deletedAt?: true
 }
 
@@ -113,12 +123,14 @@ export type UserCountAggregateInputType = {
   emailVerified?: true
   password?: true
   needPasswordReset?: true
+  needPasswordChange?: true
   image?: true
   gender?: true
   role?: true
   status?: true
   createdAt?: true
   updatedAt?: true
+  isDeleted?: true
   deletedAt?: true
   _all?: true
 }
@@ -202,12 +214,14 @@ export type UserGroupByOutputType = {
   emailVerified: boolean
   password: string | null
   needPasswordReset: boolean
+  needPasswordChange: boolean
   image: string | null
   gender: $Enums.Gender | null
   role: $Enums.Role
   status: $Enums.UserStatus
   createdAt: Date
   updatedAt: Date
+  isDeleted: boolean
   deletedAt: Date | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
@@ -239,18 +253,21 @@ export type UserWhereInput = {
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   password?: Prisma.StringNullableFilter<"User"> | string | null
   needPasswordReset?: Prisma.BoolFilter<"User"> | boolean
+  needPasswordChange?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  isDeleted?: Prisma.BoolFilter<"User"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  organizer?: Prisma.XOR<Prisma.OrganizerNullableScalarRelationFilter, Prisma.OrganizerWhereInput> | null
+  participant?: Prisma.XOR<Prisma.ParticipantNullableScalarRelationFilter, Prisma.ParticipantWhereInput> | null
   admin?: Prisma.XOR<Prisma.AdminNullableScalarRelationFilter, Prisma.AdminWhereInput> | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   verifications?: Prisma.VerificationListRelationFilter
-  events?: Prisma.EventListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
 }
@@ -262,18 +279,21 @@ export type UserOrderByWithRelationInput = {
   emailVerified?: Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   needPasswordReset?: Prisma.SortOrder
+  needPasswordChange?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizer?: Prisma.OrganizerOrderByWithRelationInput
+  participant?: Prisma.ParticipantOrderByWithRelationInput
   admin?: Prisma.AdminOrderByWithRelationInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   verifications?: Prisma.VerificationOrderByRelationAggregateInput
-  events?: Prisma.EventOrderByRelationAggregateInput
   bookings?: Prisma.BookingOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
 }
@@ -288,18 +308,21 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   password?: Prisma.StringNullableFilter<"User"> | string | null
   needPasswordReset?: Prisma.BoolFilter<"User"> | boolean
+  needPasswordChange?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  isDeleted?: Prisma.BoolFilter<"User"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  organizer?: Prisma.XOR<Prisma.OrganizerNullableScalarRelationFilter, Prisma.OrganizerWhereInput> | null
+  participant?: Prisma.XOR<Prisma.ParticipantNullableScalarRelationFilter, Prisma.ParticipantWhereInput> | null
   admin?: Prisma.XOR<Prisma.AdminNullableScalarRelationFilter, Prisma.AdminWhereInput> | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   verifications?: Prisma.VerificationListRelationFilter
-  events?: Prisma.EventListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
 }, "id" | "email">
@@ -311,12 +334,14 @@ export type UserOrderByWithAggregationInput = {
   emailVerified?: Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   needPasswordReset?: Prisma.SortOrder
+  needPasswordChange?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -333,12 +358,14 @@ export type UserScalarWhereWithAggregatesInput = {
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   needPasswordReset?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  needPasswordChange?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   gender?: Prisma.EnumGenderNullableWithAggregatesFilter<"User"> | $Enums.Gender | null
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  isDeleted?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
@@ -349,18 +376,21 @@ export type UserCreateInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
-  events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
 }
@@ -372,18 +402,21 @@ export type UserUncheckedCreateInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
-  events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
 }
@@ -395,18 +428,21 @@ export type UserUpdateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
 }
@@ -418,18 +454,21 @@ export type UserUncheckedUpdateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -441,12 +480,14 @@ export type UserCreateManyInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
 }
 
@@ -457,12 +498,14 @@ export type UserUpdateManyMutationInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -473,12 +516,14 @@ export type UserUncheckedUpdateManyInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -494,12 +539,14 @@ export type UserCountOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   password?: Prisma.SortOrder
   needPasswordReset?: Prisma.SortOrder
+  needPasswordChange?: Prisma.SortOrder
   image?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
 
@@ -510,12 +557,14 @@ export type UserMaxOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   password?: Prisma.SortOrder
   needPasswordReset?: Prisma.SortOrder
+  needPasswordChange?: Prisma.SortOrder
   image?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
 
@@ -526,12 +575,14 @@ export type UserMinOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   password?: Prisma.SortOrder
   needPasswordReset?: Prisma.SortOrder
+  needPasswordChange?: Prisma.SortOrder
   image?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
 
@@ -628,18 +679,32 @@ export type UserUpdateOneRequiredWithoutBookingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBookingsInput, Prisma.UserUpdateWithoutBookingsInput>, Prisma.UserUncheckedUpdateWithoutBookingsInput>
 }
 
-export type UserCreateNestedOneWithoutEventsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutEventsInput, Prisma.UserUncheckedCreateWithoutEventsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEventsInput
+export type UserCreateNestedOneWithoutOrganizerInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOrganizerInput, Prisma.UserUncheckedCreateWithoutOrganizerInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrganizerInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutEventsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutEventsInput, Prisma.UserUncheckedCreateWithoutEventsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEventsInput
-  upsert?: Prisma.UserUpsertWithoutEventsInput
+export type UserUpdateOneRequiredWithoutOrganizerNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOrganizerInput, Prisma.UserUncheckedCreateWithoutOrganizerInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrganizerInput
+  upsert?: Prisma.UserUpsertWithoutOrganizerInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEventsInput, Prisma.UserUpdateWithoutEventsInput>, Prisma.UserUncheckedUpdateWithoutEventsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOrganizerInput, Prisma.UserUpdateWithoutOrganizerInput>, Prisma.UserUncheckedUpdateWithoutOrganizerInput>
+}
+
+export type UserCreateNestedOneWithoutParticipantInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutParticipantInput, Prisma.UserUncheckedCreateWithoutParticipantInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutParticipantInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutParticipantNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutParticipantInput, Prisma.UserUncheckedCreateWithoutParticipantInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutParticipantInput
+  upsert?: Prisma.UserUpsertWithoutParticipantInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutParticipantInput, Prisma.UserUpdateWithoutParticipantInput>, Prisma.UserUncheckedUpdateWithoutParticipantInput>
 }
 
 export type UserCreateNestedOneWithoutReviewsInput = {
@@ -663,17 +728,20 @@ export type UserCreateWithoutAdminInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
-  events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
 }
@@ -685,17 +753,20 @@ export type UserUncheckedCreateWithoutAdminInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
-  events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
 }
@@ -723,17 +794,20 @@ export type UserUpdateWithoutAdminInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
 }
@@ -745,17 +819,20 @@ export type UserUncheckedUpdateWithoutAdminInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -767,17 +844,20 @@ export type UserCreateWithoutAccountsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
-  events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
 }
@@ -789,17 +869,20 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
-  events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
 }
@@ -827,17 +910,20 @@ export type UserUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
 }
@@ -849,17 +935,20 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -871,17 +960,20 @@ export type UserCreateWithoutSessionsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
-  events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
 }
@@ -893,17 +985,20 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
-  events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
 }
@@ -931,17 +1026,20 @@ export type UserUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
 }
@@ -953,17 +1051,20 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -975,17 +1076,20 @@ export type UserCreateWithoutVerificationsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
 }
@@ -997,17 +1101,20 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1035,17 +1142,20 @@ export type UserUpdateWithoutVerificationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
 }
@@ -1057,17 +1167,20 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1079,18 +1192,21 @@ export type UserCreateWithoutBookingsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
-  events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
 }
 
@@ -1101,18 +1217,21 @@ export type UserUncheckedCreateWithoutBookingsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
-  events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1139,18 +1258,21 @@ export type UserUpdateWithoutBookingsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
 }
 
@@ -1161,35 +1283,41 @@ export type UserUncheckedUpdateWithoutBookingsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutEventsInput = {
+export type UserCreateWithoutOrganizerInput = {
   id?: string
   name: string
   email: string
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
@@ -1198,20 +1326,23 @@ export type UserCreateWithoutEventsInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutEventsInput = {
+export type UserUncheckedCreateWithoutOrganizerInput = {
   id?: string
   name: string
   email: string
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
@@ -1220,36 +1351,39 @@ export type UserUncheckedCreateWithoutEventsInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutEventsInput = {
+export type UserCreateOrConnectWithoutOrganizerInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutEventsInput, Prisma.UserUncheckedCreateWithoutEventsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutOrganizerInput, Prisma.UserUncheckedCreateWithoutOrganizerInput>
 }
 
-export type UserUpsertWithoutEventsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutEventsInput, Prisma.UserUncheckedUpdateWithoutEventsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutEventsInput, Prisma.UserUncheckedCreateWithoutEventsInput>
+export type UserUpsertWithoutOrganizerInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutOrganizerInput, Prisma.UserUncheckedUpdateWithoutOrganizerInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutOrganizerInput, Prisma.UserUncheckedCreateWithoutOrganizerInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutEventsInput = {
+export type UserUpdateToOneWithWhereWithoutOrganizerInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutEventsInput, Prisma.UserUncheckedUpdateWithoutEventsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutOrganizerInput, Prisma.UserUncheckedUpdateWithoutOrganizerInput>
 }
 
-export type UserUpdateWithoutEventsInput = {
+export type UserUpdateWithoutOrganizerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
@@ -1258,20 +1392,139 @@ export type UserUpdateWithoutEventsInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutEventsInput = {
+export type UserUncheckedUpdateWithoutOrganizerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
+  admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutParticipantInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  password?: string | null
+  needPasswordReset?: boolean
+  needPasswordChange?: boolean
+  image?: string | null
+  gender?: $Enums.Gender | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  admin?: Prisma.AdminCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutParticipantInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  password?: string | null
+  needPasswordReset?: boolean
+  needPasswordChange?: boolean
+  image?: string | null
+  gender?: $Enums.Gender | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutParticipantInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutParticipantInput, Prisma.UserUncheckedCreateWithoutParticipantInput>
+}
+
+export type UserUpsertWithoutParticipantInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutParticipantInput, Prisma.UserUncheckedUpdateWithoutParticipantInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutParticipantInput, Prisma.UserUncheckedCreateWithoutParticipantInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutParticipantInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutParticipantInput, Prisma.UserUncheckedUpdateWithoutParticipantInput>
+}
+
+export type UserUpdateWithoutParticipantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutParticipantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -1287,18 +1540,21 @@ export type UserCreateWithoutReviewsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
-  events?: Prisma.EventCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingCreateNestedManyWithoutUserInput
 }
 
@@ -1309,18 +1565,21 @@ export type UserUncheckedCreateWithoutReviewsInput = {
   emailVerified?: boolean
   password?: string | null
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: string | null
   gender?: $Enums.Gender | null
   role?: $Enums.Role
   status?: $Enums.UserStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
   deletedAt?: Date | string | null
+  organizer?: Prisma.OrganizerUncheckedCreateNestedOneWithoutUserInput
+  participant?: Prisma.ParticipantUncheckedCreateNestedOneWithoutUserInput
   admin?: Prisma.AdminUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
-  events?: Prisma.EventUncheckedCreateNestedManyWithoutOrganizerInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1347,18 +1606,21 @@ export type UserUpdateWithoutReviewsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutUserNestedInput
 }
 
@@ -1369,18 +1631,21 @@ export type UserUncheckedUpdateWithoutReviewsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   needPasswordReset?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  needPasswordChange?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  organizer?: Prisma.OrganizerUncheckedUpdateOneWithoutUserNestedInput
+  participant?: Prisma.ParticipantUncheckedUpdateOneWithoutUserNestedInput
   admin?: Prisma.AdminUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
-  events?: Prisma.EventUncheckedUpdateManyWithoutOrganizerNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1393,7 +1658,6 @@ export type UserCountOutputType = {
   accounts: number
   sessions: number
   verifications: number
-  events: number
   bookings: number
   reviews: number
 }
@@ -1402,7 +1666,6 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   verifications?: boolean | UserCountOutputTypeCountVerificationsArgs
-  events?: boolean | UserCountOutputTypeCountEventsArgs
   bookings?: boolean | UserCountOutputTypeCountBookingsArgs
   reviews?: boolean | UserCountOutputTypeCountReviewsArgs
 }
@@ -1441,13 +1704,6 @@ export type UserCountOutputTypeCountVerificationsArgs<ExtArgs extends runtime.Ty
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.EventWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
 export type UserCountOutputTypeCountBookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.BookingWhereInput
 }
@@ -1467,18 +1723,21 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   emailVerified?: boolean
   password?: boolean
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: boolean
   gender?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
   deletedAt?: boolean
+  organizer?: boolean | Prisma.User$organizerArgs<ExtArgs>
+  participant?: boolean | Prisma.User$participantArgs<ExtArgs>
   admin?: boolean | Prisma.User$adminArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   verifications?: boolean | Prisma.User$verificationsArgs<ExtArgs>
-  events?: boolean | Prisma.User$eventsArgs<ExtArgs>
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   reviews?: boolean | Prisma.User$reviewsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1491,12 +1750,14 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   password?: boolean
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: boolean
   gender?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
   deletedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1507,12 +1768,14 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   password?: boolean
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: boolean
   gender?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
   deletedAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1523,22 +1786,25 @@ export type UserSelectScalar = {
   emailVerified?: boolean
   password?: boolean
   needPasswordReset?: boolean
+  needPasswordChange?: boolean
   image?: boolean
   gender?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
   deletedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "password" | "needPasswordReset" | "image" | "gender" | "role" | "status" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "password" | "needPasswordReset" | "needPasswordChange" | "image" | "gender" | "role" | "status" | "createdAt" | "updatedAt" | "isDeleted" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  organizer?: boolean | Prisma.User$organizerArgs<ExtArgs>
+  participant?: boolean | Prisma.User$participantArgs<ExtArgs>
   admin?: boolean | Prisma.User$adminArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   verifications?: boolean | Prisma.User$verificationsArgs<ExtArgs>
-  events?: boolean | Prisma.User$eventsArgs<ExtArgs>
   bookings?: boolean | Prisma.User$bookingsArgs<ExtArgs>
   reviews?: boolean | Prisma.User$reviewsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1549,11 +1815,12 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
+    organizer: Prisma.$OrganizerPayload<ExtArgs> | null
+    participant: Prisma.$ParticipantPayload<ExtArgs> | null
     admin: Prisma.$AdminPayload<ExtArgs> | null
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     verifications: Prisma.$VerificationPayload<ExtArgs>[]
-    events: Prisma.$EventPayload<ExtArgs>[]
     bookings: Prisma.$BookingPayload<ExtArgs>[]
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
   }
@@ -1564,12 +1831,14 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     emailVerified: boolean
     password: string | null
     needPasswordReset: boolean
+    needPasswordChange: boolean
     image: string | null
     gender: $Enums.Gender | null
     role: $Enums.Role
     status: $Enums.UserStatus
     createdAt: Date
     updatedAt: Date
+    isDeleted: boolean
     deletedAt: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1965,11 +2234,12 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  organizer<T extends Prisma.User$organizerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$organizerArgs<ExtArgs>>): Prisma.Prisma__OrganizerClient<runtime.Types.Result.GetResult<Prisma.$OrganizerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  participant<T extends Prisma.User$participantArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$participantArgs<ExtArgs>>): Prisma.Prisma__ParticipantClient<runtime.Types.Result.GetResult<Prisma.$ParticipantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   admin<T extends Prisma.User$adminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminArgs<ExtArgs>>): Prisma.Prisma__AdminClient<runtime.Types.Result.GetResult<Prisma.$AdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verifications<T extends Prisma.User$verificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  events<T extends Prisma.User$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bookings<T extends Prisma.User$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.User$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2007,12 +2277,14 @@ export interface UserFieldRefs {
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly needPasswordReset: Prisma.FieldRef<"User", 'Boolean'>
+  readonly needPasswordChange: Prisma.FieldRef<"User", 'Boolean'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly gender: Prisma.FieldRef<"User", 'Gender'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly isDeleted: Prisma.FieldRef<"User", 'Boolean'>
   readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
@@ -2407,6 +2679,44 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * User.organizer
+ */
+export type User$organizerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Organizer
+   */
+  select?: Prisma.OrganizerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Organizer
+   */
+  omit?: Prisma.OrganizerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrganizerInclude<ExtArgs> | null
+  where?: Prisma.OrganizerWhereInput
+}
+
+/**
+ * User.participant
+ */
+export type User$participantArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Participant
+   */
+  select?: Prisma.ParticipantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Participant
+   */
+  omit?: Prisma.ParticipantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ParticipantInclude<ExtArgs> | null
+  where?: Prisma.ParticipantWhereInput
+}
+
+/**
  * User.admin
  */
 export type User$adminArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2495,30 +2805,6 @@ export type User$verificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.VerificationScalarFieldEnum | Prisma.VerificationScalarFieldEnum[]
-}
-
-/**
- * User.events
- */
-export type User$eventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Event
-   */
-  select?: Prisma.EventSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Event
-   */
-  omit?: Prisma.EventOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.EventInclude<ExtArgs> | null
-  where?: Prisma.EventWhereInput
-  orderBy?: Prisma.EventOrderByWithRelationInput | Prisma.EventOrderByWithRelationInput[]
-  cursor?: Prisma.EventWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.EventScalarFieldEnum | Prisma.EventScalarFieldEnum[]
 }
 
 /**

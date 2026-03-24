@@ -11,13 +11,15 @@ model Event {
   banner          String
   category        String
   isVerified      Boolean   @default(false)
-  organizerId     String
-  organizer       User      @relation(fields: [organizerId], references: [id])
 
-  bookings  Booking[]
-  reviews   Review[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  // এটি আপনার অর্গানাইজার টেবিলের সাথে কানেক্ট করবে
+  organizerId     String
+  organizer       Organizer @relation(fields: [organizerId], references: [id])
+
+  bookings        Booking[]
+  reviews         Review[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@map("events")
   @@index([category])

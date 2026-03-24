@@ -1,41 +1,47 @@
-
 model User {
-  id             String         @id @default(uuid())
-  name           String
-  email          String         @unique
-  emailVerified  Boolean        @default(false)
-  password       String?
-  needPasswordReset Boolean        @default(false)  
-  image          String?
-  gender         Gender?
-  role           Role           @default(USER)
-  status         UserStatus     @default(ACTIVE)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-   deletedAt      DateTime?
-  // --- রিলেশন ফিল্ডসমূহ ---
-  admin          Admin?         // এই লাইনটি যোগ করুন (One-to-One Relation)
-  
-  accounts       Account[]
-  sessions       Session[]
-  verifications  Verification[]
-  events         Event[]
-  bookings       Booking[]
-  reviews        Review[]
+  id                 String     @id @default(uuid())
+  name               String
+  email              String     @unique
+  emailVerified      Boolean    @default(false)
+  password           String?
+  needPasswordReset  Boolean    @default(false)
+  needPasswordChange Boolean    @default(false)
+  image              String?
+  gender             Gender?
+  role               Role       @default(USER)
+  status             UserStatus @default(ACTIVE)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  isDeleted          Boolean    @default(false)
+  deletedAt          DateTime?
+    organizer  Organizer?
+    participant Participant?
 
-  @@map("users") 
+  admin Admin?
+
+  accounts      Account[]
+  sessions      Session[]
+  verifications Verification[]
+
+  bookings      Booking[]
+  reviews       Review[]
+
   @@index([email])
+  @@map("users")
 }
 
 model Account {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   userId       String
   accountId    String
   providerId   String
   accessToken  String?
   refreshToken String?
+  password     String?
   expiresAt    DateTime?
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([providerId, accountId])
   @@map("accounts")
@@ -47,17 +53,21 @@ model Session {
   token     String   @unique
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("sessions")
 }
 
 model Verification {
-  id         String   @id @default(uuid())
+  id         String     @id @default(uuid())
   identifier String
   value      String
+
   expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  user       User?    @relation(fields: [userId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  user       User?      @relation(fields: [userId], references: [id])
   userId     String?
 
   @@map("verifications")

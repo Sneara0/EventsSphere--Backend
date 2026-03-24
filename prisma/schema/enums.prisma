@@ -4,6 +4,7 @@ enum Role {
   ADMIN
   ORGANIZER
   USER
+  PARTICIPANT
 }
 
 enum UserStatus {

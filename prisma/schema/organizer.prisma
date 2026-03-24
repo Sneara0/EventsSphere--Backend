@@ -1,0 +1,22 @@
+model Organizer {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String?
+    email         String   @unique
+  
+  organizationName String?
+  contactNumber    String
+  website          String?
+  bio              String?
+  isVerified       Boolean  @default(false)
+
+  // রিলেশন: একজন অর্গানাইজার অনেকগুলো ইভেন্ট তৈরি করতে পারেন
+  events          Event[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("organizers")
+}
+

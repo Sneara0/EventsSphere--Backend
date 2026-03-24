@@ -1,14 +1,16 @@
+/* eslint-disable no-console */
 
-import { Prisma } from "src/generated/prisma/client";
-import { Role } from "../../generated/prisma/enums";
-//import { auth } from "../lib/auth";
+
 import { prisma } from "../lib/prisma";
-
-import env from "src/config/env";
+import env from "../../config/env"; 
 import { auth } from "../lib/auth";
+import { Role } from "src/generated/prisma/enums";
 
 export const seedSuperAdmin = async () => {
+    console.log("🚀 Seeding started...");
+    
     try {
+        // ১. আগে চেক করা সুপার অ্যাডমিন আছে কি না
         const isSuperAdminExist = await prisma.user.findFirst({
             where: {
                 role: Role.SUPER_ADMIN
@@ -16,67 +18,84 @@ export const seedSuperAdmin = async () => {
         });
 
         if (isSuperAdminExist) {
-            console.log("Super admin already exists. Skipping seeding super admin.");
+            console.log("ℹ️ Super admin already exists. Skipping seeding.");
             return;
         }
 
-        // ১. Auth API দিয়ে ইউজার তৈরি
+        console.log("⏳ Creating Super Admin via Better-Auth API...");
+
+        // ২. Better-Auth API দিয়ে ইউজার তৈরি (যাতে পাসওয়ার্ড হ্যাশিং ঠিক থাকে)
         const superAdminUser = await auth.api.signUpEmail({
             body: {
-                email: env.SUPER_ADMIN_EMAIL!,
-                password: env.SUPER_ADMIN_PASSWORD!,
+                email: env.SUPER_ADMIN_EMAIL as string,
+                password: env.SUPER_ADMIN_PASSWORD as string,
                 name: "Super Admin",
+                // @ts-ignore: Better-Auth additional fields handling
                 role: Role.SUPER_ADMIN,
-                // @ts-ignore (যদি আপনার অথে এই ফিল্ডগুলো থাকে)
-                needPasswordChange: false,
-                // @ts-ignore
-                rememberMe: false,
             }
         });
 
         if (!superAdminUser || !superAdminUser.user) {
-            throw new Error("Failed to create user via Auth API");
+            throw new Error("❌ Failed to create user via Auth API");
         }
 
-        // ২. ট্রানজেকশন ব্যবহার করে ডেটা আপডেট ও অ্যাডমিন প্রোফাইল তৈরি
-        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-            // ইমেইল ভেরিফাইড করা
+        const userId = superAdminUser.user.id;
+
+        // ৩. প্রিজমা ট্রানজেকশন: ইমেইল ভেরিফাই এবং অ্যাডমিন প্রোফাইল তৈরি
+        await prisma.$transaction(async (tx) => {
+            // ইমেইল ভেরিফাইড স্ট্যাটাস আপডেট
             await tx.user.update({
-                where: { id: superAdminUser.user.id },
+                where: { id: userId },
                 data: { emailVerified: true }
             });
 
-            // অ্যাডমিন প্রোফাইল তৈরি (নতুন মডেল অনুযায়ী)
+            // অ্যাডমিন টেবিলে এন্ট্রি দেওয়া
             await tx.admin.create({
                 data: {
                     name: "Super Admin",
-                    email: env.SUPER_ADMIN_EMAIL!,
-                    contactNumber: "01700000000", // আপনার মডেল অনুযায়ী এটি রিকোয়ার্ড
+                    email: env.SUPER_ADMIN_EMAIL as string,
+                    contactNumber: "01700000000",
                     designation: "System Administrator",
                     user: {
-                        connect: { id: superAdminUser.user.id }
+                        connect: { id: userId }
                     }
                 }
             });
         });
 
-        const finalAdmin = await prisma.admin.findFirst({
-            where: { email: env.SUPER_ADMIN_EMAIL },
-            include: { user: true }
-        });
+        console.log("✅ Super Admin and Admin Profile created successfully!");
 
-        console.log("✅ Super Admin Created Successfully:", finalAdmin);
-    } catch (error) {
-        console.error("❌ Error seeding super admin:", error);
+    } catch (error: any) {
+        console.error("❌ Error during seeding:", error.message);
         
-        // ক্লিনআপ: যদি ইউজার তৈরি হয়ে যায় কিন্তু ট্রানজেকশন ফেইল করে
+        // ক্লিনআপ: যদি ইউজার তৈরি হয় কিন্তু প্রোফাইল তৈরিতে এরর হয়
         try {
-            await prisma.user.delete({
-                where: { email: env.SUPER_ADMIN_EMAIL }
+            const user = await prisma.user.findUnique({ 
+                where: { email: env.SUPER_ADMIN_EMAIL as string } 
             });
-            console.log("Cleanup: Incomplete super admin user deleted.");
+            if (user) {
+                await prisma.user.delete({ where: { id: user.id } });
+                console.log("🧹 Cleanup: Incomplete user record deleted.");
+            }
         } catch (cleanupError) {
-            // ইউজার না থাকলে এরর ইগনোর করবে
+            // No action needed if user doesn't exist
         }
+        
+        process.exit(1);
     }
 };
+
+// ফাইলটি সরাসরি রান করার জন্য সেলফ-ইনভোকিং ফাংশন
+const run = async () => {
+    try {
+        await seedSuperAdmin();
+    } catch (err) {
+        console.error(err);
+    } finally {
+        await prisma.$disconnect();
+        console.log("🔌 Database disconnected.");
+        process.exit(0);
+    }
+};
+
+run();

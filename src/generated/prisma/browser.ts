@@ -53,6 +53,16 @@ export type Booking = Prisma.BookingModel
  */
 export type Event = Prisma.EventModel
 /**
+ * Model Organizer
+ * 
+ */
+export type Organizer = Prisma.OrganizerModel
+/**
+ * Model Participant
+ * 
+ */
+export type Participant = Prisma.ParticipantModel
+/**
  * Model Review
  * 
  */

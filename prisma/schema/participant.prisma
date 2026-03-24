@@ -1,0 +1,17 @@
+model Participant {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name   String
+  email   String @unique
+  
+  
+  contactNumber String?
+  address       String?
+  interests     String[] // পার্টিসিপেন্টের পছন্দের ক্যাটাগরি (ঐচ্ছিক)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("participants")
+}
