@@ -27,26 +27,31 @@ export type AggregateEvent = {
 }
 
 export type EventAvgAggregateOutputType = {
-  price: number | null
+  ticketPrice: number | null
+  totalSeats: number | null
+  availableSeats: number | null
 }
 
 export type EventSumAggregateOutputType = {
-  price: number | null
+  ticketPrice: number | null
+  totalSeats: number | null
+  availableSeats: number | null
 }
 
 export type EventMinAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
-  location: string | null
-  date: Date | null
-  flightTime: Date | null
-  airline: string | null
-  travelGuideline: string | null
-  price: number | null
-  banner: string | null
   category: string | null
-  isVerified: boolean | null
+  date: Date | null
+  time: string | null
+  venue: string | null
+  thumbnail: string | null
+  ticketPrice: number | null
+  totalSeats: number | null
+  availableSeats: number | null
+  status: $Enums.EventStatus | null
+  isDeleted: boolean | null
   organizerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -56,15 +61,16 @@ export type EventMaxAggregateOutputType = {
   id: string | null
   title: string | null
   description: string | null
-  location: string | null
-  date: Date | null
-  flightTime: Date | null
-  airline: string | null
-  travelGuideline: string | null
-  price: number | null
-  banner: string | null
   category: string | null
-  isVerified: boolean | null
+  date: Date | null
+  time: string | null
+  venue: string | null
+  thumbnail: string | null
+  ticketPrice: number | null
+  totalSeats: number | null
+  availableSeats: number | null
+  status: $Enums.EventStatus | null
+  isDeleted: boolean | null
   organizerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -74,15 +80,16 @@ export type EventCountAggregateOutputType = {
   id: number
   title: number
   description: number
-  location: number
-  date: number
-  flightTime: number
-  airline: number
-  travelGuideline: number
-  price: number
-  banner: number
   category: number
-  isVerified: number
+  date: number
+  time: number
+  venue: number
+  thumbnail: number
+  ticketPrice: number
+  totalSeats: number
+  availableSeats: number
+  status: number
+  isDeleted: number
   organizerId: number
   createdAt: number
   updatedAt: number
@@ -91,26 +98,31 @@ export type EventCountAggregateOutputType = {
 
 
 export type EventAvgAggregateInputType = {
-  price?: true
+  ticketPrice?: true
+  totalSeats?: true
+  availableSeats?: true
 }
 
 export type EventSumAggregateInputType = {
-  price?: true
+  ticketPrice?: true
+  totalSeats?: true
+  availableSeats?: true
 }
 
 export type EventMinAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  location?: true
-  date?: true
-  flightTime?: true
-  airline?: true
-  travelGuideline?: true
-  price?: true
-  banner?: true
   category?: true
-  isVerified?: true
+  date?: true
+  time?: true
+  venue?: true
+  thumbnail?: true
+  ticketPrice?: true
+  totalSeats?: true
+  availableSeats?: true
+  status?: true
+  isDeleted?: true
   organizerId?: true
   createdAt?: true
   updatedAt?: true
@@ -120,15 +132,16 @@ export type EventMaxAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  location?: true
-  date?: true
-  flightTime?: true
-  airline?: true
-  travelGuideline?: true
-  price?: true
-  banner?: true
   category?: true
-  isVerified?: true
+  date?: true
+  time?: true
+  venue?: true
+  thumbnail?: true
+  ticketPrice?: true
+  totalSeats?: true
+  availableSeats?: true
+  status?: true
+  isDeleted?: true
   organizerId?: true
   createdAt?: true
   updatedAt?: true
@@ -138,15 +151,16 @@ export type EventCountAggregateInputType = {
   id?: true
   title?: true
   description?: true
-  location?: true
-  date?: true
-  flightTime?: true
-  airline?: true
-  travelGuideline?: true
-  price?: true
-  banner?: true
   category?: true
-  isVerified?: true
+  date?: true
+  time?: true
+  venue?: true
+  thumbnail?: true
+  ticketPrice?: true
+  totalSeats?: true
+  availableSeats?: true
+  status?: true
+  isDeleted?: true
   organizerId?: true
   createdAt?: true
   updatedAt?: true
@@ -243,15 +257,16 @@ export type EventGroupByOutputType = {
   id: string
   title: string
   description: string
-  location: string
-  date: Date
-  flightTime: Date | null
-  airline: string | null
-  travelGuideline: string | null
-  price: number
-  banner: string
   category: string
-  isVerified: boolean
+  date: Date
+  time: string
+  venue: string
+  thumbnail: string | null
+  ticketPrice: number
+  totalSeats: number
+  availableSeats: number
+  status: $Enums.EventStatus
+  isDeleted: boolean
   organizerId: string
   createdAt: Date
   updatedAt: Date
@@ -284,15 +299,16 @@ export type EventWhereInput = {
   id?: Prisma.StringFilter<"Event"> | string
   title?: Prisma.StringFilter<"Event"> | string
   description?: Prisma.StringFilter<"Event"> | string
-  location?: Prisma.StringFilter<"Event"> | string
-  date?: Prisma.DateTimeFilter<"Event"> | Date | string
-  flightTime?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
-  airline?: Prisma.StringNullableFilter<"Event"> | string | null
-  travelGuideline?: Prisma.StringNullableFilter<"Event"> | string | null
-  price?: Prisma.FloatFilter<"Event"> | number
-  banner?: Prisma.StringFilter<"Event"> | string
   category?: Prisma.StringFilter<"Event"> | string
-  isVerified?: Prisma.BoolFilter<"Event"> | boolean
+  date?: Prisma.DateTimeFilter<"Event"> | Date | string
+  time?: Prisma.StringFilter<"Event"> | string
+  venue?: Prisma.StringFilter<"Event"> | string
+  thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
+  ticketPrice?: Prisma.FloatFilter<"Event"> | number
+  totalSeats?: Prisma.IntFilter<"Event"> | number
+  availableSeats?: Prisma.IntFilter<"Event"> | number
+  status?: Prisma.EnumEventStatusFilter<"Event"> | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   organizerId?: Prisma.StringFilter<"Event"> | string
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -305,15 +321,16 @@ export type EventOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  location?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  flightTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  airline?: Prisma.SortOrderInput | Prisma.SortOrder
-  travelGuideline?: Prisma.SortOrderInput | Prisma.SortOrder
-  price?: Prisma.SortOrder
-  banner?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isVerified?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  venue?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
+  ticketPrice?: Prisma.SortOrder
+  totalSeats?: Prisma.SortOrder
+  availableSeats?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -329,15 +346,16 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.EventWhereInput | Prisma.EventWhereInput[]
   title?: Prisma.StringFilter<"Event"> | string
   description?: Prisma.StringFilter<"Event"> | string
-  location?: Prisma.StringFilter<"Event"> | string
-  date?: Prisma.DateTimeFilter<"Event"> | Date | string
-  flightTime?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
-  airline?: Prisma.StringNullableFilter<"Event"> | string | null
-  travelGuideline?: Prisma.StringNullableFilter<"Event"> | string | null
-  price?: Prisma.FloatFilter<"Event"> | number
-  banner?: Prisma.StringFilter<"Event"> | string
   category?: Prisma.StringFilter<"Event"> | string
-  isVerified?: Prisma.BoolFilter<"Event"> | boolean
+  date?: Prisma.DateTimeFilter<"Event"> | Date | string
+  time?: Prisma.StringFilter<"Event"> | string
+  venue?: Prisma.StringFilter<"Event"> | string
+  thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
+  ticketPrice?: Prisma.FloatFilter<"Event"> | number
+  totalSeats?: Prisma.IntFilter<"Event"> | number
+  availableSeats?: Prisma.IntFilter<"Event"> | number
+  status?: Prisma.EnumEventStatusFilter<"Event"> | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   organizerId?: Prisma.StringFilter<"Event"> | string
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -350,15 +368,16 @@ export type EventOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  location?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  flightTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  airline?: Prisma.SortOrderInput | Prisma.SortOrder
-  travelGuideline?: Prisma.SortOrderInput | Prisma.SortOrder
-  price?: Prisma.SortOrder
-  banner?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isVerified?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  venue?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
+  ticketPrice?: Prisma.SortOrder
+  totalSeats?: Prisma.SortOrder
+  availableSeats?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -376,15 +395,16 @@ export type EventScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Event"> | string
   title?: Prisma.StringWithAggregatesFilter<"Event"> | string
   description?: Prisma.StringWithAggregatesFilter<"Event"> | string
-  location?: Prisma.StringWithAggregatesFilter<"Event"> | string
-  date?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
-  flightTime?: Prisma.DateTimeNullableWithAggregatesFilter<"Event"> | Date | string | null
-  airline?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
-  travelGuideline?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
-  price?: Prisma.FloatWithAggregatesFilter<"Event"> | number
-  banner?: Prisma.StringWithAggregatesFilter<"Event"> | string
   category?: Prisma.StringWithAggregatesFilter<"Event"> | string
-  isVerified?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
+  date?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
+  time?: Prisma.StringWithAggregatesFilter<"Event"> | string
+  venue?: Prisma.StringWithAggregatesFilter<"Event"> | string
+  thumbnail?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
+  ticketPrice?: Prisma.FloatWithAggregatesFilter<"Event"> | number
+  totalSeats?: Prisma.IntWithAggregatesFilter<"Event"> | number
+  availableSeats?: Prisma.IntWithAggregatesFilter<"Event"> | number
+  status?: Prisma.EnumEventStatusWithAggregatesFilter<"Event"> | $Enums.EventStatus
+  isDeleted?: Prisma.BoolWithAggregatesFilter<"Event"> | boolean
   organizerId?: Prisma.StringWithAggregatesFilter<"Event"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
@@ -394,15 +414,16 @@ export type EventCreateInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   organizer: Prisma.OrganizerCreateNestedOneWithoutEventsInput
@@ -414,15 +435,16 @@ export type EventUncheckedCreateInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   organizerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -434,15 +456,16 @@ export type EventUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organizer?: Prisma.OrganizerUpdateOneRequiredWithoutEventsNestedInput
@@ -454,15 +477,16 @@ export type EventUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organizerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -474,15 +498,16 @@ export type EventCreateManyInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   organizerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -492,15 +517,16 @@ export type EventUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -509,15 +535,16 @@ export type EventUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organizerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -532,37 +559,41 @@ export type EventCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  location?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  flightTime?: Prisma.SortOrder
-  airline?: Prisma.SortOrder
-  travelGuideline?: Prisma.SortOrder
-  price?: Prisma.SortOrder
-  banner?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isVerified?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  venue?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrder
+  ticketPrice?: Prisma.SortOrder
+  totalSeats?: Prisma.SortOrder
+  availableSeats?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type EventAvgOrderByAggregateInput = {
-  price?: Prisma.SortOrder
+  ticketPrice?: Prisma.SortOrder
+  totalSeats?: Prisma.SortOrder
+  availableSeats?: Prisma.SortOrder
 }
 
 export type EventMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  location?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  flightTime?: Prisma.SortOrder
-  airline?: Prisma.SortOrder
-  travelGuideline?: Prisma.SortOrder
-  price?: Prisma.SortOrder
-  banner?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isVerified?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  venue?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrder
+  ticketPrice?: Prisma.SortOrder
+  totalSeats?: Prisma.SortOrder
+  availableSeats?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -572,22 +603,25 @@ export type EventMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  location?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  flightTime?: Prisma.SortOrder
-  airline?: Prisma.SortOrder
-  travelGuideline?: Prisma.SortOrder
-  price?: Prisma.SortOrder
-  banner?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  isVerified?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  venue?: Prisma.SortOrder
+  thumbnail?: Prisma.SortOrder
+  ticketPrice?: Prisma.SortOrder
+  totalSeats?: Prisma.SortOrder
+  availableSeats?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
   organizerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type EventSumOrderByAggregateInput = {
-  price?: Prisma.SortOrder
+  ticketPrice?: Prisma.SortOrder
+  totalSeats?: Prisma.SortOrder
+  availableSeats?: Prisma.SortOrder
 }
 
 export type EventListRelationFilter = {
@@ -612,6 +646,18 @@ export type EventUpdateOneRequiredWithoutBookingsNestedInput = {
   upsert?: Prisma.EventUpsertWithoutBookingsInput
   connect?: Prisma.EventWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutBookingsInput, Prisma.EventUpdateWithoutBookingsInput>, Prisma.EventUncheckedUpdateWithoutBookingsInput>
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type EnumEventStatusFieldUpdateOperationsInput = {
+  set?: $Enums.EventStatus
 }
 
 export type EventCreateNestedManyWithoutOrganizerInput = {
@@ -674,15 +720,16 @@ export type EventCreateWithoutBookingsInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   organizer: Prisma.OrganizerCreateNestedOneWithoutEventsInput
@@ -693,15 +740,16 @@ export type EventUncheckedCreateWithoutBookingsInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   organizerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -728,15 +776,16 @@ export type EventUpdateWithoutBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organizer?: Prisma.OrganizerUpdateOneRequiredWithoutEventsNestedInput
@@ -747,15 +796,16 @@ export type EventUncheckedUpdateWithoutBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organizerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -766,15 +816,16 @@ export type EventCreateWithoutOrganizerInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutEventInput
@@ -785,15 +836,16 @@ export type EventUncheckedCreateWithoutOrganizerInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutEventInput
@@ -833,15 +885,16 @@ export type EventScalarWhereInput = {
   id?: Prisma.StringFilter<"Event"> | string
   title?: Prisma.StringFilter<"Event"> | string
   description?: Prisma.StringFilter<"Event"> | string
-  location?: Prisma.StringFilter<"Event"> | string
-  date?: Prisma.DateTimeFilter<"Event"> | Date | string
-  flightTime?: Prisma.DateTimeNullableFilter<"Event"> | Date | string | null
-  airline?: Prisma.StringNullableFilter<"Event"> | string | null
-  travelGuideline?: Prisma.StringNullableFilter<"Event"> | string | null
-  price?: Prisma.FloatFilter<"Event"> | number
-  banner?: Prisma.StringFilter<"Event"> | string
   category?: Prisma.StringFilter<"Event"> | string
-  isVerified?: Prisma.BoolFilter<"Event"> | boolean
+  date?: Prisma.DateTimeFilter<"Event"> | Date | string
+  time?: Prisma.StringFilter<"Event"> | string
+  venue?: Prisma.StringFilter<"Event"> | string
+  thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
+  ticketPrice?: Prisma.FloatFilter<"Event"> | number
+  totalSeats?: Prisma.IntFilter<"Event"> | number
+  availableSeats?: Prisma.IntFilter<"Event"> | number
+  status?: Prisma.EnumEventStatusFilter<"Event"> | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFilter<"Event"> | boolean
   organizerId?: Prisma.StringFilter<"Event"> | string
   createdAt?: Prisma.DateTimeFilter<"Event"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Event"> | Date | string
@@ -851,15 +904,16 @@ export type EventCreateWithoutReviewsInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   organizer: Prisma.OrganizerCreateNestedOneWithoutEventsInput
@@ -870,15 +924,16 @@ export type EventUncheckedCreateWithoutReviewsInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   organizerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -905,15 +960,16 @@ export type EventUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organizer?: Prisma.OrganizerUpdateOneRequiredWithoutEventsNestedInput
@@ -924,15 +980,16 @@ export type EventUncheckedUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organizerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -943,15 +1000,16 @@ export type EventCreateManyOrganizerInput = {
   id?: string
   title: string
   description: string
-  location: string
-  date: Date | string
-  flightTime?: Date | string | null
-  airline?: string | null
-  travelGuideline?: string | null
-  price: number
-  banner: string
   category: string
-  isVerified?: boolean
+  date: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -960,15 +1018,16 @@ export type EventUpdateWithoutOrganizerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutEventNestedInput
@@ -979,15 +1038,16 @@ export type EventUncheckedUpdateWithoutOrganizerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutEventNestedInput
@@ -998,15 +1058,16 @@ export type EventUncheckedUpdateManyWithoutOrganizerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
-  location?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  flightTime?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  airline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  travelGuideline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  banner?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1055,15 +1116,16 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   title?: boolean
   description?: boolean
-  location?: boolean
-  date?: boolean
-  flightTime?: boolean
-  airline?: boolean
-  travelGuideline?: boolean
-  price?: boolean
-  banner?: boolean
   category?: boolean
-  isVerified?: boolean
+  date?: boolean
+  time?: boolean
+  venue?: boolean
+  thumbnail?: boolean
+  ticketPrice?: boolean
+  totalSeats?: boolean
+  availableSeats?: boolean
+  status?: boolean
+  isDeleted?: boolean
   organizerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1077,15 +1139,16 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   title?: boolean
   description?: boolean
-  location?: boolean
-  date?: boolean
-  flightTime?: boolean
-  airline?: boolean
-  travelGuideline?: boolean
-  price?: boolean
-  banner?: boolean
   category?: boolean
-  isVerified?: boolean
+  date?: boolean
+  time?: boolean
+  venue?: boolean
+  thumbnail?: boolean
+  ticketPrice?: boolean
+  totalSeats?: boolean
+  availableSeats?: boolean
+  status?: boolean
+  isDeleted?: boolean
   organizerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1096,15 +1159,16 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   title?: boolean
   description?: boolean
-  location?: boolean
-  date?: boolean
-  flightTime?: boolean
-  airline?: boolean
-  travelGuideline?: boolean
-  price?: boolean
-  banner?: boolean
   category?: boolean
-  isVerified?: boolean
+  date?: boolean
+  time?: boolean
+  venue?: boolean
+  thumbnail?: boolean
+  ticketPrice?: boolean
+  totalSeats?: boolean
+  availableSeats?: boolean
+  status?: boolean
+  isDeleted?: boolean
   organizerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1115,21 +1179,22 @@ export type EventSelectScalar = {
   id?: boolean
   title?: boolean
   description?: boolean
-  location?: boolean
-  date?: boolean
-  flightTime?: boolean
-  airline?: boolean
-  travelGuideline?: boolean
-  price?: boolean
-  banner?: boolean
   category?: boolean
-  isVerified?: boolean
+  date?: boolean
+  time?: boolean
+  venue?: boolean
+  thumbnail?: boolean
+  ticketPrice?: boolean
+  totalSeats?: boolean
+  availableSeats?: boolean
+  status?: boolean
+  isDeleted?: boolean
   organizerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "location" | "date" | "flightTime" | "airline" | "travelGuideline" | "price" | "banner" | "category" | "isVerified" | "organizerId" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "date" | "time" | "venue" | "thumbnail" | "ticketPrice" | "totalSeats" | "availableSeats" | "status" | "isDeleted" | "organizerId" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizer?: boolean | Prisma.OrganizerDefaultArgs<ExtArgs>
   bookings?: boolean | Prisma.Event$bookingsArgs<ExtArgs>
@@ -1154,15 +1219,16 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     title: string
     description: string
-    location: string
-    date: Date
-    flightTime: Date | null
-    airline: string | null
-    travelGuideline: string | null
-    price: number
-    banner: string
     category: string
-    isVerified: boolean
+    date: Date
+    time: string
+    venue: string
+    thumbnail: string | null
+    ticketPrice: number
+    totalSeats: number
+    availableSeats: number
+    status: $Enums.EventStatus
+    isDeleted: boolean
     organizerId: string
     createdAt: Date
     updatedAt: Date
@@ -1595,15 +1661,16 @@ export interface EventFieldRefs {
   readonly id: Prisma.FieldRef<"Event", 'String'>
   readonly title: Prisma.FieldRef<"Event", 'String'>
   readonly description: Prisma.FieldRef<"Event", 'String'>
-  readonly location: Prisma.FieldRef<"Event", 'String'>
-  readonly date: Prisma.FieldRef<"Event", 'DateTime'>
-  readonly flightTime: Prisma.FieldRef<"Event", 'DateTime'>
-  readonly airline: Prisma.FieldRef<"Event", 'String'>
-  readonly travelGuideline: Prisma.FieldRef<"Event", 'String'>
-  readonly price: Prisma.FieldRef<"Event", 'Float'>
-  readonly banner: Prisma.FieldRef<"Event", 'String'>
   readonly category: Prisma.FieldRef<"Event", 'String'>
-  readonly isVerified: Prisma.FieldRef<"Event", 'Boolean'>
+  readonly date: Prisma.FieldRef<"Event", 'DateTime'>
+  readonly time: Prisma.FieldRef<"Event", 'String'>
+  readonly venue: Prisma.FieldRef<"Event", 'String'>
+  readonly thumbnail: Prisma.FieldRef<"Event", 'String'>
+  readonly ticketPrice: Prisma.FieldRef<"Event", 'Float'>
+  readonly totalSeats: Prisma.FieldRef<"Event", 'Int'>
+  readonly availableSeats: Prisma.FieldRef<"Event", 'Int'>
+  readonly status: Prisma.FieldRef<"Event", 'EventStatus'>
+  readonly isDeleted: Prisma.FieldRef<"Event", 'Boolean'>
   readonly organizerId: Prisma.FieldRef<"Event", 'String'>
   readonly createdAt: Prisma.FieldRef<"Event", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Event", 'DateTime'>

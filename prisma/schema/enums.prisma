@@ -31,7 +31,12 @@ enum PaymentStatus {
   PAID
   REFUNDED
 }
-
+enum EventStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
 
 
 

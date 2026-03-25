@@ -1291,15 +1291,16 @@ export const EventScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
-  location: 'location',
-  date: 'date',
-  flightTime: 'flightTime',
-  airline: 'airline',
-  travelGuideline: 'travelGuideline',
-  price: 'price',
-  banner: 'banner',
   category: 'category',
-  isVerified: 'isVerified',
+  date: 'date',
+  time: 'time',
+  venue: 'venue',
+  thumbnail: 'thumbnail',
+  ticketPrice: 'ticketPrice',
+  totalSeats: 'totalSeats',
+  availableSeats: 'availableSeats',
+  status: 'status',
+  isDeleted: 'isDeleted',
   organizerId: 'organizerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1346,7 +1347,8 @@ export const ReviewScalarFieldEnum = {
   comment: 'comment',
   userId: 'userId',
   eventId: 'eventId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
@@ -1512,6 +1514,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EventStatus'
+ */
+export type EnumEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'EventStatus[]'
+ */
+export type ListEnumEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventStatus[]'>
     
 
 /**

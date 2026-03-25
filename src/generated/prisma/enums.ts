@@ -55,3 +55,13 @@ export const PaymentStatus = {
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const EventStatus = {
+  UPCOMING: 'UPCOMING',
+  ONGOING: 'ONGOING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]

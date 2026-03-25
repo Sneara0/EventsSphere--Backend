@@ -1,27 +1,27 @@
 model Event {
-  id              String    @id @default(uuid())
+  id              String   @id @default(cuid())
   title           String
   description     String
-  location        String
+  category        String   // e.g., Concert, Workshop, Seminar
   date            DateTime
-  flightTime      DateTime?
-  airline         String?
-  travelGuideline String?
-  price           Float
-  banner          String
-  category        String
-  isVerified      Boolean   @default(false)
+  time            String
+  venue           String   // Location
+  thumbnail       String?  // Cloudinary Image URL
+  ticketPrice     Float    @default(0)
+  totalSeats      Int
+  availableSeats  Int
+  status          EventStatus @default(UPCOMING)
+  isDeleted       Boolean  @default(false)
 
-  // এটি আপনার অর্গানাইজার টেবিলের সাথে কানেক্ট করবে
+  // Relations
   organizerId     String
   organizer       Organizer @relation(fields: [organizerId], references: [id])
-
+  
   bookings        Booking[]
-  reviews         Review[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  reviews Review[]
 
   @@map("events")
-  @@index([category])
-  @@index([location])
 }
