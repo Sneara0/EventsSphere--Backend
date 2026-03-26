@@ -28,10 +28,12 @@ export type AggregateBooking = {
 
 export type BookingAvgAggregateOutputType = {
   totalAmount: number | null
+  quantity: number | null
 }
 
 export type BookingSumAggregateOutputType = {
   totalAmount: number | null
+  quantity: number | null
 }
 
 export type BookingMinAggregateOutputType = {
@@ -44,6 +46,7 @@ export type BookingMinAggregateOutputType = {
   transactionId: string | null
   ticketUrl: string | null
   isTicketGenerated: boolean | null
+  quantity: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +61,7 @@ export type BookingMaxAggregateOutputType = {
   transactionId: string | null
   ticketUrl: string | null
   isTicketGenerated: boolean | null
+  quantity: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -72,6 +76,7 @@ export type BookingCountAggregateOutputType = {
   transactionId: number
   ticketUrl: number
   isTicketGenerated: number
+  quantity: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -80,10 +85,12 @@ export type BookingCountAggregateOutputType = {
 
 export type BookingAvgAggregateInputType = {
   totalAmount?: true
+  quantity?: true
 }
 
 export type BookingSumAggregateInputType = {
   totalAmount?: true
+  quantity?: true
 }
 
 export type BookingMinAggregateInputType = {
@@ -96,6 +103,7 @@ export type BookingMinAggregateInputType = {
   transactionId?: true
   ticketUrl?: true
   isTicketGenerated?: true
+  quantity?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -110,6 +118,7 @@ export type BookingMaxAggregateInputType = {
   transactionId?: true
   ticketUrl?: true
   isTicketGenerated?: true
+  quantity?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -124,6 +133,7 @@ export type BookingCountAggregateInputType = {
   transactionId?: true
   ticketUrl?: true
   isTicketGenerated?: true
+  quantity?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -225,6 +235,7 @@ export type BookingGroupByOutputType = {
   transactionId: string | null
   ticketUrl: string | null
   isTicketGenerated: boolean
+  quantity: number
   createdAt: Date
   updatedAt: Date
   _count: BookingCountAggregateOutputType | null
@@ -262,6 +273,7 @@ export type BookingWhereInput = {
   transactionId?: Prisma.StringNullableFilter<"Booking"> | string | null
   ticketUrl?: Prisma.StringNullableFilter<"Booking"> | string | null
   isTicketGenerated?: Prisma.BoolFilter<"Booking"> | boolean
+  quantity?: Prisma.IntFilter<"Booking"> | number
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -278,6 +290,7 @@ export type BookingOrderByWithRelationInput = {
   transactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isTicketGenerated?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -297,6 +310,7 @@ export type BookingWhereUniqueInput = Prisma.AtLeast<{
   totalAmount?: Prisma.FloatFilter<"Booking"> | number
   ticketUrl?: Prisma.StringNullableFilter<"Booking"> | string | null
   isTicketGenerated?: Prisma.BoolFilter<"Booking"> | boolean
+  quantity?: Prisma.IntFilter<"Booking"> | number
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -313,6 +327,7 @@ export type BookingOrderByWithAggregationInput = {
   transactionId?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isTicketGenerated?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BookingCountOrderByAggregateInput
@@ -335,6 +350,7 @@ export type BookingScalarWhereWithAggregatesInput = {
   transactionId?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   ticketUrl?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   isTicketGenerated?: Prisma.BoolWithAggregatesFilter<"Booking"> | boolean
+  quantity?: Prisma.IntWithAggregatesFilter<"Booking"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Booking"> | Date | string
 }
@@ -347,6 +363,7 @@ export type BookingCreateInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -363,6 +380,7 @@ export type BookingUncheckedCreateInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -375,6 +393,7 @@ export type BookingUpdateInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -391,6 +410,7 @@ export type BookingUncheckedUpdateInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -405,6 +425,7 @@ export type BookingCreateManyInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -417,6 +438,7 @@ export type BookingUpdateManyMutationInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -431,6 +453,7 @@ export type BookingUncheckedUpdateManyInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -455,12 +478,14 @@ export type BookingCountOrderByAggregateInput = {
   transactionId?: Prisma.SortOrder
   ticketUrl?: Prisma.SortOrder
   isTicketGenerated?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type BookingAvgOrderByAggregateInput = {
   totalAmount?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
 }
 
 export type BookingMaxOrderByAggregateInput = {
@@ -473,6 +498,7 @@ export type BookingMaxOrderByAggregateInput = {
   transactionId?: Prisma.SortOrder
   ticketUrl?: Prisma.SortOrder
   isTicketGenerated?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -487,12 +513,14 @@ export type BookingMinOrderByAggregateInput = {
   transactionId?: Prisma.SortOrder
   ticketUrl?: Prisma.SortOrder
   isTicketGenerated?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type BookingSumOrderByAggregateInput = {
   totalAmount?: Prisma.SortOrder
+  quantity?: Prisma.SortOrder
 }
 
 export type BookingCreateNestedManyWithoutUserInput = {
@@ -553,6 +581,14 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type BookingCreateNestedManyWithoutEventInput = {
   create?: Prisma.XOR<Prisma.BookingCreateWithoutEventInput, Prisma.BookingUncheckedCreateWithoutEventInput> | Prisma.BookingCreateWithoutEventInput[] | Prisma.BookingUncheckedCreateWithoutEventInput[]
   connectOrCreate?: Prisma.BookingCreateOrConnectWithoutEventInput | Prisma.BookingCreateOrConnectWithoutEventInput[]
@@ -603,6 +639,7 @@ export type BookingCreateWithoutUserInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   event: Prisma.EventCreateNestedOneWithoutBookingsInput
@@ -617,6 +654,7 @@ export type BookingUncheckedCreateWithoutUserInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -660,6 +698,7 @@ export type BookingScalarWhereInput = {
   transactionId?: Prisma.StringNullableFilter<"Booking"> | string | null
   ticketUrl?: Prisma.StringNullableFilter<"Booking"> | string | null
   isTicketGenerated?: Prisma.BoolFilter<"Booking"> | boolean
+  quantity?: Prisma.IntFilter<"Booking"> | number
   createdAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Booking"> | Date | string
 }
@@ -672,6 +711,7 @@ export type BookingCreateWithoutEventInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutBookingsInput
@@ -686,6 +726,7 @@ export type BookingUncheckedCreateWithoutEventInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -725,6 +766,7 @@ export type BookingCreateManyUserInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -737,6 +779,7 @@ export type BookingUpdateWithoutUserInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   event?: Prisma.EventUpdateOneRequiredWithoutBookingsNestedInput
@@ -751,6 +794,7 @@ export type BookingUncheckedUpdateWithoutUserInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -764,6 +808,7 @@ export type BookingUncheckedUpdateManyWithoutUserInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -777,6 +822,7 @@ export type BookingCreateManyEventInput = {
   transactionId?: string | null
   ticketUrl?: string | null
   isTicketGenerated?: boolean
+  quantity?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -789,6 +835,7 @@ export type BookingUpdateWithoutEventInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutBookingsNestedInput
@@ -803,6 +850,7 @@ export type BookingUncheckedUpdateWithoutEventInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -816,6 +864,7 @@ export type BookingUncheckedUpdateManyWithoutEventInput = {
   transactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isTicketGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -832,6 +881,7 @@ export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   transactionId?: boolean
   ticketUrl?: boolean
   isTicketGenerated?: boolean
+  quantity?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -848,6 +898,7 @@ export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   transactionId?: boolean
   ticketUrl?: boolean
   isTicketGenerated?: boolean
+  quantity?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -864,6 +915,7 @@ export type BookingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   transactionId?: boolean
   ticketUrl?: boolean
   isTicketGenerated?: boolean
+  quantity?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -880,11 +932,12 @@ export type BookingSelectScalar = {
   transactionId?: boolean
   ticketUrl?: boolean
   isTicketGenerated?: boolean
+  quantity?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "status" | "paymentStatus" | "totalAmount" | "transactionId" | "ticketUrl" | "isTicketGenerated" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
+export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "eventId" | "status" | "paymentStatus" | "totalAmount" | "transactionId" | "ticketUrl" | "isTicketGenerated" | "quantity" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
 export type BookingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   event?: boolean | Prisma.EventDefaultArgs<ExtArgs>
@@ -914,6 +967,7 @@ export type $BookingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     transactionId: string | null
     ticketUrl: string | null
     isTicketGenerated: boolean
+    quantity: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["booking"]>
@@ -1350,6 +1404,7 @@ export interface BookingFieldRefs {
   readonly transactionId: Prisma.FieldRef<"Booking", 'String'>
   readonly ticketUrl: Prisma.FieldRef<"Booking", 'String'>
   readonly isTicketGenerated: Prisma.FieldRef<"Booking", 'Boolean'>
+  readonly quantity: Prisma.FieldRef<"Booking", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Booking", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Booking", 'DateTime'>
 }

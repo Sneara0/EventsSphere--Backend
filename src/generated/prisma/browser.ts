@@ -48,6 +48,11 @@ export type Verification = Prisma.VerificationModel
  */
 export type Booking = Prisma.BookingModel
 /**
+ * Model Coupon
+ * 
+ */
+export type Coupon = Prisma.CouponModel
+/**
  * Model Event
  * 
  */

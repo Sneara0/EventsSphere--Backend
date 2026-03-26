@@ -5,12 +5,13 @@ model Review {
   userId  String
   eventId String
 
-  // রিলেশন ডিফাইন করা হয়েছে
   user  User  @relation(fields: [userId], references: [id])
   event Event @relation(fields: [eventId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // এটি নিশ্চিত করবে যে এক ইউজার এক ইভেন্টে একাধিক রিভিউ দিতে পারবে না
+  @@unique([userId, eventId]) 
   @@map("reviews")
 }

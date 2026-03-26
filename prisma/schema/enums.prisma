@@ -27,6 +27,7 @@ enum BookingStatus {
 }
 
 enum PaymentStatus {
+  PENDING   // ✅ এটি যোগ করুন
   UNPAID
   PAID
   REFUNDED

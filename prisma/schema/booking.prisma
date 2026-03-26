@@ -8,6 +8,8 @@ model Booking {
   transactionId     String?       @unique
   ticketUrl         String?
   isTicketGenerated Boolean       @default(false)
+  quantity      Int           @default(1)
+  payments Payment[]
 
   user      User     @relation(fields: [userId], references: [id])
   event     Event    @relation(fields: [eventId], references: [id])

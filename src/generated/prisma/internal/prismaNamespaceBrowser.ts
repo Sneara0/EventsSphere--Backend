@@ -57,6 +57,7 @@ export const ModelName = {
   Session: 'Session',
   Verification: 'Verification',
   Booking: 'Booking',
+  Coupon: 'Coupon',
   Event: 'Event',
   Organizer: 'Organizer',
   Participant: 'Participant',
@@ -167,6 +168,7 @@ export const BookingScalarFieldEnum = {
   transactionId: 'transactionId',
   ticketUrl: 'ticketUrl',
   isTicketGenerated: 'isTicketGenerated',
+  quantity: 'quantity',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -174,12 +176,28 @@ export const BookingScalarFieldEnum = {
 export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
 
 
+export const CouponScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  discountValue: 'discountValue',
+  isPercentage: 'isPercentage',
+  expiryDate: 'expiryDate',
+  usageLimit: 'usageLimit',
+  usedCount: 'usedCount',
+  eventId: 'eventId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CouponScalarFieldEnum = (typeof CouponScalarFieldEnum)[keyof typeof CouponScalarFieldEnum]
+
+
 export const EventScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
   category: 'category',
-  date: 'date',
+  dateTime: 'dateTime',
   time: 'time',
   venue: 'venue',
   thumbnail: 'thumbnail',
@@ -205,6 +223,7 @@ export const OrganizerScalarFieldEnum = {
   contactNumber: 'contactNumber',
   website: 'website',
   bio: 'bio',
+  logo: 'logo',
   isVerified: 'isVerified',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

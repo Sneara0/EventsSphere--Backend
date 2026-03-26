@@ -33,6 +33,7 @@ export type OrganizerMinAggregateOutputType = {
   contactNumber: string | null
   website: string | null
   bio: string | null
+  logo: string | null
   isVerified: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -47,6 +48,7 @@ export type OrganizerMaxAggregateOutputType = {
   contactNumber: string | null
   website: string | null
   bio: string | null
+  logo: string | null
   isVerified: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -61,6 +63,7 @@ export type OrganizerCountAggregateOutputType = {
   contactNumber: number
   website: number
   bio: number
+  logo: number
   isVerified: number
   createdAt: number
   updatedAt: number
@@ -77,6 +80,7 @@ export type OrganizerMinAggregateInputType = {
   contactNumber?: true
   website?: true
   bio?: true
+  logo?: true
   isVerified?: true
   createdAt?: true
   updatedAt?: true
@@ -91,6 +95,7 @@ export type OrganizerMaxAggregateInputType = {
   contactNumber?: true
   website?: true
   bio?: true
+  logo?: true
   isVerified?: true
   createdAt?: true
   updatedAt?: true
@@ -105,6 +110,7 @@ export type OrganizerCountAggregateInputType = {
   contactNumber?: true
   website?: true
   bio?: true
+  logo?: true
   isVerified?: true
   createdAt?: true
   updatedAt?: true
@@ -192,6 +198,7 @@ export type OrganizerGroupByOutputType = {
   contactNumber: string
   website: string | null
   bio: string | null
+  logo: string | null
   isVerified: boolean
   createdAt: Date
   updatedAt: Date
@@ -227,6 +234,7 @@ export type OrganizerWhereInput = {
   contactNumber?: Prisma.StringFilter<"Organizer"> | string
   website?: Prisma.StringNullableFilter<"Organizer"> | string | null
   bio?: Prisma.StringNullableFilter<"Organizer"> | string | null
+  logo?: Prisma.StringNullableFilter<"Organizer"> | string | null
   isVerified?: Prisma.BoolFilter<"Organizer"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Organizer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Organizer"> | Date | string
@@ -243,6 +251,7 @@ export type OrganizerOrderByWithRelationInput = {
   contactNumber?: Prisma.SortOrder
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
+  logo?: Prisma.SortOrderInput | Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -262,6 +271,7 @@ export type OrganizerWhereUniqueInput = Prisma.AtLeast<{
   contactNumber?: Prisma.StringFilter<"Organizer"> | string
   website?: Prisma.StringNullableFilter<"Organizer"> | string | null
   bio?: Prisma.StringNullableFilter<"Organizer"> | string | null
+  logo?: Prisma.StringNullableFilter<"Organizer"> | string | null
   isVerified?: Prisma.BoolFilter<"Organizer"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Organizer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Organizer"> | Date | string
@@ -278,6 +288,7 @@ export type OrganizerOrderByWithAggregationInput = {
   contactNumber?: Prisma.SortOrder
   website?: Prisma.SortOrderInput | Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
+  logo?: Prisma.SortOrderInput | Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -298,6 +309,7 @@ export type OrganizerScalarWhereWithAggregatesInput = {
   contactNumber?: Prisma.StringWithAggregatesFilter<"Organizer"> | string
   website?: Prisma.StringNullableWithAggregatesFilter<"Organizer"> | string | null
   bio?: Prisma.StringNullableWithAggregatesFilter<"Organizer"> | string | null
+  logo?: Prisma.StringNullableWithAggregatesFilter<"Organizer"> | string | null
   isVerified?: Prisma.BoolWithAggregatesFilter<"Organizer"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Organizer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Organizer"> | Date | string
@@ -311,6 +323,7 @@ export type OrganizerCreateInput = {
   contactNumber: string
   website?: string | null
   bio?: string | null
+  logo?: string | null
   isVerified?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -327,6 +340,7 @@ export type OrganizerUncheckedCreateInput = {
   contactNumber: string
   website?: string | null
   bio?: string | null
+  logo?: string | null
   isVerified?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -341,6 +355,7 @@ export type OrganizerUpdateInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -357,6 +372,7 @@ export type OrganizerUncheckedUpdateInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -372,6 +388,7 @@ export type OrganizerCreateManyInput = {
   contactNumber: string
   website?: string | null
   bio?: string | null
+  logo?: string | null
   isVerified?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -385,6 +402,7 @@ export type OrganizerUpdateManyMutationInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -399,6 +417,7 @@ export type OrganizerUncheckedUpdateManyInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -423,6 +442,7 @@ export type OrganizerCountOrderByAggregateInput = {
   contactNumber?: Prisma.SortOrder
   website?: Prisma.SortOrder
   bio?: Prisma.SortOrder
+  logo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -437,6 +457,7 @@ export type OrganizerMaxOrderByAggregateInput = {
   contactNumber?: Prisma.SortOrder
   website?: Prisma.SortOrder
   bio?: Prisma.SortOrder
+  logo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -451,6 +472,7 @@ export type OrganizerMinOrderByAggregateInput = {
   contactNumber?: Prisma.SortOrder
   website?: Prisma.SortOrder
   bio?: Prisma.SortOrder
+  logo?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -510,6 +532,7 @@ export type OrganizerCreateWithoutUserInput = {
   contactNumber: string
   website?: string | null
   bio?: string | null
+  logo?: string | null
   isVerified?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -524,6 +547,7 @@ export type OrganizerUncheckedCreateWithoutUserInput = {
   contactNumber: string
   website?: string | null
   bio?: string | null
+  logo?: string | null
   isVerified?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -554,6 +578,7 @@ export type OrganizerUpdateWithoutUserInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -568,6 +593,7 @@ export type OrganizerUncheckedUpdateWithoutUserInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -582,6 +608,7 @@ export type OrganizerCreateWithoutEventsInput = {
   contactNumber: string
   website?: string | null
   bio?: string | null
+  logo?: string | null
   isVerified?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -597,6 +624,7 @@ export type OrganizerUncheckedCreateWithoutEventsInput = {
   contactNumber: string
   website?: string | null
   bio?: string | null
+  logo?: string | null
   isVerified?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -626,6 +654,7 @@ export type OrganizerUpdateWithoutEventsInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -641,6 +670,7 @@ export type OrganizerUncheckedUpdateWithoutEventsInput = {
   contactNumber?: Prisma.StringFieldUpdateOperationsInput | string
   website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -686,6 +716,7 @@ export type OrganizerSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   contactNumber?: boolean
   website?: boolean
   bio?: boolean
+  logo?: boolean
   isVerified?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -703,6 +734,7 @@ export type OrganizerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   contactNumber?: boolean
   website?: boolean
   bio?: boolean
+  logo?: boolean
   isVerified?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -718,6 +750,7 @@ export type OrganizerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   contactNumber?: boolean
   website?: boolean
   bio?: boolean
+  logo?: boolean
   isVerified?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -733,12 +766,13 @@ export type OrganizerSelectScalar = {
   contactNumber?: boolean
   website?: boolean
   bio?: boolean
+  logo?: boolean
   isVerified?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrganizerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "email" | "organizationName" | "contactNumber" | "website" | "bio" | "isVerified" | "createdAt" | "updatedAt", ExtArgs["result"]["organizer"]>
+export type OrganizerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "email" | "organizationName" | "contactNumber" | "website" | "bio" | "logo" | "isVerified" | "createdAt" | "updatedAt", ExtArgs["result"]["organizer"]>
 export type OrganizerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   events?: boolean | Prisma.Organizer$eventsArgs<ExtArgs>
@@ -766,6 +800,7 @@ export type $OrganizerPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     contactNumber: string
     website: string | null
     bio: string | null
+    logo: string | null
     isVerified: boolean
     createdAt: Date
     updatedAt: Date
@@ -1202,6 +1237,7 @@ export interface OrganizerFieldRefs {
   readonly contactNumber: Prisma.FieldRef<"Organizer", 'String'>
   readonly website: Prisma.FieldRef<"Organizer", 'String'>
   readonly bio: Prisma.FieldRef<"Organizer", 'String'>
+  readonly logo: Prisma.FieldRef<"Organizer", 'String'>
   readonly isVerified: Prisma.FieldRef<"Organizer", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Organizer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Organizer", 'DateTime'>

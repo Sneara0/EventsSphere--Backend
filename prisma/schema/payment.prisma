@@ -1,0 +1,21 @@
+model Payment {
+  id               String        @id @default(uuid())
+  transactionId    String        @unique // Stripe থেকে আসা Payment Intent ID
+  amount           Float
+  currency         String        @default("usd")
+  paymentStatus    PaymentStatus @default(PENDING)
+  paymentMethod    String?       // e.g., "card", "bkash"
+  
+  // রিলেশন
+  bookingId        String        @unique
+  booking          Booking       @relation(fields: [bookingId], references: [id])
+  
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@map("payments")
+}
+

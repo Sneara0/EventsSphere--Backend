@@ -1,0 +1,16 @@
+import { Router } from 'express';
+
+import { CouponController } from './coupon.controller';
+import { CouponValidation } from './coupon.validation';
+import { checkAuth } from 'src/app/middlewares/checkAuth';
+import { validateRequest } from 'src/app/middlewares/validateRequest';
+
+const router = Router();
+
+router.post('/', checkAuth('ADMIN'), validateRequest(CouponValidation.createCouponZodSchema), CouponController.createCoupon);
+router.post('/validate', checkAuth('PARTICIPANT', 'ADMIN'), CouponController.validateCoupon);
+router.get('/', checkAuth('ADMIN', 'ORGANIZER'), CouponController.getAllCoupons);
+router.patch('/:id', checkAuth('ADMIN'), validateRequest(CouponValidation.updateCouponZodSchema), CouponController.updateCoupon);
+router.delete('/:id', checkAuth('ADMIN'), CouponController.deleteCoupon);
+
+export const CouponRoutes = router;

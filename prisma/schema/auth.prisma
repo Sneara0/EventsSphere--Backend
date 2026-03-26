@@ -16,6 +16,7 @@ model User {
   deletedAt          DateTime?
     organizer  Organizer?
     participant Participant?
+    payments Payment[]
 
   admin Admin?
 

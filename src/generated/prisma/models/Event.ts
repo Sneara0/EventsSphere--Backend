@@ -43,7 +43,7 @@ export type EventMinAggregateOutputType = {
   title: string | null
   description: string | null
   category: string | null
-  date: Date | null
+  dateTime: Date | null
   time: string | null
   venue: string | null
   thumbnail: string | null
@@ -62,7 +62,7 @@ export type EventMaxAggregateOutputType = {
   title: string | null
   description: string | null
   category: string | null
-  date: Date | null
+  dateTime: Date | null
   time: string | null
   venue: string | null
   thumbnail: string | null
@@ -81,7 +81,7 @@ export type EventCountAggregateOutputType = {
   title: number
   description: number
   category: number
-  date: number
+  dateTime: number
   time: number
   venue: number
   thumbnail: number
@@ -114,7 +114,7 @@ export type EventMinAggregateInputType = {
   title?: true
   description?: true
   category?: true
-  date?: true
+  dateTime?: true
   time?: true
   venue?: true
   thumbnail?: true
@@ -133,7 +133,7 @@ export type EventMaxAggregateInputType = {
   title?: true
   description?: true
   category?: true
-  date?: true
+  dateTime?: true
   time?: true
   venue?: true
   thumbnail?: true
@@ -152,7 +152,7 @@ export type EventCountAggregateInputType = {
   title?: true
   description?: true
   category?: true
-  date?: true
+  dateTime?: true
   time?: true
   venue?: true
   thumbnail?: true
@@ -258,7 +258,7 @@ export type EventGroupByOutputType = {
   title: string
   description: string
   category: string
-  date: Date
+  dateTime: Date
   time: string
   venue: string
   thumbnail: string | null
@@ -300,7 +300,7 @@ export type EventWhereInput = {
   title?: Prisma.StringFilter<"Event"> | string
   description?: Prisma.StringFilter<"Event"> | string
   category?: Prisma.StringFilter<"Event"> | string
-  date?: Prisma.DateTimeFilter<"Event"> | Date | string
+  dateTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   time?: Prisma.StringFilter<"Event"> | string
   venue?: Prisma.StringFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -315,6 +315,7 @@ export type EventWhereInput = {
   organizer?: Prisma.XOR<Prisma.OrganizerScalarRelationFilter, Prisma.OrganizerWhereInput>
   bookings?: Prisma.BookingListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
+  coupons?: Prisma.CouponListRelationFilter
 }
 
 export type EventOrderByWithRelationInput = {
@@ -322,7 +323,7 @@ export type EventOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  date?: Prisma.SortOrder
+  dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -337,6 +338,7 @@ export type EventOrderByWithRelationInput = {
   organizer?: Prisma.OrganizerOrderByWithRelationInput
   bookings?: Prisma.BookingOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
+  coupons?: Prisma.CouponOrderByRelationAggregateInput
 }
 
 export type EventWhereUniqueInput = Prisma.AtLeast<{
@@ -347,7 +349,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Event"> | string
   description?: Prisma.StringFilter<"Event"> | string
   category?: Prisma.StringFilter<"Event"> | string
-  date?: Prisma.DateTimeFilter<"Event"> | Date | string
+  dateTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   time?: Prisma.StringFilter<"Event"> | string
   venue?: Prisma.StringFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -362,6 +364,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   organizer?: Prisma.XOR<Prisma.OrganizerScalarRelationFilter, Prisma.OrganizerWhereInput>
   bookings?: Prisma.BookingListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
+  coupons?: Prisma.CouponListRelationFilter
 }, "id">
 
 export type EventOrderByWithAggregationInput = {
@@ -369,7 +372,7 @@ export type EventOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  date?: Prisma.SortOrder
+  dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -396,7 +399,7 @@ export type EventScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Event"> | string
   description?: Prisma.StringWithAggregatesFilter<"Event"> | string
   category?: Prisma.StringWithAggregatesFilter<"Event"> | string
-  date?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
+  dateTime?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   time?: Prisma.StringWithAggregatesFilter<"Event"> | string
   venue?: Prisma.StringWithAggregatesFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
@@ -415,7 +418,7 @@ export type EventCreateInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -429,6 +432,7 @@ export type EventCreateInput = {
   organizer: Prisma.OrganizerCreateNestedOneWithoutEventsInput
   bookings?: Prisma.BookingCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateInput = {
@@ -436,7 +440,7 @@ export type EventUncheckedCreateInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -450,6 +454,7 @@ export type EventUncheckedCreateInput = {
   updatedAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventUpdateInput = {
@@ -457,7 +462,7 @@ export type EventUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -471,6 +476,7 @@ export type EventUpdateInput = {
   organizer?: Prisma.OrganizerUpdateOneRequiredWithoutEventsNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateInput = {
@@ -478,7 +484,7 @@ export type EventUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -492,6 +498,7 @@ export type EventUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateManyInput = {
@@ -499,7 +506,7 @@ export type EventCreateManyInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -518,7 +525,7 @@ export type EventUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -536,7 +543,7 @@ export type EventUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -555,12 +562,17 @@ export type EventScalarRelationFilter = {
   isNot?: Prisma.EventWhereInput
 }
 
+export type EventNullableScalarRelationFilter = {
+  is?: Prisma.EventWhereInput | null
+  isNot?: Prisma.EventWhereInput | null
+}
+
 export type EventCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  date?: Prisma.SortOrder
+  dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrder
@@ -585,7 +597,7 @@ export type EventMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  date?: Prisma.SortOrder
+  dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrder
@@ -604,7 +616,7 @@ export type EventMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  date?: Prisma.SortOrder
+  dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrder
@@ -648,12 +660,20 @@ export type EventUpdateOneRequiredWithoutBookingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutBookingsInput, Prisma.EventUpdateWithoutBookingsInput>, Prisma.EventUncheckedUpdateWithoutBookingsInput>
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type EventCreateNestedOneWithoutCouponsInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutCouponsInput, Prisma.EventUncheckedCreateWithoutCouponsInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutCouponsInput
+  connect?: Prisma.EventWhereUniqueInput
+}
+
+export type EventUpdateOneWithoutCouponsNestedInput = {
+  create?: Prisma.XOR<Prisma.EventCreateWithoutCouponsInput, Prisma.EventUncheckedCreateWithoutCouponsInput>
+  connectOrCreate?: Prisma.EventCreateOrConnectWithoutCouponsInput
+  upsert?: Prisma.EventUpsertWithoutCouponsInput
+  disconnect?: Prisma.EventWhereInput | boolean
+  delete?: Prisma.EventWhereInput | boolean
+  connect?: Prisma.EventWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EventUpdateToOneWithWhereWithoutCouponsInput, Prisma.EventUpdateWithoutCouponsInput>, Prisma.EventUncheckedUpdateWithoutCouponsInput>
 }
 
 export type EnumEventStatusFieldUpdateOperationsInput = {
@@ -721,7 +741,7 @@ export type EventCreateWithoutBookingsInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -734,6 +754,7 @@ export type EventCreateWithoutBookingsInput = {
   updatedAt?: Date | string
   organizer: Prisma.OrganizerCreateNestedOneWithoutEventsInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutBookingsInput = {
@@ -741,7 +762,7 @@ export type EventUncheckedCreateWithoutBookingsInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -754,6 +775,7 @@ export type EventUncheckedCreateWithoutBookingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutBookingsInput = {
@@ -777,7 +799,7 @@ export type EventUpdateWithoutBookingsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -790,6 +812,7 @@ export type EventUpdateWithoutBookingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organizer?: Prisma.OrganizerUpdateOneRequiredWithoutEventsNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutBookingsInput = {
@@ -797,7 +820,7 @@ export type EventUncheckedUpdateWithoutBookingsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -810,6 +833,107 @@ export type EventUncheckedUpdateWithoutBookingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUncheckedUpdateManyWithoutEventNestedInput
+}
+
+export type EventCreateWithoutCouponsInput = {
+  id?: string
+  title: string
+  description: string
+  category: string
+  dateTime: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organizer: Prisma.OrganizerCreateNestedOneWithoutEventsInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutEventInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
+}
+
+export type EventUncheckedCreateWithoutCouponsInput = {
+  id?: string
+  title: string
+  description: string
+  category: string
+  dateTime: Date | string
+  time: string
+  venue: string
+  thumbnail?: string | null
+  ticketPrice?: number
+  totalSeats: number
+  availableSeats: number
+  status?: $Enums.EventStatus
+  isDeleted?: boolean
+  organizerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutEventInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
+}
+
+export type EventCreateOrConnectWithoutCouponsInput = {
+  where: Prisma.EventWhereUniqueInput
+  create: Prisma.XOR<Prisma.EventCreateWithoutCouponsInput, Prisma.EventUncheckedCreateWithoutCouponsInput>
+}
+
+export type EventUpsertWithoutCouponsInput = {
+  update: Prisma.XOR<Prisma.EventUpdateWithoutCouponsInput, Prisma.EventUncheckedUpdateWithoutCouponsInput>
+  create: Prisma.XOR<Prisma.EventCreateWithoutCouponsInput, Prisma.EventUncheckedCreateWithoutCouponsInput>
+  where?: Prisma.EventWhereInput
+}
+
+export type EventUpdateToOneWithWhereWithoutCouponsInput = {
+  where?: Prisma.EventWhereInput
+  data: Prisma.XOR<Prisma.EventUpdateWithoutCouponsInput, Prisma.EventUncheckedUpdateWithoutCouponsInput>
+}
+
+export type EventUpdateWithoutCouponsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organizer?: Prisma.OrganizerUpdateOneRequiredWithoutEventsNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutEventNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
+}
+
+export type EventUncheckedUpdateWithoutCouponsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  venue?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  totalSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumEventStatusFieldUpdateOperationsInput | $Enums.EventStatus
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  organizerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutEventNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateWithoutOrganizerInput = {
@@ -817,7 +941,7 @@ export type EventCreateWithoutOrganizerInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -830,6 +954,7 @@ export type EventCreateWithoutOrganizerInput = {
   updatedAt?: Date | string
   bookings?: Prisma.BookingCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutOrganizerInput = {
@@ -837,7 +962,7 @@ export type EventUncheckedCreateWithoutOrganizerInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -850,6 +975,7 @@ export type EventUncheckedCreateWithoutOrganizerInput = {
   updatedAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutEventInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutOrganizerInput = {
@@ -886,7 +1012,7 @@ export type EventScalarWhereInput = {
   title?: Prisma.StringFilter<"Event"> | string
   description?: Prisma.StringFilter<"Event"> | string
   category?: Prisma.StringFilter<"Event"> | string
-  date?: Prisma.DateTimeFilter<"Event"> | Date | string
+  dateTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   time?: Prisma.StringFilter<"Event"> | string
   venue?: Prisma.StringFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
@@ -905,7 +1031,7 @@ export type EventCreateWithoutReviewsInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -918,6 +1044,7 @@ export type EventCreateWithoutReviewsInput = {
   updatedAt?: Date | string
   organizer: Prisma.OrganizerCreateNestedOneWithoutEventsInput
   bookings?: Prisma.BookingCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponCreateNestedManyWithoutEventInput
 }
 
 export type EventUncheckedCreateWithoutReviewsInput = {
@@ -925,7 +1052,7 @@ export type EventUncheckedCreateWithoutReviewsInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -938,6 +1065,7 @@ export type EventUncheckedCreateWithoutReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutEventInput
+  coupons?: Prisma.CouponUncheckedCreateNestedManyWithoutEventInput
 }
 
 export type EventCreateOrConnectWithoutReviewsInput = {
@@ -961,7 +1089,7 @@ export type EventUpdateWithoutReviewsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -974,6 +1102,7 @@ export type EventUpdateWithoutReviewsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organizer?: Prisma.OrganizerUpdateOneRequiredWithoutEventsNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutReviewsInput = {
@@ -981,7 +1110,7 @@ export type EventUncheckedUpdateWithoutReviewsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -994,6 +1123,7 @@ export type EventUncheckedUpdateWithoutReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventCreateManyOrganizerInput = {
@@ -1001,7 +1131,7 @@ export type EventCreateManyOrganizerInput = {
   title: string
   description: string
   category: string
-  date: Date | string
+  dateTime: Date | string
   time: string
   venue: string
   thumbnail?: string | null
@@ -1019,7 +1149,7 @@ export type EventUpdateWithoutOrganizerInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1032,6 +1162,7 @@ export type EventUpdateWithoutOrganizerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateWithoutOrganizerInput = {
@@ -1039,7 +1170,7 @@ export type EventUncheckedUpdateWithoutOrganizerInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1052,6 +1183,7 @@ export type EventUncheckedUpdateWithoutOrganizerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutEventNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutEventNestedInput
+  coupons?: Prisma.CouponUncheckedUpdateManyWithoutEventNestedInput
 }
 
 export type EventUncheckedUpdateManyWithoutOrganizerInput = {
@@ -1059,7 +1191,7 @@ export type EventUncheckedUpdateManyWithoutOrganizerInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1080,11 +1212,13 @@ export type EventUncheckedUpdateManyWithoutOrganizerInput = {
 export type EventCountOutputType = {
   bookings: number
   reviews: number
+  coupons: number
 }
 
 export type EventCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bookings?: boolean | EventCountOutputTypeCountBookingsArgs
   reviews?: boolean | EventCountOutputTypeCountReviewsArgs
+  coupons?: boolean | EventCountOutputTypeCountCouponsArgs
 }
 
 /**
@@ -1111,13 +1245,20 @@ export type EventCountOutputTypeCountReviewsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.ReviewWhereInput
 }
 
+/**
+ * EventCountOutputType without action
+ */
+export type EventCountOutputTypeCountCouponsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CouponWhereInput
+}
+
 
 export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
   description?: boolean
   category?: boolean
-  date?: boolean
+  dateTime?: boolean
   time?: boolean
   venue?: boolean
   thumbnail?: boolean
@@ -1132,6 +1273,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   organizer?: boolean | Prisma.OrganizerDefaultArgs<ExtArgs>
   bookings?: boolean | Prisma.Event$bookingsArgs<ExtArgs>
   reviews?: boolean | Prisma.Event$reviewsArgs<ExtArgs>
+  coupons?: boolean | Prisma.Event$couponsArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["event"]>
 
@@ -1140,7 +1282,7 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   title?: boolean
   description?: boolean
   category?: boolean
-  date?: boolean
+  dateTime?: boolean
   time?: boolean
   venue?: boolean
   thumbnail?: boolean
@@ -1160,7 +1302,7 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   title?: boolean
   description?: boolean
   category?: boolean
-  date?: boolean
+  dateTime?: boolean
   time?: boolean
   venue?: boolean
   thumbnail?: boolean
@@ -1180,7 +1322,7 @@ export type EventSelectScalar = {
   title?: boolean
   description?: boolean
   category?: boolean
-  date?: boolean
+  dateTime?: boolean
   time?: boolean
   venue?: boolean
   thumbnail?: boolean
@@ -1194,11 +1336,12 @@ export type EventSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "date" | "time" | "venue" | "thumbnail" | "ticketPrice" | "totalSeats" | "availableSeats" | "status" | "isDeleted" | "organizerId" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "dateTime" | "time" | "venue" | "thumbnail" | "ticketPrice" | "totalSeats" | "availableSeats" | "status" | "isDeleted" | "organizerId" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizer?: boolean | Prisma.OrganizerDefaultArgs<ExtArgs>
   bookings?: boolean | Prisma.Event$bookingsArgs<ExtArgs>
   reviews?: boolean | Prisma.Event$reviewsArgs<ExtArgs>
+  coupons?: boolean | Prisma.Event$couponsArgs<ExtArgs>
   _count?: boolean | Prisma.EventCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EventIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1214,13 +1357,14 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     organizer: Prisma.$OrganizerPayload<ExtArgs>
     bookings: Prisma.$BookingPayload<ExtArgs>[]
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
+    coupons: Prisma.$CouponPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
     description: string
     category: string
-    date: Date
+    dateTime: Date
     time: string
     venue: string
     thumbnail: string | null
@@ -1629,6 +1773,7 @@ export interface Prisma__EventClient<T, Null = never, ExtArgs extends runtime.Ty
   organizer<T extends Prisma.OrganizerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizerDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizerClient<runtime.Types.Result.GetResult<Prisma.$OrganizerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   bookings<T extends Prisma.Event$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.Event$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coupons<T extends Prisma.Event$couponsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Event$couponsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CouponPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1662,7 +1807,7 @@ export interface EventFieldRefs {
   readonly title: Prisma.FieldRef<"Event", 'String'>
   readonly description: Prisma.FieldRef<"Event", 'String'>
   readonly category: Prisma.FieldRef<"Event", 'String'>
-  readonly date: Prisma.FieldRef<"Event", 'DateTime'>
+  readonly dateTime: Prisma.FieldRef<"Event", 'DateTime'>
   readonly time: Prisma.FieldRef<"Event", 'String'>
   readonly venue: Prisma.FieldRef<"Event", 'String'>
   readonly thumbnail: Prisma.FieldRef<"Event", 'String'>
@@ -2120,6 +2265,30 @@ export type Event$reviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ReviewScalarFieldEnum | Prisma.ReviewScalarFieldEnum[]
+}
+
+/**
+ * Event.coupons
+ */
+export type Event$couponsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Coupon
+   */
+  select?: Prisma.CouponSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Coupon
+   */
+  omit?: Prisma.CouponOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CouponInclude<ExtArgs> | null
+  where?: Prisma.CouponWhereInput
+  orderBy?: Prisma.CouponOrderByWithRelationInput | Prisma.CouponOrderByWithRelationInput[]
+  cursor?: Prisma.CouponWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CouponScalarFieldEnum | Prisma.CouponScalarFieldEnum[]
 }
 
 /**
