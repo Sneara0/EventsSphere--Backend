@@ -4,14 +4,38 @@ import cookieParser from 'cookie-parser'; // কুকি রিড করার
 import { IndexRoutes } from './app/routes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
+import env from "src/config/env";
 
 const app: Application = express();
 app.use(express.json())
 // ১. গ্লোবাল মিডলওয়্যার (Parsers & CORS)
+
+
+
+
+
+
+
+app.post("/webhook", express.raw({ type: "application/json" }), async (req: Request, res: Response) => {
+    console.log("Received webhook:", req.body);
+    // Process the webhook data here (e.g., verify signature, update database, etc.)
+    res.status(200).json({ received: true });
+}
+)
+
+
+
+
+
+
+
+
 app.use(cors({
-  origin: ["http://localhost:3000"], // আপনার ফ্রন্টএন্ড ইউআরএল দিন
-  credentials: true, // কুকি সহ রিকোয়েস্টের জন্য
-}));
+    origin : [env.FRONTEND_URL, env.BETTER_AUTH_URL, "http://localhost:3000", "http://localhost:5000"],
+    credentials : true,
+    methods : ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders : ["Content-Type", "Authorization"]
+}))
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
