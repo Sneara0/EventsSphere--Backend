@@ -61,6 +61,7 @@ export const ModelName = {
   Event: 'Event',
   Organizer: 'Organizer',
   Participant: 'Participant',
+  Payment: 'Payment',
   Review: 'Review'
 } as const
 
@@ -199,6 +200,7 @@ export const EventScalarFieldEnum = {
   category: 'category',
   dateTime: 'dateTime',
   time: 'time',
+  location: 'location',
   venue: 'venue',
   thumbnail: 'thumbnail',
   ticketPrice: 'ticketPrice',
@@ -245,6 +247,23 @@ export const ParticipantScalarFieldEnum = {
 } as const
 
 export type ParticipantScalarFieldEnum = (typeof ParticipantScalarFieldEnum)[keyof typeof ParticipantScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  transactionId: 'transactionId',
+  amount: 'amount',
+  currency: 'currency',
+  paymentStatus: 'paymentStatus',
+  paymentMethod: 'paymentMethod',
+  invoiceUrl: 'invoiceUrl',
+  bookingId: 'bookingId',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {

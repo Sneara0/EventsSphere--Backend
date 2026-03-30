@@ -1,92 +1,94 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
-import { Role, UserStatus } from "../../generated/prisma/enums";
+import { Role, UserStatus } from "../../generated/prisma/enums"; 
 import { prisma } from "./prisma";
-import env from "src/config/env";
 import { sendEmail } from "../utils/email";
+// পাথ ফিক্স: '../../' ব্যবহার করা হয়েছে কারণ auth.ts থেকে src/config এ যেতে হবে
+import env from "../../config/env"; 
 
 export const auth = betterAuth({
-    baseURL: env.BETTER_AUTH_URL,
+    baseURL: "http://localhost:5000", 
     secret: env.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
 
-    // ✅ ডাটাসোর্স হুক: ইউজার তৈরি হওয়ার সাথে সাথে প্রোফাইল তৈরি করবে
+    // --- সোশ্যাল লগইন (গুগল) যোগ করা হয়েছে ---
+    socialProviders: {
+        google: {
+            clientId: env.GOOGLE_CLIENT_ID as string,
+            clientSecret: env.GOOGLE_CLIENT_SECRET as string,
+        },
+    },
+
+    // --- DATABASE HOOKS ---
     databaseHooks: {
         user: {
             create: {
                 after: async (user) => {
-                    console.log(`👤 User created with ID: ${user.id}. Creating profile...`);
+                    console.log(`👤 Creating profile for User: ${user.email} with Role: ${(user as any).role}`);
                     
-                    if (user.role === Role.PARTICIPANT) {
-                        await prisma.participant.create({
-                            data: {
-                                userId: user.id,
-                                email: user.email,
-                                name: user.name,
-                            },
-                        });
-                        console.log("✅ Participant profile linked.");
-                    } else if (user.role === Role.ORGANIZER) {
-                        await prisma.organizer.create({
-                            data: {
-                                userId: user.id,
-                                email: user.email,
-                                name: user.name,
-                                contactNumber: "N/A", 
-                            },
-                        });
-                        console.log("✅ Organizer profile linked.");
+                    try {
+                        const userRole = (user as any).role;
+
+                        if (userRole === Role.PARTICIPANT) {
+                            await prisma.participant.create({
+                                data: {
+                                    userId: user.id,
+                                    email: user.email,
+                                    name: user.name || "New Participant",
+                                },
+                            });
+                        } else if (userRole === Role.ORGANIZER) {
+                            await prisma.organizer.create({
+                                data: {
+                                    userId: user.id,
+                                    email: user.email,
+                                    name: user.name || "New Organizer",
+                                    contactNumber: "01XXXXXXXXX", 
+                                },
+                            });
+                        }
+                        console.log("✅ Profile linked successfully.");
+                    } catch (error) {
+                        console.error("❌ Profile Creation Hook Error:", error);
                     }
                 },
             },
         },
     },
 
+    // --- AUTH METHODS ---
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
     },
 
-    socialProviders: {
-        google: {
-            clientId: env.GOOGLE_CLIENT_ID,
-            clientSecret: env.GOOGLE_CLIENT_SECRET,
-            mapProfileToUser: (profile) => {
-                return {
-                    role: Role.PARTICIPANT,
-                    status: UserStatus.ACTIVE,
-                    needPasswordChange: false,
-                    emailVerified: true,
-                    isDeleted: false,
-                }
-            }
-        }
-    },
-
+    // --- ADDITIONAL FIELDS ---
     user: {
         additionalFields: {
             role: {
                 type: "string",
                 required: true,
-                defaultValue: Role.PARTICIPANT
+                defaultValue: Role.PARTICIPANT,
+                input: true, 
             },
             status: {
                 type: "string",
                 required: true,
-                defaultValue: UserStatus.ACTIVE
+                defaultValue: UserStatus.ACTIVE,
+                input: true,
             },
             needPasswordChange: {
                 type: "boolean",
-                required: true,
-                defaultValue: false
+                defaultValue: false,
+                input: true,
             },
             isDeleted: {
                 type: "boolean",
-                required: true,
-                defaultValue: false
+                defaultValue: false,
+                input: true,
             }
         }
     },
@@ -94,39 +96,28 @@ export const auth = betterAuth({
     plugins: [
         bearer(),
         emailOTP({
-            // ✅ ডিফল্ট ইমেইল ভেরিফিকেশন ওভাররাইড করা হয়েছে
             async sendVerificationOTP({ email, otp, type }) {
-                // টার্মিনালে ওটিপি প্রিন্ট করা (ব্যাকআপ হিসেবে)
-                console.log("-------------------------------");
-                console.log(`📩 OTP for ${email}: ${otp}`);
-                console.log(`-------------------------------`);
-
-                /**
-                 * 🛠️ Fix: নতুন ইউজারের ক্ষেত্রে findUnique অনেক সময় তৎক্ষণাৎ ডাটা পায় না।
-                 * তাই আমরা সরাসরি ইমেইল পাঠানোর চেষ্টা করব।
-                 */
+                console.log(`📩 OTP generated for ${email}: ${otp}`);
                 try {
                     await sendEmail({
                         to: email,
-                        subject: type === "email-verification" ? "Verify your email" : "Password Reset OTP",
+                        subject: type === "email-verification" ? "Verify your Event Sphere account" : "Password Reset OTP",
                         templateName: "otp",
-                        templateData: { 
-                            name: "User", // যেহেতু রেজিস্ট্রেশন প্রসেসে নাম পাঠানো হয়, এখানে জেনেরিক নাম রাখা নিরাপদ
-                            otp: otp 
-                        }
+                        templateData: { name: "User", otp: otp }
                     });
-                    console.log(`✅ Email sent to ${email}`);
                 } catch (error) {
-                    console.error("❌ Failed to send email via sendEmail util:", error);
+                    console.error("❌ Email sending failed:", error);
                 }
             },
-            expiresIn: 2 * 60,
+            expiresIn: 300,
             otpLength: 6,
         })
     ],
 
-    trustedOrigins: [env.BETTER_AUTH_URL || "http://localhost:5000", env.FRONTEND_URL],
+    trustedOrigins: ["http://localhost:3000", "http://localhost:5000"],
     advanced: {
         useSecureCookies: false, 
     }
 });
+
+export default auth;

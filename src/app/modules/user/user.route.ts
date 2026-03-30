@@ -26,7 +26,7 @@ router.patch(
     "/update-profile",
     checkAuth(Role.PARTICIPANT, Role.ORGANIZER, Role.ADMIN),
    (UserController.updateMyProfile),
-    UserController.updateMyProfile
+ 
 );
 
 /**

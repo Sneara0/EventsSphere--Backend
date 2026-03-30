@@ -1,145 +1,178 @@
-import path from 'path';
-import fs from 'fs';
-import status from 'http-status';
-import { prisma } from "../../lib/prisma";
-import { IBookingCreatePayload } from "./booking.interface";
-import { generateTicketPDF } from '../../utils/pdfGenerator';
-import { uploadPDFToCloudinary } from '../../utils/cloudinary.utils';
-import AppError from 'src/app/errorHelpers/AppError';
-import { BookingStatus, PaymentStatus } from 'src/generated/prisma/enums';
+// 📂 src/app/modules/booking/booking.service.ts
+
+import { prisma } from "../../lib/prisma"; 
+import { 
+  ICreateBookingRequest, 
+  IUpdateBookingRequest, 
+  IPaymentFulfillmentData 
+} from './booking.interface';
+import { sendEmailWithInvoice } from '../../utils/sendEmail';
+import AppError from "../../errorHelpers/AppError";
+import httpStatus from "http-status";
+import { BookingStatus, PaymentStatus } from "src/generated/prisma/enums";
 
 /**
- * ১. নতুন বুকিং তৈরি করা (Transaction + PDF Generation)
+ * 1. User: Create Initial Booking
  */
-const createBookingIntoDB = async (userId: string, payload: IBookingCreatePayload) => {
-    const { eventId, quantity = 1 } = payload;
-
-    const event = await prisma.event.findUnique({
-        where: { id: eventId },
+const createBookingIntoDB = async (userId: string, payload: ICreateBookingRequest) => {
+  return await prisma.$transaction(async (tx) => {
+    const event = await tx.event.findUnique({
+      where: { id: payload.eventId },
     });
 
     if (!event) {
-        throw new AppError(status.NOT_FOUND, "Event not found!");
+      throw new AppError(httpStatus.NOT_FOUND, "Event not found!");
     }
 
-    if (event.availableSeats < quantity) {
-        throw new AppError(status.BAD_REQUEST, "Not enough seats available!");
+    if (event.availableSeats < payload.quantity) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Insufficient seats available!");
     }
 
-    // Prisma Transaction: বুকিং তৈরি এবং সিট কমানো
-    const result = await prisma.$transaction(async (tx) => {
-        const newBooking = await tx.booking.create({
-            data: {
-                userId,
-                eventId,
-                totalAmount: event.ticketPrice * quantity,
-                status: BookingStatus.SUCCESS, 
-                paymentStatus: PaymentStatus.PAID, 
-            },
-            include: {
-                event: true,
-                user: true
-            }
-        });
-
-        await tx.event.update({
-            where: { id: eventId },
-            data: {
-                availableSeats: {
-                    decrement: quantity
-                }
-            }
-        });
-
-        return newBooking;
+    const booking = await tx.booking.create({
+      data: {
+        userId,
+        eventId: payload.eventId,
+        quantity: payload.quantity,
+        totalAmount: event.ticketPrice * payload.quantity,
+        status: BookingStatus.PENDING,
+        paymentStatus: PaymentStatus.UNPAID,
+      },
     });
 
-    // --- PDF Generation & Upload (Background Process) ---
-    const tempDir = path.join(process.cwd(), 'temp');
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-    const filePath = path.join(tempDir, `ticket-${result.id}.pdf`);
-
-    try {
-        await generateTicketPDF(result, filePath);
-        const cloudinaryUrl = await uploadPDFToCloudinary(filePath, 'event_tickets');
-
-        if (cloudinaryUrl) {
-            await prisma.booking.update({
-                where: { id: result.id },
-                data: {
-                    ticketUrl: cloudinaryUrl,
-                    isTicketGenerated: true,
-                },
-            });
-            result.ticketUrl = cloudinaryUrl;
-        }
-    } catch (error) {
-        console.error("Ticket Process Failed:", error);
-    }
-
-    return result;
+    return booking;
+  });
 };
 
 /**
- * ২. ইউজারের নিজের সব বুকিং দেখা
+ * 2. Payment Fulfillment: Update Stats, Create Payment & Send PDF Invoice
+ */
+const fulfillBookingAfterPayment = async (data: IPaymentFulfillmentData) => {
+  const result = await prisma.$transaction(async (tx) => {
+    
+    const booking = await tx.booking.findUnique({
+      where: { id: data.bookingId },
+    });
+
+    if (!booking || booking.paymentStatus === PaymentStatus.PAID) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Invalid booking or already processed!");
+    }
+
+    const updatedBooking = await tx.booking.update({
+      where: { id: data.bookingId },
+      data: {
+        paymentStatus: PaymentStatus.PAID,
+        status: BookingStatus.SUCCESS,
+      },
+      include: { 
+        user: { select: { name: true, email: true } }, 
+        event: { select: { title: true, dateTime: true, location: true } } 
+      }
+    });
+
+    await tx.payment.create({
+      data: {
+        transactionId: data.transactionId,
+        amount: data.amount,
+        bookingId: data.bookingId,
+        userId: data.userId,
+        paymentStatus: PaymentStatus.PAID, 
+        currency: 'bdt',
+        paymentMethod: 'stripe', 
+      },
+    });
+
+    await tx.event.update({
+      where: { id: updatedBooking.eventId },
+      data: {
+        availableSeats: {
+          decrement: updatedBooking.quantity,
+        },
+      },
+    });
+
+    return updatedBooking;
+  });
+
+  // E. Background Task: ইমেইল পাঠানো
+  if (result) {
+    const emailData = result as any; // Type mismatch দূর করার জন্য কাস্টিং
+    
+    // মনে রাখবেন: এখানে ২য় প্যারামিটার হিসেবে PDF এর Base64 ডাটা লাগবে। 
+    // আপাতত আমি খালি স্ট্রিং "" দিচ্ছি যাতে এরর না আসে। 
+    // আসল PDF জেনারেট করলে সেই ভ্যালুটা এখানে বসাবেন।
+    
+    sendEmailWithInvoice(
+      emailData.user.email,             // to
+      "",                               // pdfBase64 (এখানে PDF ডাটা বসবে)
+      `Invoice_${result.id}.pdf`,         // fileName
+      emailData.user.name               // userName
+    ).catch((err) => {
+      console.error("❌ Failed to send invoice email:", err);
+    });
+  }
+
+  return result;
+};
+
+/**
+ * 3. Admin: Get All Bookings
+ */
+const getAllBookingsFromDB = async () => {
+  return await prisma.booking.findMany({
+    include: {
+      user: { select: { name: true, email: true } },
+      event: { select: { title: true, dateTime: true } },
+      payments: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+/**
+ * 4. Admin: Manual Status Update
+ */
+const updateBookingStatusByAdmin = async (id: string, payload: IUpdateBookingRequest) => {
+  return await prisma.booking.update({
+    where: { id },
+    data: payload,
+  });
+};
+
+/**
+ * 5. Admin: Delete & Restore Seats
+ */
+const deleteBookingByAdmin = async (id: string) => {
+  return await prisma.$transaction(async (tx) => {
+    const booking = await tx.booking.findUnique({ where: { id } });
+    if (!booking) throw new AppError(httpStatus.NOT_FOUND, "Booking not found!");
+
+    if (booking.status === BookingStatus.SUCCESS || booking.paymentStatus === PaymentStatus.PAID) {
+      await tx.event.update({
+        where: { id: booking.eventId },
+        data: { availableSeats: { increment: booking.quantity } },
+      });
+    }
+
+    return await tx.booking.delete({ where: { id } });
+  });
+};
+
+/**
+ * 6. User: Personal History
  */
 const getMyBookingsFromDB = async (userId: string) => {
-    return await prisma.booking.findMany({
-        where: { userId },
-        include: {
-            event: {
-                include: {
-                    organizer: true
-                }
-            }
-        },
-        orderBy: {
-            createdAt: 'desc'
-        }
-    });
+  return await prisma.booking.findMany({
+    where: { userId },
+    include: { event: true },
+    orderBy: { createdAt: 'desc' },
+  });
 };
 
-/**
- * ৩. বুকিং ডিলিট/ক্যানসেল করা এবং সিট ফেরত দেওয়া
- */
-const deleteBookingFromDB = async (userId: string, bookingId: string) => {
-    const booking = await prisma.booking.findUnique({
-        where: { id: bookingId },
-    });
-
-    if (!booking) {
-        throw new AppError(status.NOT_FOUND, "Booking not found!");
-    }
-
-    // নিশ্চিত করা যে ইউজার নিজের বুকিং ডিলিট করছে
-    if (booking.userId !== userId) {
-        throw new AppError(status.FORBIDDEN, "Unauthorized access!");
-    }
-
-    await prisma.$transaction(async (tx) => {
-        // বুকিং ডিলিট করা
-        await tx.booking.delete({
-            where: { id: bookingId },
-        });
-
-        // ইভেন্টের সিট সংখ্যা ফেরত দেওয়া
-        await tx.event.update({
-            where: { id: booking.eventId },
-            data: {
-                availableSeats: {
-                    increment: 1 // বা আপনার logic অনুযায়ী booking.quantity
-                }
-            }
-        });
-    });
-
-    return { message: "Booking deleted successfully and seat restored" };
-};
-
-// ফাইনাল এক্সপোর্ট অবজেক্ট
 export const BookingService = {
-    createBookingIntoDB,
-    getMyBookingsFromDB,
-    deleteBookingFromDB,
+  createBookingIntoDB,
+  fulfillBookingAfterPayment,
+  getAllBookingsFromDB,
+  updateBookingStatusByAdmin,
+  deleteBookingByAdmin,
+  getMyBookingsFromDB,
 };

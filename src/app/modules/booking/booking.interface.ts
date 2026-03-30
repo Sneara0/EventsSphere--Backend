@@ -1,49 +1,49 @@
-export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
-export type PaymentStatus = 'UNPAID' | 'PAID' | 'REFUNDED';
+import { BookingStatus, PaymentStatus } from "src/generated/prisma/enums";
 
 /**
- * ১. ক্লায়েন্ট থেকে আসা ডেটার ইন্টারফেস (Payload)
+ * 1. User: Booking request payload from frontend
  */
-export type IBookingCreatePayload = {
+export type ICreateBookingRequest = {
   eventId: string;
-  quantity?: number; // ডিফল্ট ১ থাকবে, তবে চাইলে ইউজার বেশি দিতে পারে
+  quantity: number;
 };
 
 /**
- * ২. কুয়েরি ফিল্টার করার ইন্টারফেস (Admin বা Organizer এর জন্য)
+ * 2. Admin: Manual status or payment status update
  */
-export type IBookingFilterRequest = {
+export type IUpdateBookingRequest = {
+  status?: BookingStatus;
+  paymentStatus?: PaymentStatus;
+};
+
+/**
+ * 3. Filters: Used for searching bookings in admin panel
+ */
+export type IBookingFilters = {
   searchTerm?: string;
   status?: BookingStatus;
   paymentStatus?: PaymentStatus;
   eventId?: string;
   userId?: string;
-  startDate?: string;
-  endDate?: string;
 };
 
 /**
- * ৩. পেজিনেশন এবং সর্টিং অপশন
+ * 4. Dashboard Stats: Summary data for the super admin
  */
-export type IPaginationOptions = {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+export type IAdminDashboardStats = {
+  totalBookings: number;
+  totalRevenue: number;
+  confirmedBookings: number;
+  pendingBookings: number;
+  totalSoldTickets: number;
 };
 
 /**
- * ৪. সার্ভিসের ভেতরে ব্যবহারের জন্য এক্সটেন্ডেড টাইপ (ঐচ্ছিক)
+ * 5. Payment Fulfillment: Data from Stripe/Payment Webhook
  */
-export interface IBookingResponse {
-  id: string;
+export type IPaymentFulfillmentData = {
+  transactionId: string;
+  bookingId: string;
   userId: string;
-  eventId: string;
-  status: BookingStatus;
-  paymentStatus: PaymentStatus;
-  totalAmount: number;
-  ticketUrl?: string | null;
-  isTicketGenerated: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  amount: number;
+};

@@ -19,7 +19,7 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
     cookieUtils.setRefreshTokenCookie(res, refreshToken);
 
     sendResponse(res, {
-        statusCode: status.CREATED, // httpStatusCode এর বদলে statusCode
+        statusCode: status.CREATED, 
         success: true,
         message: "User registered successfully!",
         data: {
@@ -128,19 +128,20 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// 8. Forget & Reset Password
+// 8. Forget Password
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email } = req.body;
+    
+    // সার্ভিসে ইমেইল পাঠানো হচ্ছে
     await AuthService.forgetPassword(email);
 
     sendResponse(res, {
-        statusCode: status.OK,
+        statusCode: 200, // status.OK
         success: true,
-        message: "Password reset OTP sent to email!",
+        message: "Password reset link sent to your email! 📧",
         data: null,
     });
 });
-
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email, otp, newPassword } = req.body;
     const result = await AuthService.resetPassword(email, otp, newPassword);
@@ -158,7 +159,7 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
     const result = await auth.api.signInSocial({
         body: {
             provider: "google",
-            callbackURL: `${env.FRONTEND_URL}/google/success`,
+            callbackURL: `${env.BETTER_AUTH_URL}/google/success`,
         }
     });
 

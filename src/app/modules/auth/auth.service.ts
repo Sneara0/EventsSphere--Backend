@@ -194,23 +194,52 @@ const logoutUser = async (sessionToken: string) => {
  * 8. Forget Password
  */
 const forgetPassword = async (email: string) => {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || user.isDeleted) throw new AppError(status.NOT_FOUND, "User not found");
-    return await auth.api.requestPasswordResetEmailOTP({ body: { email } });
+    // ১. ইউজার আছে কি না এবং ডিলিট করা কি না চেক করুন
+    const user = await prisma.user.findUnique({ 
+        where: { email } 
+    });
+
+    if (!user) {
+        throw new AppError(status.NOT_FOUND, "User not found with this email!");
+    }
+
+    if (user.isDeleted) {
+        throw new AppError(status.FORBIDDEN, "This account has been deleted!");
+    }
+
+    // ২. Better-Auth এর মাধ্যমে OTP রিকোয়েস্ট পাঠানো
+    // এটি আপনার auth.ts-এ সেট করা ইমেইল সেন্ডারের মাধ্যমে OTP পাঠাবে
+    return await auth.api.requestPasswordResetEmailOTP({ 
+        body: { email } 
+    });
 };
 
 /**
  * 9. Reset Password
  */
 const resetPassword = async (email: string, otp: string, newPassword: string) => {
+    // ১. Better-Auth এর মাধ্যমে OTP ভেরিফাই এবং পাসওয়ার্ড আপডেট
     const result = await auth.api.resetPasswordEmailOTP({
-        body: { email, otp, password: newPassword }
+        body: { 
+            email, 
+            otp, 
+            password: newPassword 
+        }
     });
-    
+
+    // ২. সেশন ক্লিনিং (Security Best Practice)
+    // Better-Auth এর রেজাল্ট থেকে ইউজার আইডি চেক করা হচ্ছে
     const userResult = result as any;
-    if (userResult && userResult.user) {
-        await prisma.session.deleteMany({ where: { userId: userResult.user.id } });
+    
+    if (userResult?.user?.id) {
+        // এই ইউজারের সব পুরনো সেশন ডাটাবেজ থেকে মুছে ফেলা হচ্ছে
+        await prisma.session.deleteMany({ 
+            where: { 
+                userId: userResult.user.id 
+            } 
+        });
     }
+
     return result;
 };
 

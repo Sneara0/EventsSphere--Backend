@@ -1,49 +1,54 @@
-import { Router } from 'express';
-
-
+import express from 'express';
 import { BookingController } from './booking.controller';
-import { BookingValidation } from './booking.validation';
-import { checkAuth } from 'src/app/middlewares/checkAuth';
-import { validateRequest } from 'src/app/middlewares/validateRequest';
 
-const router = Router();
+
+import { checkAuth } from 'src/app/middlewares/checkAuth';
+import { Role } from 'src/generated/prisma/enums';
+
+const router = express.Router();
 
 /**
- * ১. নতুন বুকিং তৈরি করা (Create)
- * PARTICIPANT, ADMIN, ORGANIZER সবাই বুকিং করতে পারবে।
+ * 1. User & Participant: নতুন বুকিং বা রেজিস্ট্রেশন করা
  */
 router.post(
   '/create-booking',
-  checkAuth('PARTICIPANT', 'ADMIN', 'ORGANIZER'), 
-  validateRequest(BookingValidation.createBooking),
+  checkAuth(Role.USER, Role.PARTICIPANT),
   BookingController.createBooking
 );
 
 /**
- * ২. ইউজারের নিজের সব বুকিং লিস্ট দেখা (Read All)
+ * 2. User & Participant: নিজের বুকিং হিস্ট্রি দেখা
  */
 router.get(
   '/my-bookings',
-  checkAuth('PARTICIPANT', 'ADMIN', 'ORGANIZER'),
+  checkAuth(Role.USER, Role.PARTICIPANT),
   BookingController.getMyBookings
 );
 
 /**
- * ৩. নির্দিষ্ট একটি বুকিং-এর বিস্তারিত দেখা (Read Single)
+ * 3. Organizer & Admin: ইভেন্টের সব বুকিং লিস্ট দেখা
  */
 router.get(
-  '/:id',
-  checkAuth('PARTICIPANT', 'ADMIN', 'ORGANIZER'),
-  BookingController.getSingleBooking
+  '/',
+checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.ORGANIZER),
+  BookingController.getAllBookings
 );
 
 /**
- * ৪. বুকিং ডিলিট বা ক্যানসেল করা (Delete & Restore Seat)
- * সাধারণত PARTICIPANT নিজে অথবা ADMIN এটি ডিলিট করতে পারে।
+ * 4. Admin & Organizer: বুকিং স্ট্যাটাস আপডেট (Manual Approval)
+ */
+router.patch(
+  '/:id',
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.ORGANIZER),
+  BookingController.updateBookingStatus
+);
+
+/**
+ * 5. Super Admin: বুকিং ডিলিট করা (Full Control)
  */
 router.delete(
   '/:id',
-  checkAuth('PARTICIPANT', 'ADMIN'),
+  checkAuth(Role.SUPER_ADMIN),
   BookingController.deleteBooking
 );
 

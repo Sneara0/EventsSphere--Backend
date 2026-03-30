@@ -1,32 +1,21 @@
 import { Router } from "express";
+import { toNodeHandler } from "better-auth/node";
 import { AuthController } from "./auth.controller";
-
 import { Role } from "../../../generated/prisma/enums";
 import { checkAuth } from "src/app/middlewares/checkAuth";
+import { auth } from "src/app/lib/auth";
 
 const router = Router();
 
-// --- Public Routes ---
-// রেজিস্ট্রেশন এবং লগইন
+// --- ১. কাস্টম এপিআই রাউটস ---
 router.post("/register", AuthController.registerUser);
 router.post("/login", AuthController.loginUser);
-
-// টোকেন রিফ্রেশ (নতুন এক্সেস টোকেন পাওয়ার জন্য)
 router.post("/refresh-token", AuthController.getNewToken);
-
-// ইমেইল ভেরিফিকেশন ও পাসওয়ার্ড রিকভারি
 router.post("/verify-email", AuthController.verifyEmail);
 router.post("/forget-password", AuthController.forgetPassword);
 router.post("/reset-password", AuthController.resetPassword);
 
-// Google OAuth রুটস
-router.get("/login/google", AuthController.googleLogin);
-router.get("/google/success", AuthController.googleLoginSuccess);
-router.get("/oauth/error", AuthController.handleOAuthError);
-
-
-// --- Protected Routes ---
-// লগইন করা ইউজারদের জন্য (Admin, Organizer, Participant/Patient)
+// --- ২. প্রোটেক্টেড রাউটস ---
 router.get(
     "/me", 
     checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.ORGANIZER, Role.PARTICIPANT), 
@@ -44,5 +33,16 @@ router.post(
     checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.ORGANIZER, Role.PARTICIPANT),
     AuthController.logoutUser
 );
+
+// --- ৩. Better Auth ইন্টারনাল হ্যান্ডলার (FIXED for Node v24) ---
+/**
+ * সরাসরি 'all' এর বদলে ওয়াইল্ডকার্ড ছাড়া হ্যান্ডলার ব্যবহার করুন।
+ * এটি /auth/ এর পরের সব সাব-পাথ (login, session, etc.) ধরবে।
+ */
+router.use((req, res, next) => {
+    // Better-Auth এর হ্যান্ডলারকে সরাসরি কল করা হচ্ছে
+    const handler = toNodeHandler(auth);
+    return handler(req, res);
+});
 
 export const AuthRoutes = router;

@@ -5,6 +5,7 @@ model Event {
   category        String   // e.g., Concert, Workshop, Seminar
    dateTime        DateTime
   time            String
+  location       String
   venue           String   // Location
   thumbnail       String?  // Cloudinary Image URL
   ticketPrice     Float    @default(0)

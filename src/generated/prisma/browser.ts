@@ -68,6 +68,11 @@ export type Organizer = Prisma.OrganizerModel
  */
 export type Participant = Prisma.ParticipantModel
 /**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
  * Model Review
  * 
  */

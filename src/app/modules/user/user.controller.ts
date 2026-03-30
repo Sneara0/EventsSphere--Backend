@@ -3,13 +3,14 @@ import status from "http-status";
 import { UserService } from "./user.service";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
 import { Role } from "../../../generated/prisma/enums";
-import { catchAsync } from "src/app/utils/catchAsync";
-import { sendResponse } from "src/app/utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync"; // পাথ চেক করে নিন
+import { sendResponse } from "../../utils/sendResponse"; // পাথ চেক করে নিন
 
-// সব ইউজার আনা
+// ১. সব ইউজার আনা
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     const role = req.query.role as Role;
     const result = await UserService.getAllUsersFromDB(role);
+    
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -18,12 +19,10 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// ✅ গেট সিঙ্গেল ইউজার (TypeError Fix)
+// ২. সিঙ্গেল ইউজার আনা (ID Fix)
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-    // এখানে 'as string' যোগ করা হয়েছে যাতে string | string[] এরর না আসে
-    const id = req.params.id as string; 
-    
-    const result = await UserService.getSingleUserFromDB(id);
+    const { id } = req.params; // ডিরেক্ট ডিস্ট্রাকচার করা ভালো
+    const result = await UserService.getSingleUserFromDB(id as string);
 
     sendResponse(res, {
         statusCode: status.OK,
@@ -33,10 +32,13 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// প্রোফাইল দেখা
+// ৩. নিজের প্রোফাইল দেখা
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IRequestUser;
+    
+    // সার্ভিসে userId এবং role পাঠানো হচ্ছে
     const result = await UserService.getMyProfileFromDB(user.userId, user.role as Role);
+
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -45,10 +47,17 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// প্রোফাইল আপডেট
+// ৪. প্রোফাইল আপডেট (লজিক্যাল ফিক্স)
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IRequestUser;
-    const result = await UserService.updateMyProfileIntoDB(user.userId, user.role as Role, req.body);
+    
+    // payload হিসেবে req.body পাঠানো হচ্ছে
+    const result = await UserService.updateMyProfileIntoDB(
+        user.userId, 
+        user.role as Role, 
+        req.body
+    );
+
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -59,7 +68,7 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
 
 export const UserController = {
     getAllUsers,
-    getSingleUser, // এটি এখন এক্সপোর্ট হচ্ছে
+    getSingleUser,
     getMyProfile,
     updateMyProfile
 };

@@ -1,32 +1,32 @@
 import { z } from "zod";
 
 /**
- * ১. প্রোফাইল আপডেট করার জন্য ভ্যালিডেশন স্কিমা
+ * ১. প্রোফাইল আপডেট করার জন্য বুলেটপ্রুফ ভ্যালিডেশন স্কিমা
  */
 const updateMyProfile = z.object({
     body: z.object({
-        name: z.string({
-            // আপনার এরর অনুযায়ী এখানে শুধু message প্রপার্টি ব্যবহার করা নিরাপদ
-            message: "Name must be a string", 
-        }).optional(),
+        // z.string() এর ভেতরে অবজেক্ট না দিয়ে সরাসরি মেথড চেইন ব্যবহার করুন
+        name: z.string()
+            .describe("User's full name") // description এর বদলে .describe() ব্যবহার করুন
+            .optional(),
         
-        image: z.string().url({
-            message: "Image must be a valid URL",
-        }).optional(),
+        image: z.string()
+            .url("Image must be a valid URL")
+            .optional(),
         
         contactNumber: z.string()
-            .min(10, { message: "Contact number must be at least 10 characters" })
-            .max(15, { message: "Contact number cannot exceed 15 characters" })
+            .min(10, "Contact number must be at least 10 characters")
+            .max(15, "Contact number cannot exceed 15 characters")
             .optional(),
         
         address: z.string().optional(),
         
-        bio: z.string().max(500, {
-            message: "Bio cannot exceed 500 characters",
-        }).optional(),
+        bio: z.string()
+            .max(500, "Bio cannot exceed 500 characters")
+            .optional(),
         
         organizationName: z.string().optional(),
-    }),
+    }).strict(), 
 });
 
 export const UserValidation = {

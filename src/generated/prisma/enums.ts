@@ -49,6 +49,7 @@ export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
 
 
 export const PaymentStatus = {
+  PENDING: 'PENDING',
   UNPAID: 'UNPAID',
   PAID: 'PAID',
   REFUNDED: 'REFUNDED'

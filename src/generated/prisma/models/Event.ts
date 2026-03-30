@@ -45,6 +45,7 @@ export type EventMinAggregateOutputType = {
   category: string | null
   dateTime: Date | null
   time: string | null
+  location: string | null
   venue: string | null
   thumbnail: string | null
   ticketPrice: number | null
@@ -64,6 +65,7 @@ export type EventMaxAggregateOutputType = {
   category: string | null
   dateTime: Date | null
   time: string | null
+  location: string | null
   venue: string | null
   thumbnail: string | null
   ticketPrice: number | null
@@ -83,6 +85,7 @@ export type EventCountAggregateOutputType = {
   category: number
   dateTime: number
   time: number
+  location: number
   venue: number
   thumbnail: number
   ticketPrice: number
@@ -116,6 +119,7 @@ export type EventMinAggregateInputType = {
   category?: true
   dateTime?: true
   time?: true
+  location?: true
   venue?: true
   thumbnail?: true
   ticketPrice?: true
@@ -135,6 +139,7 @@ export type EventMaxAggregateInputType = {
   category?: true
   dateTime?: true
   time?: true
+  location?: true
   venue?: true
   thumbnail?: true
   ticketPrice?: true
@@ -154,6 +159,7 @@ export type EventCountAggregateInputType = {
   category?: true
   dateTime?: true
   time?: true
+  location?: true
   venue?: true
   thumbnail?: true
   ticketPrice?: true
@@ -260,6 +266,7 @@ export type EventGroupByOutputType = {
   category: string
   dateTime: Date
   time: string
+  location: string
   venue: string
   thumbnail: string | null
   ticketPrice: number
@@ -302,6 +309,7 @@ export type EventWhereInput = {
   category?: Prisma.StringFilter<"Event"> | string
   dateTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   time?: Prisma.StringFilter<"Event"> | string
+  location?: Prisma.StringFilter<"Event"> | string
   venue?: Prisma.StringFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
   ticketPrice?: Prisma.FloatFilter<"Event"> | number
@@ -325,6 +333,7 @@ export type EventOrderByWithRelationInput = {
   category?: Prisma.SortOrder
   dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketPrice?: Prisma.SortOrder
@@ -351,6 +360,7 @@ export type EventWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.StringFilter<"Event"> | string
   dateTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   time?: Prisma.StringFilter<"Event"> | string
+  location?: Prisma.StringFilter<"Event"> | string
   venue?: Prisma.StringFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
   ticketPrice?: Prisma.FloatFilter<"Event"> | number
@@ -374,6 +384,7 @@ export type EventOrderByWithAggregationInput = {
   category?: Prisma.SortOrder
   dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
   ticketPrice?: Prisma.SortOrder
@@ -401,6 +412,7 @@ export type EventScalarWhereWithAggregatesInput = {
   category?: Prisma.StringWithAggregatesFilter<"Event"> | string
   dateTime?: Prisma.DateTimeWithAggregatesFilter<"Event"> | Date | string
   time?: Prisma.StringWithAggregatesFilter<"Event"> | string
+  location?: Prisma.StringWithAggregatesFilter<"Event"> | string
   venue?: Prisma.StringWithAggregatesFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableWithAggregatesFilter<"Event"> | string | null
   ticketPrice?: Prisma.FloatWithAggregatesFilter<"Event"> | number
@@ -420,6 +432,7 @@ export type EventCreateInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -442,6 +455,7 @@ export type EventUncheckedCreateInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -464,6 +478,7 @@ export type EventUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -486,6 +501,7 @@ export type EventUncheckedUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -508,6 +524,7 @@ export type EventCreateManyInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -527,6 +544,7 @@ export type EventUpdateManyMutationInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -545,6 +563,7 @@ export type EventUncheckedUpdateManyInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -574,6 +593,7 @@ export type EventCountOrderByAggregateInput = {
   category?: Prisma.SortOrder
   dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrder
   ticketPrice?: Prisma.SortOrder
@@ -599,6 +619,7 @@ export type EventMaxOrderByAggregateInput = {
   category?: Prisma.SortOrder
   dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrder
   ticketPrice?: Prisma.SortOrder
@@ -618,6 +639,7 @@ export type EventMinOrderByAggregateInput = {
   category?: Prisma.SortOrder
   dateTime?: Prisma.SortOrder
   time?: Prisma.SortOrder
+  location?: Prisma.SortOrder
   venue?: Prisma.SortOrder
   thumbnail?: Prisma.SortOrder
   ticketPrice?: Prisma.SortOrder
@@ -743,6 +765,7 @@ export type EventCreateWithoutBookingsInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -764,6 +787,7 @@ export type EventUncheckedCreateWithoutBookingsInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -801,6 +825,7 @@ export type EventUpdateWithoutBookingsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -822,6 +847,7 @@ export type EventUncheckedUpdateWithoutBookingsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -843,6 +869,7 @@ export type EventCreateWithoutCouponsInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -864,6 +891,7 @@ export type EventUncheckedCreateWithoutCouponsInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -901,6 +929,7 @@ export type EventUpdateWithoutCouponsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -922,6 +951,7 @@ export type EventUncheckedUpdateWithoutCouponsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -943,6 +973,7 @@ export type EventCreateWithoutOrganizerInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -964,6 +995,7 @@ export type EventUncheckedCreateWithoutOrganizerInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -1014,6 +1046,7 @@ export type EventScalarWhereInput = {
   category?: Prisma.StringFilter<"Event"> | string
   dateTime?: Prisma.DateTimeFilter<"Event"> | Date | string
   time?: Prisma.StringFilter<"Event"> | string
+  location?: Prisma.StringFilter<"Event"> | string
   venue?: Prisma.StringFilter<"Event"> | string
   thumbnail?: Prisma.StringNullableFilter<"Event"> | string | null
   ticketPrice?: Prisma.FloatFilter<"Event"> | number
@@ -1033,6 +1066,7 @@ export type EventCreateWithoutReviewsInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -1054,6 +1088,7 @@ export type EventUncheckedCreateWithoutReviewsInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -1091,6 +1126,7 @@ export type EventUpdateWithoutReviewsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1112,6 +1148,7 @@ export type EventUncheckedUpdateWithoutReviewsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1133,6 +1170,7 @@ export type EventCreateManyOrganizerInput = {
   category: string
   dateTime: Date | string
   time: string
+  location: string
   venue: string
   thumbnail?: string | null
   ticketPrice?: number
@@ -1151,6 +1189,7 @@ export type EventUpdateWithoutOrganizerInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1172,6 +1211,7 @@ export type EventUncheckedUpdateWithoutOrganizerInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1193,6 +1233,7 @@ export type EventUncheckedUpdateManyWithoutOrganizerInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   dateTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   time?: Prisma.StringFieldUpdateOperationsInput | string
+  location?: Prisma.StringFieldUpdateOperationsInput | string
   venue?: Prisma.StringFieldUpdateOperationsInput | string
   thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ticketPrice?: Prisma.FloatFieldUpdateOperationsInput | number
@@ -1260,6 +1301,7 @@ export type EventSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   category?: boolean
   dateTime?: boolean
   time?: boolean
+  location?: boolean
   venue?: boolean
   thumbnail?: boolean
   ticketPrice?: boolean
@@ -1284,6 +1326,7 @@ export type EventSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   category?: boolean
   dateTime?: boolean
   time?: boolean
+  location?: boolean
   venue?: boolean
   thumbnail?: boolean
   ticketPrice?: boolean
@@ -1304,6 +1347,7 @@ export type EventSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   category?: boolean
   dateTime?: boolean
   time?: boolean
+  location?: boolean
   venue?: boolean
   thumbnail?: boolean
   ticketPrice?: boolean
@@ -1324,6 +1368,7 @@ export type EventSelectScalar = {
   category?: boolean
   dateTime?: boolean
   time?: boolean
+  location?: boolean
   venue?: boolean
   thumbnail?: boolean
   ticketPrice?: boolean
@@ -1336,7 +1381,7 @@ export type EventSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "dateTime" | "time" | "venue" | "thumbnail" | "ticketPrice" | "totalSeats" | "availableSeats" | "status" | "isDeleted" | "organizerId" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
+export type EventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "category" | "dateTime" | "time" | "location" | "venue" | "thumbnail" | "ticketPrice" | "totalSeats" | "availableSeats" | "status" | "isDeleted" | "organizerId" | "createdAt" | "updatedAt", ExtArgs["result"]["event"]>
 export type EventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organizer?: boolean | Prisma.OrganizerDefaultArgs<ExtArgs>
   bookings?: boolean | Prisma.Event$bookingsArgs<ExtArgs>
@@ -1366,6 +1411,7 @@ export type $EventPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     category: string
     dateTime: Date
     time: string
+    location: string
     venue: string
     thumbnail: string | null
     ticketPrice: number
@@ -1809,6 +1855,7 @@ export interface EventFieldRefs {
   readonly category: Prisma.FieldRef<"Event", 'String'>
   readonly dateTime: Prisma.FieldRef<"Event", 'DateTime'>
   readonly time: Prisma.FieldRef<"Event", 'String'>
+  readonly location: Prisma.FieldRef<"Event", 'String'>
   readonly venue: Prisma.FieldRef<"Event", 'String'>
   readonly thumbnail: Prisma.FieldRef<"Event", 'String'>
   readonly ticketPrice: Prisma.FieldRef<"Event", 'Float'>
