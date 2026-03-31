@@ -121,9 +121,9 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.verifyEmail(email, otp);
 
     sendResponse(res, {
-        statusCode: status.OK,
+        statusCode: 200,
         success: true,
-        message: "Email verified successfully!",
+        message: "Email verified successfully! ✅",
         data: result,
     });
 });
