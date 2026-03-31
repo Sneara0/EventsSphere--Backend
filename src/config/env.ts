@@ -6,7 +6,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 interface EnvConfig {
     NODE_ENV: string;
-    PORT: string; // নিশ্চিত করুন এটি স্ট্রিং হিসেবেই রিড হবে
+    PORT: string; 
     DATABASE_URL: string;
     SUPER_ADMIN_EMAIL: string;
     SUPER_ADMIN_PASSWORD: string;
@@ -25,28 +25,23 @@ interface EnvConfig {
         SMTP_PORT: string;
         SMTP_FROM: string;
     };
-    SMTP_HOST: string;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     GOOGLE_CALLBACK_URL: string;
     FRONTEND_URL: string;
-    CLOUDINARY:{
+    CLOUDINARY: {
         CLOUDINARY_CLOUD_NAME: string;
         CLOUDINARY_API_KEY: string;
         CLOUDINARY_API_SECRET: string;
-    }
-    STRIPE:{
-          
-          STRIPE_SECRET_KEY:string,
-          STRIPE_WEBHOOK_SECRET:string
-    
-
-    }
+    };
+    STRIPE: {
+        STRIPE_SECRET_KEY: string;
+        STRIPE_WEBHOOK_SECRET: string;
+    };
 }
 
 const config: EnvConfig = {
     NODE_ENV: process.env.NODE_ENV || 'development',
-    // মেইন ফিক্স: যদি এনভায়রনমেন্টে পোর্ট না থাকে তবে ডিফল্ট '5000' নিবে
     PORT: process.env.PORT || '5000', 
     DATABASE_URL: process.env.DATABASE_URL as string,
     SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
@@ -59,28 +54,32 @@ const config: EnvConfig = {
     REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
     BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN: process.env.BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN || '7d',
     BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: process.env.BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE || '24h',
+    
+    // --- ইমেইল কনফিগারেশন ফিক্স ---
     EMAIL_SENDER: {
-        // এখানে নামগুলো আপনার .env ফাইলের নামের সাথে মিল রেখে লিখুন
-        SMTP_HOST: process.env.SMTP_HOST as string, 
-        SMTP_PORT: process.env.SMTP_PORT || '587',
-        SMTP_USER: process.env.SMTP_USER as string,
-        SMTP_PASS: process.env.SMTP_PASS as string,
-        SMTP_FROM: process.env.SMTP_FROM as string,
+        // আপনার .env ফাইলের নামের সাথে মিল রেখে পরিবর্তন করা হয়েছে
+        SMTP_HOST: process.env.EMAIL_SENDER_SMTP_HOST || 'smtp.gmail.com', 
+        SMTP_PORT: process.env.EMAIL_SENDER_SMTP_PORT || '465',
+        SMTP_USER: process.env.EMAIL_SENDER_SMTP_USER as string, // snearaparvin.cse1@gmail.com
+        SMTP_PASS: process.env.EMAIL_SENDER_SMTP_PASS as string, // ncalvdgxvqhxqgel
+        SMTP_FROM: process.env.EMAIL_SENDER_SMTP_FROM as string,
     },
-    SMTP_HOST: process.env.SMTP_HOST as string,
+
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     FRONTEND_URL: process.env.FRONTEND_URL as string,
+    
     CLOUDINARY: {
         CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
         CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
         CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
     },
-    STRIPE:{   
-          STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
-          STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
-         },
+    
+    STRIPE: {   
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
+        STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
+    },
 };
 
 export default config;

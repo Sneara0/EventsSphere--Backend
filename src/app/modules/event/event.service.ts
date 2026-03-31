@@ -1,15 +1,16 @@
-
 import status from "http-status";
 import { prisma } from "../../lib/prisma";
 import { IEventCreatePayload, IEventFilterRequest } from "./event.interface";
-import AppError from "../../errorHelpers/AppError"; // পাথটি আপনার প্রোজেক্ট অনুযায়ী ঠিক করুন
+import AppError from "../../errorHelpers/AppError"; 
 import { Prisma } from "src/generated/prisma/client";
+
 
 /**
  * 1. Create a new event
+ * এখানে টাইপ এরর ফিক্স করা হয়েছে এবং location ফিল্ড নিশ্চিত করা হয়েছে।
  */
 const createEventIntoDB = async (userId: string, payload: IEventCreatePayload) => {
-    // অর্গানাইজার প্রোফাইল আছে কি না চেক করা
+    // ১. অর্গানাইজার প্রোফাইল চেক
     const organizer = await prisma.organizer.findUnique({
         where: { userId },
     });
@@ -18,11 +19,22 @@ const createEventIntoDB = async (userId: string, payload: IEventCreatePayload) =
         throw new AppError(status.NOT_FOUND, "Organizer profile not found!");
     }
 
+    // ২. ডাটাবেজে ইভেন্ট তৈরি (সব রিকোয়ার্ড ফিল্ডসহ)
     const result = await prisma.event.create({
         data: {
-            ...payload,
+            title: payload.title,
+            description: payload.description,
+            category: payload.category,
+            location: payload.location, // এটি আপনার এররের প্রধান কারণ ছিল
+            venue: payload.venue,
+            time: payload.time,
+            thumbnail: payload.thumbnail || null,
+            ticketPrice: Number(payload.ticketPrice) || 0,
+            totalSeats: Number(payload.totalSeats),
+            availableSeats: Number(payload.totalSeats), // শুরুতে ফুল সিট থাকবে
+            dateTime: new Date(payload.dateTime), // স্ট্রিং থেকে ডেট অবজেক্ট
             organizerId: organizer.id,
-            availableSeats: payload.totalSeats, // শুরুতে totalSeats ই available থাকবে
+            status: "UPCOMING", // ডিফল্ট স্ট্যাটাস
         },
     });
 
@@ -35,16 +47,16 @@ const createEventIntoDB = async (userId: string, payload: IEventCreatePayload) =
 const getAllEventsFromDB = async (filters: IEventFilterRequest) => {
     const { searchTerm, category, minPrice, maxPrice, status: eventStatus } = filters;
     
-    // Prisma.EventWhereInput টাইপ ব্যবহার করা হয়েছে টাইপ সেফটির জন্য
     const andConditions: Prisma.EventWhereInput[] = [];
 
-    // Search logic (Title, Description, Venue)
+    // Search logic (Title, Description, Venue, Location)
     if (searchTerm) {
         andConditions.push({
             OR: [
                 { title: { contains: searchTerm, mode: 'insensitive' } },
                 { description: { contains: searchTerm, mode: 'insensitive' } },
                 { venue: { contains: searchTerm, mode: 'insensitive' } },
+                { location: { contains: searchTerm, mode: 'insensitive' } },
             ],
         });
     }
@@ -54,17 +66,17 @@ const getAllEventsFromDB = async (filters: IEventFilterRequest) => {
         andConditions.push({ category });
     }
 
-    // Status filter (Upcoming/Ongoing etc.)
+    // Status filter
     if (eventStatus) {
         andConditions.push({ status: eventStatus });
     }
 
-    // Price range filter (String থেকে Number এ কনভার্ট করা হয়েছে)
+    // Price range filter
     if (minPrice || maxPrice) {
         andConditions.push({
             ticketPrice: {
-                gte: minPrice ? parseFloat(minPrice) : undefined,
-                lte: maxPrice ? parseFloat(maxPrice) : undefined,
+                gte: minPrice ? parseFloat(minPrice as string) : undefined,
+                lte: maxPrice ? parseFloat(maxPrice as string) : undefined,
             },
         });
     }
@@ -83,7 +95,7 @@ const getAllEventsFromDB = async (filters: IEventFilterRequest) => {
                 }
             }
         },
-        orderBy: { date: 'asc' },
+        orderBy: { dateTime: 'asc' }, // dateTime ফিল্ড অনুযায়ী সর্টিং
     });
 
     return result;
@@ -94,7 +106,7 @@ const getAllEventsFromDB = async (filters: IEventFilterRequest) => {
  */
 const getSingleEventFromDB = async (id: string) => {
     const result = await prisma.event.findUnique({
-        where: { id, isDeleted: false },
+        where: { id },
         include: { 
             organizer: {
                 include: { 
@@ -107,31 +119,38 @@ const getSingleEventFromDB = async (id: string) => {
                 include: {
                     user: { select: { name: true, image: true } }
                 }
-            }
+            },
+            coupons: true // কুপন থাকলে তাও দেখতে পাবেন
         },
     });
 
-    if (!result) {
+    if (!result || result.isDeleted) {
         throw new AppError(status.NOT_FOUND, "Event not found!");
     }
     return result;
 };
 
 /**
- * 4. Update an event (with Ownership check)
+ * 4. Update an event
  */
 const updateEventIntoDB = async (eventId: string, userId: string, payload: Partial<IEventCreatePayload>) => {
-    const isOwner = await prisma.event.findFirst({
+    const event = await prisma.event.findFirst({
         where: { id: eventId, organizer: { userId }, isDeleted: false }
     });
 
-    if (!isOwner) {
-        throw new AppError(status.FORBIDDEN, "You are not authorized to update this event!");
+    if (!event) {
+        throw new AppError(status.FORBIDDEN, "Unauthorized or event not found!");
     }
 
     const result = await prisma.event.update({
         where: { id: eventId },
-        data: payload,
+        data: {
+            ...payload,
+            // যদি dateTime আপডেট হয় তবে সেটি Date অবজেক্টে নিতে হবে
+            ...(payload.dateTime && { dateTime: new Date(payload.dateTime) }),
+            // যদি totalSeats আপডেট হয় তবে লজিক অনুযায়ী availableSeats চেক করা দরকার
+            ...(payload.totalSeats && { availableSeats: Number(payload.totalSeats) })
+        },
     });
     return result;
 };
@@ -140,12 +159,12 @@ const updateEventIntoDB = async (eventId: string, userId: string, payload: Parti
  * 5. Soft delete an event
  */
 const deleteEventFromDB = async (eventId: string, userId: string) => {
-    const isOwner = await prisma.event.findFirst({
+    const event = await prisma.event.findFirst({
         where: { id: eventId, organizer: { userId }, isDeleted: false }
     });
 
-    if (!isOwner) {
-        throw new AppError(status.FORBIDDEN, "You are not authorized to delete this event!");
+    if (!event) {
+        throw new AppError(status.FORBIDDEN, "Unauthorized or event not found!");
     }
 
     const result = await prisma.event.update({

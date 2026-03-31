@@ -4,7 +4,6 @@ import { bearer, emailOTP } from "better-auth/plugins";
 import { Role, UserStatus } from "../../generated/prisma/enums"; 
 import { prisma } from "./prisma";
 import { sendEmail } from "../utils/email";
-// পাথ ফিক্স: '../../' ব্যবহার করা হয়েছে কারণ auth.ts থেকে src/config এ যেতে হবে
 import env from "../../config/env"; 
 
 export const auth = betterAuth({
@@ -14,7 +13,7 @@ export const auth = betterAuth({
         provider: "postgresql",
     }),
 
-    // --- সোশ্যাল লগইন (গুগল) যোগ করা হয়েছে ---
+    // --- সোশ্যাল লগইন (গুগল) ---
     socialProviders: {
         google: {
             clientId: env.GOOGLE_CLIENT_ID as string,
@@ -27,8 +26,7 @@ export const auth = betterAuth({
         user: {
             create: {
                 after: async (user) => {
-                    console.log(`👤 Creating profile for User: ${user.email} with Role: ${(user as any).role}`);
-                    
+                    console.log(`👤 Creating profile for User: ${user.email}`);
                     try {
                         const userRole = (user as any).role;
 
@@ -62,7 +60,7 @@ export const auth = betterAuth({
     // --- AUTH METHODS ---
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: true,
+        // মনে রাখবেন: requireEmailVerification এখানে দরকার নেই যদি আপনি OTP প্লাগিন ব্যবহার করেন
     },
 
     // --- ADDITIONAL FIELDS ---
@@ -96,27 +94,34 @@ export const auth = betterAuth({
     plugins: [
         bearer(),
         emailOTP({
+            // 'sendOnSignUp' এখানে নেই, তাই এটি সরানো হয়েছে
             async sendVerificationOTP({ email, otp, type }) {
                 console.log(`📩 OTP generated for ${email}: ${otp}`);
                 try {
                     await sendEmail({
                         to: email,
-                        subject: type === "email-verification" ? "Verify your Event Sphere account" : "Password Reset OTP",
+                        subject: type === "email-verification" 
+                            ? "Verify your Event Sphere account" 
+                            : "Password Reset OTP",
                         templateName: "otp",
-                        templateData: { name: "User", otp: otp }
+                        templateData: { 
+                            name: "User", 
+                            otp: otp 
+                        }
                     });
+                    console.log(`✅ OTP Email sent successfully to ${email}`);
                 } catch (error) {
-                    console.error("❌ Email sending failed:", error);
+                    console.error("❌ Email sending failed in Auth Plugin:", error);
                 }
             },
-            expiresIn: 300,
+            expiresIn: 300, // ৫ মিনিট মেয়াদ
             otpLength: 6,
         })
     ],
 
     trustedOrigins: ["http://localhost:3000", "http://localhost:5000"],
     advanced: {
-        useSecureCookies: false, 
+        useSecureCookies: false, // লোকালহোস্টের জন্য false রাখা ভালো
     }
 });
 

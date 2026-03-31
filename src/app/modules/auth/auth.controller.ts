@@ -1,19 +1,33 @@
 import { Request, Response } from "express";
 import status from "http-status";
 import { AuthService } from "./auth.service";
-import { catchAsync } from "../../utils/catchAsync"; // পাথগুলো চেক করে নিন
+import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import { cookieUtils } from "../../utils/cookie";
 import { auth } from "../../lib/auth";
-
 import AppError from "../../errorHelpers/AppError";
 import env from "src/config/env";
 
-
-// 1. User Registration
+// 1. User Registration (Fixed Enum Case Sensitivity)
 const registerUser = catchAsync(async (req: Request, res: Response) => {
-    const result = await AuthService.registerUser(req.body);
-    const { accessToken, refreshToken } = result;
+    // ইউজারের পাঠানো ডাটা থেকে রোলটিকে বড় হাতের অক্ষরে রূপান্তর করা হচ্ছে
+    // কারণ প্রিজমা Enum (ORGANIZER, PARTICIPANT) বড় হাতের অক্ষর আশা করে
+    const registrationData = {
+        ...req.body,
+        role: req.body.role ? req.body.role.toUpperCase() : "PARTICIPANT"
+    };
+
+    const result = await AuthService.registerUser(registrationData);
+    const { accessToken, refreshToken, user } = result;
+
+    // --- Better Auth OTP Trigger ---
+    // রেজিস্ট্রেশন সফল হওয়ার পর অটোমেটিক ওটিপি পাঠানো হচ্ছে
+    await auth.api.sendVerificationOTP({
+        body: {
+            email: user.email,
+            type: "email-verification",
+        },
+    });
 
     cookieUtils.setAccessTokenCookie(res, accessToken);
     cookieUtils.setRefreshTokenCookie(res, refreshToken);
@@ -21,9 +35,9 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: status.CREATED, 
         success: true,
-        message: "User registered successfully!",
+        message: "User registered successfully! Please check your email for OTP. 📩",
         data: {
-            user: result.user,
+            user: user,
             accessToken
         },
     });
@@ -115,13 +129,19 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// 7. Verify Email
+// 7. Verify Email (OTP Verification)
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
     const { email, otp } = req.body;
-    const result = await AuthService.verifyEmail(email, otp);
+    
+    const result = await auth.api.verifyEmailOTP({
+        body: {
+            email,
+            otp,
+        }
+    });
 
     sendResponse(res, {
-        statusCode: 200,
+        statusCode: status.OK,
         success: true,
         message: "Email verified successfully! ✅",
         data: result,
@@ -132,19 +152,32 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email } = req.body;
     
-    // সার্ভিসে ইমেইল পাঠানো হচ্ছে
-    await AuthService.forgetPassword(email);
+    await auth.api.sendVerificationOTP({
+        body: {
+            email,
+            type: "forget-password",
+        }
+    });
 
     sendResponse(res, {
-        statusCode: 200, // status.OK
+        statusCode: status.OK,
         success: true,
-        message: "Password reset link sent to your email! 📧",
+        message: "Password reset OTP sent to your email! 📧",
         data: null,
     });
 });
+
+// 9. Reset Password (Fixed Typescript/Overload issue)
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email, otp, newPassword } = req.body;
-    const result = await AuthService.resetPassword(email, otp, newPassword);
+    
+    const result = await auth.api.resetPassword({
+        body: {
+            email,
+            otp,
+            newPassword
+        } as any
+    });
 
     sendResponse(res, {
         statusCode: status.OK,
@@ -154,12 +187,12 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// 9. Google Login
+// 10. Google Login
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
     const result = await auth.api.signInSocial({
         body: {
             provider: "google",
-            callbackURL: `${env.BETTER_AUTH_URL}/google/success`,
+            callbackURL: `${env.FRONTEND_URL}/google/success`,
         }
     });
 
@@ -171,7 +204,7 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// 10. Google Login Success
+// 11. Google Login Success
 const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
     const session = await auth.api.getSession({
         headers: new Headers(req.headers as Record<string, string>)
@@ -197,7 +230,7 @@ const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// 11. Handle OAuth Error
+// 12. Handle OAuth Error
 const handleOAuthError = catchAsync(async (req: Request, res: Response) => {
     const error = req.query.error || "OAuth authentication failed";
     
