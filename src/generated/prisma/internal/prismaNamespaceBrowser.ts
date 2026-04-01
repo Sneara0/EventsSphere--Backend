@@ -210,6 +210,11 @@ export const EventScalarFieldEnum = {
   availableSeats: 'availableSeats',
   status: 'status',
   isDeleted: 'isDeleted',
+  airlineName: 'airlineName',
+  flightNumber: 'flightNumber',
+  flightClass: 'flightClass',
+  baggageAllowance: 'baggageAllowance',
+  isRefundable: 'isRefundable',
   organizerId: 'organizerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

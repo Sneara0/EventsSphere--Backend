@@ -4,13 +4,11 @@ import { IEventCreatePayload, IEventFilterRequest } from "./event.interface";
 import AppError from "../../errorHelpers/AppError"; 
 import { Prisma } from "src/generated/prisma/client";
 
-
 /**
- * 1. Create a new event
- * এখানে টাইপ এরর ফিক্স করা হয়েছে এবং location ফিল্ড নিশ্চিত করা হয়েছে।
+ * 1. Create a New Flight/Event Offer
  */
 const createEventIntoDB = async (userId: string, payload: IEventCreatePayload) => {
-    // ১. অর্গানাইজার প্রোফাইল চেক
+    // অর্গানাইজার (ট্রাভেল এজেন্সি/অ্যাডমিন) প্রোফাইল চেক
     const organizer = await prisma.organizer.findUnique({
         where: { userId },
     });
@@ -19,22 +17,29 @@ const createEventIntoDB = async (userId: string, payload: IEventCreatePayload) =
         throw new AppError(status.NOT_FOUND, "Organizer profile not found!");
     }
 
-    // ২. ডাটাবেজে ইভেন্ট তৈরি (সব রিকোয়ার্ড ফিল্ডসহ)
+    // ডাটাবেজে নতুন টিকেট অফার তৈরি
     const result = await prisma.event.create({
         data: {
             title: payload.title,
             description: payload.description,
             category: payload.category,
-            location: payload.location, // এটি আপনার এররের প্রধান কারণ ছিল
-            venue: payload.venue,
+            location: payload.location, // Arrival City (e.g., Dubai)
+            venue: payload.venue,       // Departure Airport (e.g., HSIA)
             time: payload.time,
             thumbnail: payload.thumbnail || null,
             ticketPrice: Number(payload.ticketPrice) || 0,
             totalSeats: Number(payload.totalSeats),
-            availableSeats: Number(payload.totalSeats), // শুরুতে ফুল সিট থাকবে
-            dateTime: new Date(payload.dateTime), // স্ট্রিং থেকে ডেট অবজেক্ট
+            availableSeats: Number(payload.totalSeats), 
+            dateTime: new Date(payload.dateTime),
             organizerId: organizer.id,
-            status: "UPCOMING", // ডিফল্ট স্ট্যাটাস
+            status: "UPCOMING",
+
+            // --- এয়ার টিকিট স্পেসিফিক ডাটা ---
+            airlineName: payload.airlineName || null,
+            flightNumber: payload.flightNumber || null,
+            flightClass: payload.flightClass || "ECONOMY",
+            baggageAllowance: payload.baggageAllowance || null,
+            isRefundable: payload.isRefundable ?? false,
         },
     });
 
@@ -42,14 +47,14 @@ const createEventIntoDB = async (userId: string, payload: IEventCreatePayload) =
 };
 
 /**
- * 2. Get all events with filtering and search
+ * 2. Get All Flight Offers (With Search & Filters)
  */
 const getAllEventsFromDB = async (filters: IEventFilterRequest) => {
-    const { searchTerm, category, minPrice, maxPrice, status: eventStatus } = filters;
+    const { searchTerm, category, minPrice, maxPrice, status: eventStatus, airlineName, flightClass } = filters;
     
     const andConditions: Prisma.EventWhereInput[] = [];
 
-    // Search logic (Title, Description, Venue, Location)
+    // Search logic (এয়ারলাইন্স এবং লোকেশন দিয়েও সার্চ করা যাবে)
     if (searchTerm) {
         andConditions.push({
             OR: [
@@ -57,21 +62,19 @@ const getAllEventsFromDB = async (filters: IEventFilterRequest) => {
                 { description: { contains: searchTerm, mode: 'insensitive' } },
                 { venue: { contains: searchTerm, mode: 'insensitive' } },
                 { location: { contains: searchTerm, mode: 'insensitive' } },
+                { airlineName: { contains: searchTerm, mode: 'insensitive' } },
+                { flightNumber: { contains: searchTerm, mode: 'insensitive' } },
             ],
         });
     }
 
-    // Category filter
-    if (category) {
-        andConditions.push({ category });
-    }
+    // ফিল্টারিং লজিক
+    if (category) andConditions.push({ category });
+    if (eventStatus) andConditions.push({ status: eventStatus });
+    if (airlineName) andConditions.push({ airlineName: { contains: airlineName as string, mode: 'insensitive' } });
+    if (flightClass) andConditions.push({ flightClass: flightClass as any });
 
-    // Status filter
-    if (eventStatus) {
-        andConditions.push({ status: eventStatus });
-    }
-
-    // Price range filter
+    // প্রাইস রেঞ্জ ফিল্টার
     if (minPrice || maxPrice) {
         andConditions.push({
             ticketPrice: {
@@ -81,57 +84,47 @@ const getAllEventsFromDB = async (filters: IEventFilterRequest) => {
         });
     }
 
-    // Soft delete check
+    // শুধুমাত্র যেগুলো ডিলিট করা হয়নি
     andConditions.push({ isDeleted: false });
 
-    const result = await prisma.event.findMany({
+    return await prisma.event.findMany({
         where: { AND: andConditions },
         include: {
             organizer: {
                 include: { 
-                    user: { 
-                        select: { name: true, image: true } 
-                    } 
+                    user: { select: { name: true, image: true } } 
                 }
             }
         },
-        orderBy: { dateTime: 'asc' }, // dateTime ফিল্ড অনুযায়ী সর্টিং
+        orderBy: { dateTime: 'asc' }, 
     });
-
-    return result;
 };
 
 /**
- * 3. Get a single event by ID
+ * 3. Get Single Flight Details
  */
 const getSingleEventFromDB = async (id: string) => {
     const result = await prisma.event.findUnique({
         where: { id },
         include: { 
             organizer: {
-                include: { 
-                    user: { 
-                        select: { name: true, email: true, image: true } 
-                    } 
-                }
+                include: { user: { select: { name: true, email: true, image: true } } }
             },
             reviews: {
-                include: {
-                    user: { select: { name: true, image: true } }
-                }
+                include: { user: { select: { name: true, image: true } } }
             },
-            coupons: true // কুপন থাকলে তাও দেখতে পাবেন
+            coupons: true 
         },
     });
 
     if (!result || result.isDeleted) {
-        throw new AppError(status.NOT_FOUND, "Event not found!");
+        throw new AppError(status.NOT_FOUND, "Flight offer not found!");
     }
     return result;
 };
 
 /**
- * 4. Update an event
+ * 4. Update Flight/Event Info
  */
 const updateEventIntoDB = async (eventId: string, userId: string, payload: Partial<IEventCreatePayload>) => {
     const event = await prisma.event.findFirst({
@@ -139,24 +132,26 @@ const updateEventIntoDB = async (eventId: string, userId: string, payload: Parti
     });
 
     if (!event) {
-        throw new AppError(status.FORBIDDEN, "Unauthorized or event not found!");
+        throw new AppError(status.FORBIDDEN, "Unauthorized or flight not found!");
     }
 
-    const result = await prisma.event.update({
+    const { dateTime, totalSeats, ...rest } = payload;
+
+    return await prisma.event.update({
         where: { id: eventId },
         data: {
-            ...payload,
-            // যদি dateTime আপডেট হয় তবে সেটি Date অবজেক্টে নিতে হবে
-            ...(payload.dateTime && { dateTime: new Date(payload.dateTime) }),
-            // যদি totalSeats আপডেট হয় তবে লজিক অনুযায়ী availableSeats চেক করা দরকার
-            ...(payload.totalSeats && { availableSeats: Number(payload.totalSeats) })
+            ...rest,
+            ...(dateTime && { dateTime: new Date(dateTime) }),
+            ...(totalSeats && { 
+                totalSeats: Number(totalSeats),
+                availableSeats: Number(totalSeats) // সিট আপডেট হলে অ্যাভেইলেবল সিট রিসেট হবে
+            })
         },
     });
-    return result;
 };
 
 /**
- * 5. Soft delete an event
+ * 5. Soft Delete Flight Offer
  */
 const deleteEventFromDB = async (eventId: string, userId: string) => {
     const event = await prisma.event.findFirst({
@@ -164,14 +159,13 @@ const deleteEventFromDB = async (eventId: string, userId: string) => {
     });
 
     if (!event) {
-        throw new AppError(status.FORBIDDEN, "Unauthorized or event not found!");
+        throw new AppError(status.FORBIDDEN, "Unauthorized or flight not found!");
     }
 
-    const result = await prisma.event.update({
+    return await prisma.event.update({
         where: { id: eventId },
         data: { isDeleted: true },
     });
-    return result;
 };
 
 export const EventService = {

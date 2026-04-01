@@ -1,19 +1,20 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
+// Prisma থেকে Role এবং UserStatus ইমপোর্ট নিশ্চিত করুন
 import { Role, UserStatus } from "../../generated/prisma/enums"; 
 import { prisma } from "./prisma";
 import { sendEmail } from "../utils/email";
 import env from "../../config/env"; 
 
 export const auth = betterAuth({
-    baseURL: "http://localhost:5000", 
+    // ১. আপনার ফ্রন্টএন্ড যদি ৩০০০ পোর্টে চলে, তবে baseURL সেটাই হওয়া উচিত
+    baseURL: env.BETTER_AUTH_URL || "http://localhost:3000", 
     secret: env.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
 
-    // --- সোশ্যাল লগইন (গুগল) ---
     socialProviders: {
         google: {
             clientId: env.GOOGLE_CLIENT_ID as string,
@@ -21,13 +22,14 @@ export const auth = betterAuth({
         },
     },
 
-    // --- DATABASE HOOKS ---
+    // --- DATABASE HOOKS (FIXED) ---
     databaseHooks: {
         user: {
             create: {
                 after: async (user) => {
                     console.log(`👤 Creating profile for User: ${user.email}`);
                     try {
+                        // BetterAuth এ অতিরিক্ত ফিল্ডগুলো সরাসরি user অবজেক্টে থাকে
                         const userRole = (user as any).role;
 
                         if (userRole === Role.PARTICIPANT) {
@@ -50,6 +52,7 @@ export const auth = betterAuth({
                         }
                         console.log("✅ Profile linked successfully.");
                     } catch (error) {
+                        // হুক এরর দিলে রেজিস্ট্রেশন ফেইল করবে না যদি আমরা এখানে হ্যান্ডেল করি
                         console.error("❌ Profile Creation Hook Error:", error);
                     }
                 },
@@ -57,13 +60,12 @@ export const auth = betterAuth({
         },
     },
 
-    // --- AUTH METHODS ---
     emailAndPassword: {
         enabled: true,
-        // মনে রাখবেন: requireEmailVerification এখানে দরকার নেই যদি আপনি OTP প্লাগিন ব্যবহার করেন
+        // ২. OTP প্লাগিন থাকলে এটি false রাখা নিরাপদ যাতে কনফ্লিক্ট না হয়
+        requireEmailVerification: false, 
     },
 
-    // --- ADDITIONAL FIELDS ---
     user: {
         additionalFields: {
             role: {
@@ -94,7 +96,6 @@ export const auth = betterAuth({
     plugins: [
         bearer(),
         emailOTP({
-            // 'sendOnSignUp' এখানে নেই, তাই এটি সরানো হয়েছে
             async sendVerificationOTP({ email, otp, type }) {
                 console.log(`📩 OTP generated for ${email}: ${otp}`);
                 try {
@@ -114,14 +115,15 @@ export const auth = betterAuth({
                     console.error("❌ Email sending failed in Auth Plugin:", error);
                 }
             },
-            expiresIn: 300, // ৫ মিনিট মেয়াদ
+            expiresIn: 300,
             otpLength: 6,
         })
     ],
 
+    // ৩. অরিজিনগুলো নিশ্চিত করুন যাতে CORS এরর না আসে
     trustedOrigins: ["http://localhost:3000", "http://localhost:5000"],
     advanced: {
-        useSecureCookies: false, // লোকালহোস্টের জন্য false রাখা ভালো
+        useSecureCookies: false, 
     }
 });
 

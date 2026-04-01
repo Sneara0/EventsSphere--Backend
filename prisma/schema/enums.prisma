@@ -33,10 +33,12 @@ enum PaymentStatus {
   REFUNDED
 }
 enum EventStatus {
-  UPCOMING
-  ONGOING
-  COMPLETED
-  CANCELLED
+  UPCOMING    // টিকিট বিক্রির জন্য উন্মুক্ত
+  ON_BOARDING // চেক-ইন বা বোর্ডিং শুরু হয়েছে (Ongoing এর বদলে)
+  DEPARTED    // বিমান ছেড়ে গেছে
+  ARRIVED     // গন্তব্যে পৌঁছেছে (Completed এর বদলে)
+  CANCELLED   // ফ্লাইট বাতিল হয়েছে
+  DELAYED     // ফ্লাইট দেরি হয়েছে (এটি খুব গুরুত্বপূর্ণ)
 }
 
 

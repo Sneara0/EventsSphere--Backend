@@ -60,9 +60,11 @@ export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
 
 export const EventStatus = {
   UPCOMING: 'UPCOMING',
-  ONGOING: 'ONGOING',
-  COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED'
+  ON_BOARDING: 'ON_BOARDING',
+  DEPARTED: 'DEPARTED',
+  ARRIVED: 'ARRIVED',
+  CANCELLED: 'CANCELLED',
+  DELAYED: 'DELAYED'
 } as const
 
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]

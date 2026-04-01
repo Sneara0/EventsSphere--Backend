@@ -1,29 +1,35 @@
 model Event {
-  id              String   @id @default(cuid())
-  title           String
+  id              String      @id @default(cuid())
+  title           String      // যেমন: Dhaka to Dubai Special
   description     String
-  category        String   // e.g., Concert, Workshop, Seminar
-   dateTime        DateTime
-  time            String
-  location       String
-  venue           String   // Location
-  thumbnail       String?  // Cloudinary Image URL
-  ticketPrice     Float    @default(0)
+  category        String      // Flight, Holiday Package, etc.
+  dateTime        DateTime    // Departure Date & Time
+  time            String      // Flight Time
+  location        String      // Arrival City (Dubai)
+  venue           String      // Airport Name (HSIA)
+  thumbnail       String?     // Cloudinary Image URL
+  ticketPrice     Float       @default(0)
   totalSeats      Int
   availableSeats  Int
   status          EventStatus @default(UPCOMING)
-  isDeleted       Boolean  @default(false)
+  isDeleted       Boolean     @default(false)
+
+  // --- নতুন এয়ার টিকিট সংক্রান্ত ফিল্ডস ---
+  airlineName     String?     // যেমন: Emirates, Biman
+  flightNumber    String?     // যেমন: EK-585
+  flightClass     String?     // Economy, Business
+  baggageAllowance String?    // 30KG, 40KG
+  isRefundable    Boolean     @default(false)
 
   // Relations
   organizerId     String
-  organizer       Organizer @relation(fields: [organizerId], references: [id])
-  
+  organizer       Organizer   @relation(fields: [organizerId], references: [id])
   bookings        Booking[]
+  reviews         Review[]
+  coupons         Coupon[]
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  reviews Review[]
-  coupons     Coupon[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   @@map("events")
 }

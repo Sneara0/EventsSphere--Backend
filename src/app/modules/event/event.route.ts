@@ -6,32 +6,32 @@ import { multerUpload } from "src/config/multer.config";
 import { validateRequest } from "src/app/middlewares/validateRequest";
 import { EventValidation } from "./event.validation";
 
-
-
 const router = Router();
 
 /**
  * Public Routes
- * Everyone can view events and event details
+ * যে কেউ ফ্লাইট অফার এবং ডিটেইলস দেখতে পারবে
  */
 router.get("/", EventController.getAllEvents);
 router.get("/:id", EventController.getSingleEvent);
 
 /**
  * Protected Routes
- * Only Organizers and Admins can manage events
+ * শুধুমাত্র Organizer (এজেন্সি) এবং Admin এই ফ্লাইটগুলো ম্যানেজ করতে পারবে
  */
 
-// Create a new event
+// ১. নতুন ফ্লাইট অফার তৈরি করা
 router.post(
     "/",
     checkAuth(Role.ORGANIZER, Role.ADMIN),
+    // ফ্রন্টএন্ডে আমরা "image" কি-তে ফাইল পাঠাচ্ছি, তাই এটি নিশ্চিত করুন
     multerUpload.single("image"), 
+    // Multer এর পর ভ্যালিডেশন চালানো উচিত কারণ এটি বডি ডাটা পার্স করে
     validateRequest(EventValidation.createEventZodSchema),
     EventController.createEvent
 );
 
-// Update an existing event
+// ২. বিদ্যমান ফ্লাইট আপডেট করা
 router.patch(
     "/:id",
     checkAuth(Role.ORGANIZER, Role.ADMIN),
@@ -40,7 +40,7 @@ router.patch(
     EventController.updateEvent
 );
 
-// Soft delete an event
+// ৩. ফ্লাইট ডিলিট (Soft Delete) করা
 router.delete(
     "/:id",
     checkAuth(Role.ORGANIZER, Role.ADMIN),
