@@ -1428,11 +1428,12 @@ export const BookingScalarFieldEnum = {
   eventId: 'eventId',
   status: 'status',
   paymentStatus: 'paymentStatus',
+  quantity: 'quantity',
   totalAmount: 'totalAmount',
   transactionId: 'transactionId',
   ticketUrl: 'ticketUrl',
   isTicketGenerated: 'isTicketGenerated',
-  quantity: 'quantity',
+  bookingCode: 'bookingCode',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1507,6 +1508,7 @@ export const ParticipantScalarFieldEnum = {
   userId: 'userId',
   name: 'name',
   email: 'email',
+  profileImage: 'profileImage',
   contactNumber: 'contactNumber',
   address: 'address',
   interests: 'interests',
@@ -1683,20 +1685,6 @@ export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
- * Reference to a field of type 'Float'
- */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1707,6 +1695,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 

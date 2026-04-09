@@ -7,7 +7,9 @@ import { cookieUtils } from "../../utils/cookie";
 import { auth } from "../../lib/auth";
 import AppError from "../../errorHelpers/AppError";
 import env from "src/config/env";
-
+import { prisma } from "src/app/lib/prisma";
+import bcrypt from 'bcrypt';
+import httpStatus from 'http-status';
 // 1. User Registration (Fixed Enum Case Sensitivity)
 const registerUser = catchAsync(async (req: Request, res: Response) => {
     // ইউজারের পাঠানো ডাটা থেকে রোলটিকে বড় হাতের অক্ষরে রূপান্তর করা হচ্ছে
@@ -149,13 +151,16 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 });
 
 // 8. Forget Password
+// 8. Forget Password (Fixed Type)
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email } = req.body;
+    const normalizedEmail = email.toLowerCase();
     
+    // Better Auth এ resetPassword এর জন্য ওটিপি টাইপ "email-verification" রাখা নিরাপদ
     await auth.api.sendVerificationOTP({
         body: {
-            email,
-            type: "forget-password",
+            email: normalizedEmail,
+            type: "email-verification", 
         }
     });
 
@@ -167,26 +172,61 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// 9. Reset Password (Fixed Typescript/Overload issue)
+// 9. Reset Password (Fixed Data Mapping)
+// 9. Reset Password (Better Auth Standard Flow)
+// auth.controller.ts
+
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email, otp, newPassword } = req.body;
+
+    const normalizedEmail = email?.trim().toLowerCase();
     
-    const result = await auth.api.resetPassword({
-        body: {
-            email,
-            otp,
-            newPassword
-        } as any
+    // ডাটাবেসে যেভাবে identifier সেভ হয়েছে সেই ফরম্যাটে রূপান্তর করুন
+    const dbIdentifier = `email-verification-otp-${normalizedEmail}`;
+    const submittedOtp = String(otp).trim();
+
+    // ১. এখন সঠিক identifier দিয়ে খুঁজুন
+    const verificationData = await prisma.verification.findFirst({
+        where: {
+            identifier: dbIdentifier, // এখন এটি ডাটাবেসের সাথে মিলবে
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
     });
+
+    if (!verificationData) {
+        console.log(`❌ ওটিপি পাওয়া যায়নি! খুঁজছিলাম: ${dbIdentifier}`);
+        throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP code! ❌");
+    }
+
+    // ২. ওটিপি ভ্যালু চেক (আপনার ইমেজে দেখা যাচ্ছে ভ্যালুর শেষে ':0' আছে)
+    // যদি আপনার ডাটাবেসে ভ্যালু '681971:0' থাকে, তবে সেভাবে মিলাতে হবে
+    const dbValue = verificationData.value; // উদা: '681971:0'
+
+    if (dbValue !== submittedOtp && dbValue !== `${submittedOtp}:0`) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP code! ❌");
+    }
+
+    // ৩. পাসওয়ার্ড আপডেট এবং ওটিপি ডিলিট
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    
+    await prisma.$transaction([
+        prisma.user.update({
+            where: { email: normalizedEmail },
+            data: { password: hashedPassword }
+        }),
+        prisma.verification.deleteMany({
+            where: { identifier: dbIdentifier }
+        })
+    ]);
 
     sendResponse(res, {
-        statusCode: status.OK,
+        statusCode: httpStatus.OK,
         success: true,
-        message: "Password reset successfully!",
-        data: result,
+        message: "Password reset successfully! 🔐",
     });
 });
-
 // 10. Google Login
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
     const result = await auth.api.signInSocial({

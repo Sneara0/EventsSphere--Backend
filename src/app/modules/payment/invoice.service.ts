@@ -1,10 +1,21 @@
+// 📂 src/app/modules/payment/invoice.service.ts
 import easyinvoice from 'easyinvoice';
-import { IInvoicePayload } from './payment.interface';
+
+export interface IInvoicePayload {
+  userName: string;
+  userEmail: string;
+  bookingId: string;
+  eventName: string;
+  amount: number;
+  date: string;
+  transactionId: string;
+}
 
 const generateInvoicePDF = async (data: IInvoicePayload): Promise<string> => {
-  const invoiceData: any = {
+  const invoiceData = {
     "images": {
-      "logo": "https://public.easyinvoice.cloud/img/logo_en_7.png" // আপনার লোগো লিঙ্ক এখানে দিন
+      // আপনার অরিজিনাল লোগো লিঙ্ক এখানে দিন
+      "logo": "https://public.easyinvoice.cloud/img/logo_en_7.png" 
     },
     "sender": {
       "company": "EventSphere Ltd.",
@@ -16,33 +27,37 @@ const generateInvoicePDF = async (data: IInvoicePayload): Promise<string> => {
     "client": {
       "company": data.userName,
       "address": data.userEmail,
+      "zip": "TX: " + data.transactionId, // ট্রানজ্যাকশন আইডি এখানে দেখানো যেতে পারে
+      "city": "Order ID: " + data.bookingId,
+      "custom1": "Payment: Successful"
     },
     "information": {
-      "number": data.bookingId,
+      "number": data.bookingId.slice(-8).toUpperCase(), // বুকিং আইডির শেষ ৮ অক্ষর ইনভয়েস নং হিসেবে
       "date": data.date,
     },
     "products": [
       {
         "quantity": "1",
         "description": data.eventName,
-        "tax-rate": "0",
-        "price": data.amount.toString() 
+        "tax-rate": 0,
+        "price": data.amount
       }
     ],
     "bottom-notice": "This is a computer-generated invoice. Thank you for choosing EventSphere.",
     "settings": {
-      "currency": "BDT", // এখানে 'USD' থেকে 'BDT' করা হয়েছে
-      "locale": "en-US", // টাকার কমা ফরম্যাট (e.g. 1,000) ঠিক রাখার জন্য
+      "currency": "BDT", 
+      "locale": "en-US", 
       "margin-top": 25,
       "margin-right": 25,
       "margin-left": 25,
-      "margin-bottom": 25
-    }
-  };
+      "margin-bottom": 25,
+      "format": "A4" 
+    } as const
+  }  ;
 
-  // @ts-ignore
+  // easyinvoice সরাসরি .pdf প্রপার্টিতে base64 রিটার্ন করে
   const result = await easyinvoice.createInvoice(invoiceData);
-  return result.pdf; // Base64 String রিটার্ন করবে
+  return result.pdf; 
 };
 
 export const InvoiceService = {

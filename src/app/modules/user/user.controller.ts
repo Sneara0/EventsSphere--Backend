@@ -3,10 +3,10 @@ import status from "http-status";
 import { UserService } from "./user.service";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
 import { Role } from "../../../generated/prisma/enums";
-import { catchAsync } from "../../utils/catchAsync"; // পাথ চেক করে নিন
-import { sendResponse } from "../../utils/sendResponse"; // পাথ চেক করে নিন
+import { catchAsync } from "../../utils/catchAsync"; 
+import { sendResponse } from "../../utils/sendResponse"; 
 
-// ১. সব ইউজার আনা
+// ১. সব ইউজার আনা (এডমিনের জন্য)
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     const role = req.query.role as Role;
     const result = await UserService.getAllUsersFromDB(role);
@@ -19,9 +19,9 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// ২. সিঙ্গেল ইউজার আনা (ID Fix)
+// ২. নির্দিষ্ট আইডি দিয়ে ইউজার আনা
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params; // ডিরেক্ট ডিস্ট্রাকচার করা ভালো
+    const { id } = req.params; 
     const result = await UserService.getSingleUserFromDB(id as string);
 
     sendResponse(res, {
@@ -32,11 +32,10 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// ৩. নিজের প্রোফাইল দেখা
+// ৩. নিজের প্রোফাইল দেখা (Me)
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IRequestUser;
-    
-    // সার্ভিসে userId এবং role পাঠানো হচ্ছে
+    // Auth Middleware থেকে পাওয়া userId এবং role ব্যবহার করা হচ্ছে
     const result = await UserService.getMyProfileFromDB(user.userId, user.role as Role);
 
     sendResponse(res, {
@@ -47,11 +46,9 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// ৪. প্রোফাইল আপডেট (লজিক্যাল ফিক্স)
+// ৪. নিজের প্রোফাইল আপডেট করা
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IRequestUser;
-    
-    // payload হিসেবে req.body পাঠানো হচ্ছে
     const result = await UserService.updateMyProfileIntoDB(
         user.userId, 
         user.role as Role, 
@@ -66,9 +63,25 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// ৫. ইউজার ডিলিট করা (Soft Delete)
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params; 
+    
+    // শুধু ID পাঠানো হচ্ছে, SQL $1 প্লেসহোল্ডারের জন্য এটিই যথেষ্ট
+    const result = await UserService.deleteUserFromDB(id as string);
+
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "User deleted successfully",
+        data: result,
+    });
+});
+
 export const UserController = {
     getAllUsers,
     getSingleUser,
     getMyProfile,
-    updateMyProfile
+    updateMyProfile,
+    deleteUser 
 };

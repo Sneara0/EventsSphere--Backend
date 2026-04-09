@@ -1,8 +1,10 @@
-import { Role, UserStatus } from "../../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
-import { IUserUpdatePayload } from "./user.interface";
 
-// ১. রোল অনুযায়ী সব ইউজার পাওয়া
+import { Role, UserStatus } from "src/generated/prisma/enums";
+import { prisma } from "../../lib/prisma";
+
+/**
+ * ১. রোল অনুযায়ী সব ইউজার পাওয়া (একটিভ ইউজারদের জন্য)
+ */
 const getAllUsersFromDB = async (role?: Role) => {
     return await prisma.user.findMany({
         where: {
@@ -17,7 +19,9 @@ const getAllUsersFromDB = async (role?: Role) => {
     });
 };
 
-// ২. নির্দিষ্ট একটি ইউজার আইডি দিয়ে ডাটা আনা
+/**
+ * ২. নির্দিষ্ট একটি ইউজার আইডি দিয়ে ডাটা আনা
+ */
 const getSingleUserFromDB = async (id: string) => {
     return await prisma.user.findUnique({
         where: { id, isDeleted: false },
@@ -29,7 +33,9 @@ const getSingleUserFromDB = async (id: string) => {
     });
 };
 
-// ৩. নিজের প্রোফাইল দেখা
+/**
+ * ৩. নিজের প্রোফাইল দেখা
+ */
 const getMyProfileFromDB = async (userId: string, role: Role) => {
     return await prisma.user.findUnique({
         where: { id: userId, isDeleted: false },
@@ -41,41 +47,68 @@ const getMyProfileFromDB = async (userId: string, role: Role) => {
     });
 };
 
-// ৪. সলিড প্রোফাইল আপডেট (Transaction সহ)
-const updateMyProfileIntoDB = async (userId: string, role: Role, payload: IUserUpdatePayload) => {
-    const { name, image, ...profileData } = payload;
+/**
+ * ৪. প্রোফাইল আপডেট (Transaction সহ)
+ */
+const updateMyProfileIntoDB = async (userId: string, role: Role, payload: any) => {
+    const { name, image, profileImage, phone, email, ...otherData } = payload;
 
     return await prisma.$transaction(async (tx) => {
         // ১. মেইন ইউজার টেবিল আপডেট
-        if (name || image) {
+        const userUpdateData: any = {};
+        if (name) userUpdateData.name = name;
+        if (image || profileImage) userUpdateData.image = image || profileImage;
+
+        if (Object.keys(userUpdateData).length > 0) {
             await tx.user.update({
                 where: { id: userId },
-                data: { name, image }
+                data: userUpdateData
             });
         }
 
-        // ২. রোল অনুযায়ী রিলেটেড টেবিল আপডেট
-        // এখানে চেক করা হচ্ছে প্রোফাইল ডাটা খালি কি না এবং রোল ঠিক আছে কি না
-        if (Object.keys(profileData).length > 0) {
-            if (role === Role.PARTICIPANT) {
-                await tx.participant.update({
-                    where: { userId },
-                    data: profileData
-                });
-            } else if (role === Role.ORGANIZER) {
-                await tx.organizer.update({
-                    where: { userId },
-                    data: profileData
-                });
-            } else if (role === Role.ADMIN) {
-                await tx.admin.update({
-                    where: { userId },
-                    data: profileData
-                });
-            }
+        // ২. রোল অনুযায়ী রিলেটেড টেবিল ডাটা রেডি করা
+        const relatedTableData: any = { ...otherData };
+        
+        if (phone) {
+            relatedTableData.contactNumber = phone;
         }
 
-        // ৩. আপডেট শেষে লেটেস্ট ডাটা রিটার্ন করা
+        if (image || profileImage) {
+            relatedTableData.profileImage = image || profileImage;
+        }
+        
+        if (name) {
+            relatedTableData.name = name;
+        }
+
+        // ৩. ডাইনামিকালি সঠিক টেবিলে আপডেট করা (Upsert ব্যবহার করে)
+        if (Object.keys(relatedTableData).length > 0) {
+            const mapper: Record<Role, any> = {
+                [Role.ADMIN]: tx.admin,
+                [Role.ORGANIZER]: tx.organizer,
+                [Role.PARTICIPANT]: tx.participant,
+                [Role.SUPER_ADMIN]: tx.admin,
+                [Role.USER]: tx.participant, 
+            };
+
+            /**
+             * 🔥 এখানে upsert ব্যবহার করা হয়েছে যাতে রেকর্ড না থাকলে তৈরি হয়।
+             * এটি P2025 এররটি সমাধান করবে।
+             */
+            await mapper[role].upsert({
+                where: { userId },
+                update: relatedTableData,
+                create: { 
+                    userId, 
+                    ...relatedTableData,
+                    // যদি name বা email রিকোয়ার্ড হয় তবে তা নিশ্চিত করা
+                    name: name || "User",
+                    email: email || "" 
+                },
+            });
+        }
+
+        // ৪. আপডেট শেষে লেটেস্ট ডাটা রিটার্ন করা
         return await tx.user.findUnique({
             where: { id: userId },
             include: {
@@ -87,9 +120,24 @@ const updateMyProfileIntoDB = async (userId: string, role: Role, payload: IUserU
     });
 };
 
+/**
+ * ৫. ইউজার ডিলিট করা (Soft Delete) 
+ */
+const deleteUserFromDB = async (id: string) => {
+    return await prisma.user.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        status: UserStatus.DELETED,
+        deletedAt: new Date(),
+      },
+    });
+};
+
 export const UserService = {
     getAllUsersFromDB,
     getSingleUserFromDB,
     getMyProfileFromDB,
-    updateMyProfileIntoDB
+    updateMyProfileIntoDB,
+    deleteUserFromDB
 };

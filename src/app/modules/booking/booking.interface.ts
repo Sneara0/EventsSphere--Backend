@@ -1,3 +1,5 @@
+// 📂 src/app/modules/booking/booking.interface.ts
+
 import { BookingStatus, PaymentStatus } from "src/generated/prisma/enums";
 
 /**
@@ -40,10 +42,12 @@ export type IAdminDashboardStats = {
 
 /**
  * 5. Payment Fulfillment: Data from Stripe/Payment Webhook
+ * এই টাইপটি মিসিং ছিল বলেই আপনার সার্ভিস ফাইলে এরর আসছিল।
  */
 export type IPaymentFulfillmentData = {
   transactionId: string;
   bookingId: string;
   userId: string;
   amount: number;
+  invoiceUrl?: string;
 };

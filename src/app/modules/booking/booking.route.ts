@@ -1,55 +1,28 @@
+// 📂 src/app/modules/booking/booking.routes.ts
 import express from 'express';
 import { BookingController } from './booking.controller';
-
-
 import { checkAuth } from 'src/app/middlewares/checkAuth';
 import { Role } from 'src/generated/prisma/enums';
 
 const router = express.Router();
 
-/**
- * 1. User & Participant: নতুন বুকিং বা রেজিস্ট্রেশন করা
- */
 router.post(
-  '/create-booking',
-  checkAuth(Role.USER, Role.PARTICIPANT),
+  '/create-booking', 
+  checkAuth(Role.USER, Role.PARTICIPANT, Role.ORGANIZER), // এখানে ORGANIZER যোগ করা হলো
   BookingController.createBooking
 );
-
-/**
- * 2. User & Participant: নিজের বুকিং হিস্ট্রি দেখা
- */
 router.get(
-  '/my-bookings',
-  checkAuth(Role.USER, Role.PARTICIPANT),
+  '/my-bookings', 
+  // এখানে Role.ORGANIZER যোগ করুন যাতে অর্গানাইজাররাও তাদের টিকিট দেখতে পারে
+  checkAuth(Role.USER, Role.PARTICIPANT, Role.ORGANIZER, Role.ADMIN, Role.SUPER_ADMIN), 
   BookingController.getMyBookings
 );
 
-/**
- * 3. Organizer & Admin: ইভেন্টের সব বুকিং লিস্ট দেখা
- */
-router.get(
-  '/',
-checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.ORGANIZER),
-  BookingController.getAllBookings
-);
+// 🚀 এটিই আপনার চেকআউট পেজের ডাটা লোড করবে
+router.get('/:id', checkAuth(Role.USER, Role.PARTICIPANT, Role.ORGANIZER, Role.ADMIN), BookingController.getSingleBooking);
 
-/**
- * 4. Admin & Organizer: বুকিং স্ট্যাটাস আপডেট (Manual Approval)
- */
-router.patch(
-  '/:id',
-  checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.ORGANIZER),
-  BookingController.updateBookingStatus
-);
-
-/**
- * 5. Super Admin: বুকিং ডিলিট করা (Full Control)
- */
-router.delete(
-  '/:id',
-  checkAuth(Role.SUPER_ADMIN),
-  BookingController.deleteBooking
-);
+router.get('/', checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.ORGANIZER), BookingController.getAllBookings);
+router.patch('/:id', checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.ORGANIZER), BookingController.updateBookingStatus);
+router.delete('/:id', checkAuth(Role.SUPER_ADMIN), BookingController.deleteBooking);
 
 export const BookingRoutes = router;

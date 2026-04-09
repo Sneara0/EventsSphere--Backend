@@ -497,7 +497,7 @@ export type EventCreateInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -525,7 +525,7 @@ export type EventUncheckedCreateInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -609,7 +609,7 @@ export type EventCreateManyInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -880,7 +880,7 @@ export type EventCreateWithoutBookingsInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -907,7 +907,7 @@ export type EventUncheckedCreateWithoutBookingsInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -1004,7 +1004,7 @@ export type EventCreateWithoutCouponsInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -1031,7 +1031,7 @@ export type EventUncheckedCreateWithoutCouponsInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -1128,7 +1128,7 @@ export type EventCreateWithoutOrganizerInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -1155,7 +1155,7 @@ export type EventUncheckedCreateWithoutOrganizerInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -1236,7 +1236,7 @@ export type EventCreateWithoutReviewsInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -1263,7 +1263,7 @@ export type EventUncheckedCreateWithoutReviewsInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null
@@ -1360,7 +1360,7 @@ export type EventCreateManyOrganizerInput = {
   thumbnail?: string | null
   ticketPrice?: number
   totalSeats: number
-  availableSeats: number
+  availableSeats?: number
   status?: $Enums.EventStatus
   isDeleted?: boolean
   airlineName?: string | null

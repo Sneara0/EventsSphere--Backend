@@ -4,7 +4,8 @@ import path from 'path';
 // .env ফাইলটি প্রজেক্টের রুট ডিরেক্টরি থেকে লোড করা হচ্ছে
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
-interface EnvConfig {
+// ১. আগে ইন্টারফেসটি ডিফাইন করতে হবে
+export interface EnvConfig {
     NODE_ENV: string;
     PORT: string; 
     DATABASE_URL: string;
@@ -40,6 +41,7 @@ interface EnvConfig {
     };
 }
 
+// ২. ইন্টারফেস অনুযায়ী কনফিগ অবজেক্ট তৈরি করা
 const config: EnvConfig = {
     NODE_ENV: process.env.NODE_ENV || 'development',
     PORT: process.env.PORT || '5000', 
@@ -55,13 +57,11 @@ const config: EnvConfig = {
     BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN: process.env.BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN || '7d',
     BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE: process.env.BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE || '24h',
     
-    // --- ইমেইল কনফিগারেশন ফিক্স ---
     EMAIL_SENDER: {
-        // আপনার .env ফাইলের নামের সাথে মিল রেখে পরিবর্তন করা হয়েছে
         SMTP_HOST: process.env.EMAIL_SENDER_SMTP_HOST || 'smtp.gmail.com', 
         SMTP_PORT: process.env.EMAIL_SENDER_SMTP_PORT || '465',
-        SMTP_USER: process.env.EMAIL_SENDER_SMTP_USER as string, // snearaparvin.cse1@gmail.com
-        SMTP_PASS: process.env.EMAIL_SENDER_SMTP_PASS as string, // ncalvdgxvqhxqgel
+        SMTP_USER: process.env.EMAIL_SENDER_SMTP_USER as string, 
+        SMTP_PASS: process.env.EMAIL_SENDER_SMTP_PASS as string, 
         SMTP_FROM: process.env.EMAIL_SENDER_SMTP_FROM as string,
     },
 

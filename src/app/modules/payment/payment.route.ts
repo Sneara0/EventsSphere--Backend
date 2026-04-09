@@ -9,9 +9,11 @@ const router = express.Router();
 
 router.post(
   '/create-session',
-  checkAuth(Role.USER,'ORGANIZER','PARTICIPANT','ADMIN','SUPER_ADMIN'), 
+  // এখানে Role.ORGANIZER যোগ করুন
+  checkAuth(Role.USER, Role.PARTICIPANT, Role.ORGANIZER, Role.ADMIN, Role.SUPER_ADMIN), 
   PaymentController.createPaymentSession
 );
+
 
 /**
  * ২. Stripe Webhook

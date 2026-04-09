@@ -2,7 +2,6 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import { ZodError } from "zod";
 import AppError from "../errorHelpers/AppError";
-// নিশ্চিত করো তোমার config ফাইল এভাবেই ইমপোর্ট হচ্ছে
 
 const globalErrorHandler: ErrorRequestHandler = (
     err,
@@ -10,22 +9,34 @@ const globalErrorHandler: ErrorRequestHandler = (
     res: Response,
     next: NextFunction
 ) => {
+    // টার্মিনালে এররটি দেখার জন্য (ডিবাগিং এর জন্য এটি সবচেয়ে গুরুত্বপূর্ণ)
+    console.error("🔥 Global Error Log:", err);
+
     let statusCode = httpStatus.INTERNAL_SERVER_ERROR;
     let message = "Something went wrong!";
     let errorMessages: { path: string | number; message: string }[] = [];
 
-    // ১. Zod Validation Error হ্যান্ডল করা
+    // ১. Zod Validation Error
     if (err instanceof ZodError) {
         statusCode = httpStatus.BAD_REQUEST;
         message = "Validation Error";
-        
-        // 'as string' যোগ করা হয়েছে যাতে PropertyKey (symbol) এরর না দেয়
         errorMessages = err.issues.map((issue) => ({
             path: issue.path[issue.path.length - 1] as string | number,
             message: issue.message,
         }));
     } 
-    // ২. কাস্টম AppError হ্যান্ডল করা
+    // ২. Prisma Client Known Request Error (যেমন: Foreign Key বা Unique Constraint)
+    else if (err?.name === 'PrismaClientKnownRequestError') {
+        statusCode = httpStatus.BAD_REQUEST;
+        message = "Database Error";
+        errorMessages = [
+            {
+                path: "",
+                message: err.message || "A database constraint failed.",
+            },
+        ];
+    }
+    // ৩. কাস্টম AppError
     else if (err instanceof AppError) {
         statusCode = err.statusCode;
         message = err.message;
@@ -36,7 +47,7 @@ const globalErrorHandler: ErrorRequestHandler = (
             },
         ];
     } 
-    // ৩. সাধারণ Error হ্যান্ডল করা
+    // ৪. সাধারণ Error
     else if (err instanceof Error) {
         message = err.message;
         errorMessages = [
@@ -52,7 +63,6 @@ const globalErrorHandler: ErrorRequestHandler = (
         success: false,
         message,
         errorMessages,
-        // config.env ব্যবহার করা হয়েছে তোমার env.ts ফাইল অনুযায়ী
         stack: process.env.NODE_ENV === "development" ? err?.stack : undefined,
     });
 };

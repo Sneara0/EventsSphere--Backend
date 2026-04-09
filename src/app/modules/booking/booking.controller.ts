@@ -1,19 +1,18 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-
 import { BookingService } from './booking.service';
-import { catchAsync } from 'src/app/utils/catchAsync';
-import { sendResponse } from 'src/app/utils/sendResponse';
+import { catchAsync } from '../../utils/catchAsync';
+import { sendResponse } from '../../utils/sendResponse';
 
 /**
  * 1. User: Create a new booking
  */
 const createBooking = catchAsync(async (req: Request, res: Response) => {
-  const user = (req as any).user; // Auth Middleware থেকে আসা ইউজার ডাটা
-  const result = await BookingService.createBookingIntoDB(user.id, req.body);
+  const user = req.user!; 
+  const result = await BookingService.createBookingIntoDB(user.userId, req.body);
 
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.CREATED,
     success: true,
     message: 'Booking initiated successfully! Please complete the payment.',
     data: result,
@@ -21,11 +20,30 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 2. User: Get personal booking history
+ * 2. User/Admin: Get a single booking by ID
+ * (সিকিউরিটি আপডেট: ইউজার শুধুমাত্র নিজের বুকিং দেখতে পারবে, এডমিন সব পারবে)
+ */
+const getSingleBooking = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user!;
+
+  // সার্ভিসে আইডি এবং ইউজার ইনফো দুটোই পাঠানো হচ্ছে সিকিউরিটি চেক করার জন্য
+  const result = await BookingService.getSingleBookingFromDB(id as string, user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Booking details fetched successfully!',
+    data: result,
+  });
+});
+
+/**
+ * 3. User: Get personal booking history
  */
 const getMyBookings = catchAsync(async (req: Request, res: Response) => {
-  const user = (req as any).user;
-  const result = await BookingService.getMyBookingsFromDB(user.id);
+  const user = req.user!;
+  const result = await BookingService.getMyBookingsFromDB(user.userId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -36,7 +54,7 @@ const getMyBookings = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 3. Admin: Get all bookings for management
+ * 4. Admin: Get all bookings (For Management)
  */
 const getAllBookings = catchAsync(async (req: Request, res: Response) => {
   const result = await BookingService.getAllBookingsFromDB();
@@ -50,7 +68,7 @@ const getAllBookings = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 4. Admin: Update booking status manually
+ * 5. Admin: Update booking status
  */
 const updateBookingStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -65,7 +83,25 @@ const updateBookingStatus = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 5. Admin: Delete a booking
+ * 6. User/Admin: Cancel Booking (নতুন যোগ করা হয়েছে)
+ * পেমেন্ট পেন্ডিং থাকলে ইউজার নিজেই ক্যানসেল করতে পারবে
+ */
+const cancelBooking = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user!;
+  
+  const result = await BookingService.cancelBookingFromDB(id as string, user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Booking cancelled successfully!',
+    data: result,
+  });
+});
+
+/**
+ * 7. Admin: Delete a booking (Permanently)
  */
 const deleteBooking = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -81,8 +117,10 @@ const deleteBooking = catchAsync(async (req: Request, res: Response) => {
 
 export const BookingController = {
   createBooking,
+  getSingleBooking,
   getMyBookings,
   getAllBookings,
   updateBookingStatus,
+  cancelBooking, // Exported
   deleteBooking,
 };

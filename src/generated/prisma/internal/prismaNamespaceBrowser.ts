@@ -167,11 +167,12 @@ export const BookingScalarFieldEnum = {
   eventId: 'eventId',
   status: 'status',
   paymentStatus: 'paymentStatus',
+  quantity: 'quantity',
   totalAmount: 'totalAmount',
   transactionId: 'transactionId',
   ticketUrl: 'ticketUrl',
   isTicketGenerated: 'isTicketGenerated',
-  quantity: 'quantity',
+  bookingCode: 'bookingCode',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -246,6 +247,7 @@ export const ParticipantScalarFieldEnum = {
   userId: 'userId',
   name: 'name',
   email: 'email',
+  profileImage: 'profileImage',
   contactNumber: 'contactNumber',
   address: 'address',
   interests: 'interests',

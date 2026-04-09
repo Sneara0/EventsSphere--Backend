@@ -1,14 +1,12 @@
 import { Router } from "express";
 import { UserController } from "./user.controller";
-
-
 import { Role } from "../../../generated/prisma/enums";
-import { checkAuth  } from "src/app/middlewares/checkAuth";
+import { checkAuth } from "src/app/middlewares/checkAuth";
 
 const router = Router();
 
 /**
- * 1. Get My Profile
+ * ১. Get My Profile
  * Access: Any Logged-in User (Participant, Organizer, Admin)
  */
 router.get(
@@ -18,21 +16,18 @@ router.get(
 );
 
 /**
- * 2. Update My Profile
+ * ২. Update My Profile
  * Access: Any Logged-in User
- * Validation: Zod schema for partial updates
  */
 router.patch(
     "/update-profile",
     checkAuth(Role.PARTICIPANT, Role.ORGANIZER, Role.ADMIN),
-   (UserController.updateMyProfile),
- 
+    UserController.updateMyProfile
 );
 
 /**
- * 3. Get All Users (Role-wise filtering via Query)
+ * ৩. Get All Users (Role-wise filtering via Query)
  * Access: Admin Only
- * Example: /api/v1/users?role=ORGANIZER
  */
 router.get(
     "/",
@@ -41,13 +36,24 @@ router.get(
 );
 
 /**
- * 4. Get Single User by ID
+ * ৪. Get Single User by ID
  * Access: Admin, Organizer
  */
 router.get(
     "/:id",
     checkAuth(Role.ADMIN, Role.ORGANIZER),
     UserController.getSingleUser
+);
+
+/**
+ * ৫. Delete User (Soft Delete)
+ * Access: Admin Only
+ * এটি আপনার SQL Error (Extra parameter 1000) সমাধান করবে।
+ */
+router.delete(
+    "/:id",
+    checkAuth(Role.ADMIN),
+    UserController.deleteUser
 );
 
 export const UserRoutes = router;

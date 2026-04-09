@@ -29,6 +29,7 @@ export type ParticipantMinAggregateOutputType = {
   userId: string | null
   name: string | null
   email: string | null
+  profileImage: string | null
   contactNumber: string | null
   address: string | null
   createdAt: Date | null
@@ -40,6 +41,7 @@ export type ParticipantMaxAggregateOutputType = {
   userId: string | null
   name: string | null
   email: string | null
+  profileImage: string | null
   contactNumber: string | null
   address: string | null
   createdAt: Date | null
@@ -51,6 +53,7 @@ export type ParticipantCountAggregateOutputType = {
   userId: number
   name: number
   email: number
+  profileImage: number
   contactNumber: number
   address: number
   interests: number
@@ -65,6 +68,7 @@ export type ParticipantMinAggregateInputType = {
   userId?: true
   name?: true
   email?: true
+  profileImage?: true
   contactNumber?: true
   address?: true
   createdAt?: true
@@ -76,6 +80,7 @@ export type ParticipantMaxAggregateInputType = {
   userId?: true
   name?: true
   email?: true
+  profileImage?: true
   contactNumber?: true
   address?: true
   createdAt?: true
@@ -87,6 +92,7 @@ export type ParticipantCountAggregateInputType = {
   userId?: true
   name?: true
   email?: true
+  profileImage?: true
   contactNumber?: true
   address?: true
   interests?: true
@@ -172,6 +178,7 @@ export type ParticipantGroupByOutputType = {
   userId: string
   name: string
   email: string
+  profileImage: string | null
   contactNumber: string | null
   address: string | null
   interests: string[]
@@ -205,6 +212,7 @@ export type ParticipantWhereInput = {
   userId?: Prisma.StringFilter<"Participant"> | string
   name?: Prisma.StringFilter<"Participant"> | string
   email?: Prisma.StringFilter<"Participant"> | string
+  profileImage?: Prisma.StringNullableFilter<"Participant"> | string | null
   contactNumber?: Prisma.StringNullableFilter<"Participant"> | string | null
   address?: Prisma.StringNullableFilter<"Participant"> | string | null
   interests?: Prisma.StringNullableListFilter<"Participant">
@@ -218,6 +226,7 @@ export type ParticipantOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  profileImage?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   interests?: Prisma.SortOrder
@@ -234,6 +243,7 @@ export type ParticipantWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ParticipantWhereInput[]
   NOT?: Prisma.ParticipantWhereInput | Prisma.ParticipantWhereInput[]
   name?: Prisma.StringFilter<"Participant"> | string
+  profileImage?: Prisma.StringNullableFilter<"Participant"> | string | null
   contactNumber?: Prisma.StringNullableFilter<"Participant"> | string | null
   address?: Prisma.StringNullableFilter<"Participant"> | string | null
   interests?: Prisma.StringNullableListFilter<"Participant">
@@ -247,6 +257,7 @@ export type ParticipantOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  profileImage?: Prisma.SortOrderInput | Prisma.SortOrder
   contactNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   interests?: Prisma.SortOrder
@@ -265,6 +276,7 @@ export type ParticipantScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"Participant"> | string
   name?: Prisma.StringWithAggregatesFilter<"Participant"> | string
   email?: Prisma.StringWithAggregatesFilter<"Participant"> | string
+  profileImage?: Prisma.StringNullableWithAggregatesFilter<"Participant"> | string | null
   contactNumber?: Prisma.StringNullableWithAggregatesFilter<"Participant"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Participant"> | string | null
   interests?: Prisma.StringNullableListFilter<"Participant">
@@ -276,6 +288,7 @@ export type ParticipantCreateInput = {
   id?: string
   name: string
   email: string
+  profileImage?: string | null
   contactNumber?: string | null
   address?: string | null
   interests?: Prisma.ParticipantCreateinterestsInput | string[]
@@ -289,6 +302,7 @@ export type ParticipantUncheckedCreateInput = {
   userId: string
   name: string
   email: string
+  profileImage?: string | null
   contactNumber?: string | null
   address?: string | null
   interests?: Prisma.ParticipantCreateinterestsInput | string[]
@@ -300,6 +314,7 @@ export type ParticipantUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interests?: Prisma.ParticipantUpdateinterestsInput | string[]
@@ -313,6 +328,7 @@ export type ParticipantUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interests?: Prisma.ParticipantUpdateinterestsInput | string[]
@@ -325,6 +341,7 @@ export type ParticipantCreateManyInput = {
   userId: string
   name: string
   email: string
+  profileImage?: string | null
   contactNumber?: string | null
   address?: string | null
   interests?: Prisma.ParticipantCreateinterestsInput | string[]
@@ -336,6 +353,7 @@ export type ParticipantUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interests?: Prisma.ParticipantUpdateinterestsInput | string[]
@@ -348,6 +366,7 @@ export type ParticipantUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interests?: Prisma.ParticipantUpdateinterestsInput | string[]
@@ -373,6 +392,7 @@ export type ParticipantCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  profileImage?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
   address?: Prisma.SortOrder
   interests?: Prisma.SortOrder
@@ -385,6 +405,7 @@ export type ParticipantMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  profileImage?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
   address?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -396,6 +417,7 @@ export type ParticipantMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  profileImage?: Prisma.SortOrder
   contactNumber?: Prisma.SortOrder
   address?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -447,6 +469,7 @@ export type ParticipantCreateWithoutUserInput = {
   id?: string
   name: string
   email: string
+  profileImage?: string | null
   contactNumber?: string | null
   address?: string | null
   interests?: Prisma.ParticipantCreateinterestsInput | string[]
@@ -458,6 +481,7 @@ export type ParticipantUncheckedCreateWithoutUserInput = {
   id?: string
   name: string
   email: string
+  profileImage?: string | null
   contactNumber?: string | null
   address?: string | null
   interests?: Prisma.ParticipantCreateinterestsInput | string[]
@@ -485,6 +509,7 @@ export type ParticipantUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interests?: Prisma.ParticipantUpdateinterestsInput | string[]
@@ -496,6 +521,7 @@ export type ParticipantUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   interests?: Prisma.ParticipantUpdateinterestsInput | string[]
@@ -510,6 +536,7 @@ export type ParticipantSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   userId?: boolean
   name?: boolean
   email?: boolean
+  profileImage?: boolean
   contactNumber?: boolean
   address?: boolean
   interests?: boolean
@@ -523,6 +550,7 @@ export type ParticipantSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   name?: boolean
   email?: boolean
+  profileImage?: boolean
   contactNumber?: boolean
   address?: boolean
   interests?: boolean
@@ -536,6 +564,7 @@ export type ParticipantSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   userId?: boolean
   name?: boolean
   email?: boolean
+  profileImage?: boolean
   contactNumber?: boolean
   address?: boolean
   interests?: boolean
@@ -549,6 +578,7 @@ export type ParticipantSelectScalar = {
   userId?: boolean
   name?: boolean
   email?: boolean
+  profileImage?: boolean
   contactNumber?: boolean
   address?: boolean
   interests?: boolean
@@ -556,7 +586,7 @@ export type ParticipantSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ParticipantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "email" | "contactNumber" | "address" | "interests" | "createdAt" | "updatedAt", ExtArgs["result"]["participant"]>
+export type ParticipantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "email" | "profileImage" | "contactNumber" | "address" | "interests" | "createdAt" | "updatedAt", ExtArgs["result"]["participant"]>
 export type ParticipantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -577,6 +607,7 @@ export type $ParticipantPayload<ExtArgs extends runtime.Types.Extensions.Interna
     userId: string
     name: string
     email: string
+    profileImage: string | null
     contactNumber: string | null
     address: string | null
     interests: string[]
@@ -1010,6 +1041,7 @@ export interface ParticipantFieldRefs {
   readonly userId: Prisma.FieldRef<"Participant", 'String'>
   readonly name: Prisma.FieldRef<"Participant", 'String'>
   readonly email: Prisma.FieldRef<"Participant", 'String'>
+  readonly profileImage: Prisma.FieldRef<"Participant", 'String'>
   readonly contactNumber: Prisma.FieldRef<"Participant", 'String'>
   readonly address: Prisma.FieldRef<"Participant", 'String'>
   readonly interests: Prisma.FieldRef<"Participant", 'String[]'>

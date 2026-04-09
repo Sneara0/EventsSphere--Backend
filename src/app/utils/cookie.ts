@@ -1,4 +1,3 @@
-import { CookieOptions } from "better-auth";
 import { Request, Response } from "express";
 import ms from "ms";
 
@@ -9,7 +8,7 @@ const getMaxAge = (envValue: string | undefined, defaultValue: string): number =
     try {
         const timeValue = envValue || defaultValue;
         const milliseconds = ms(timeValue as any);
-        return Number(milliseconds); // নিশ্চিতভাবে Number রিটার্ন করবে
+        return Number(milliseconds); 
     } catch (error) {
         return Number(ms(defaultValue as any));
     }
@@ -19,23 +18,19 @@ const setCookie = (res: Response, key: string, value: string, options: any) => {
     res.cookie(key, value, options);
 };
 
-const getCookie = (req: Request, key: string) => {
-    return req.cookies[key];
-};
-
-const clearCookie = (res: Response, key: string, options: any) => {
-    res.clearCookie(key, options);
-};
-
+// --- ফিক্সড এক্সেস টোকেন কুকি ---
 const setAccessTokenCookie = (res: Response, token: string) => {
-    const maxAge = getMaxAge(process.env.ACCESS_TOKEN_EXPIRES_IN, '1h');
+    // ১ ঘণ্টা (1h) থেকে বাড়িয়ে ১ দিন (1d) করা হয়েছে যাতে কাজ করতে সুবিধা হয়
+    const maxAge = getMaxAge(process.env.ACCESS_TOKEN_EXPIRES_IN, '1d');
 
     setCookie(res, "accessToken", token, {
         httpOnly: true,
+        // প্রোডাকশনে HTTPS থাকলে 'secure: true' হবে, লোকালহোস্টে 'false'
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        // লোকালহোস্টে 'lax' ব্যবহার করলে কুকি ব্লক হবে না
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
-        maxAge: maxAge // এখন এটি নিশ্চিতভাবে একটি number
+        maxAge: maxAge
     });
 };
 
@@ -45,7 +40,7 @@ const setRefreshTokenCookie = (res: Response, token: string) => {
     setCookie(res, "refreshToken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
         maxAge: maxAge
     });
@@ -57,7 +52,7 @@ const setBetterAuthSessionCookie = (res: Response, sessionId: string) => {
     setCookie(res, "betterAuthSession", sessionId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
         maxAge: maxAge
     });
@@ -65,8 +60,8 @@ const setBetterAuthSessionCookie = (res: Response, sessionId: string) => {
 
 export const cookieUtils = {
     setCookie,
-    getCookie,
-    clearCookie,
+    getCookie: (req: Request, key: string) => req.cookies[key],
+    clearCookie: (res: Response, key: string, options: any) => res.clearCookie(key, options),
     setAccessTokenCookie,
     setRefreshTokenCookie,
     setBetterAuthSessionCookie

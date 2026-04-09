@@ -4,6 +4,7 @@ model Participant {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name   String
   email   String @unique
+  profileImage  String?
   
   
   contactNumber String?

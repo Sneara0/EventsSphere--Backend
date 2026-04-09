@@ -2,21 +2,31 @@ model Booking {
   id                String        @id @default(uuid())
   userId            String
   eventId           String
-  status            BookingStatus @default(PENDING)
-  paymentStatus     PaymentStatus @default(UNPAID)
+  
+  // স্ট্যাটাস লজিক
+  status            BookingStatus @default(PENDING)   // PENDING, CONFIRMED, CANCELLED
+  paymentStatus     PaymentStatus @default(UNPAID)    // UNPAID, PAID, REFUNDED
+  
+  // ফিন্যান্সিয়াল ডাটা
+  quantity          Int           @default(1)
   totalAmount       Float
-  transactionId     String?       @unique
-  ticketUrl         String?
+  transactionId     String?       @unique            // Stripe বা SSLCommerz এর ট্রানজেকশন আইডি
+  
+  // এয়ার টিকিট স্পেসিফিক (নতুন যোগ করা হয়েছে)
+  ticketUrl         String?       // PDF টিকিটের ক্লাউডিনারি লিংক
   isTicketGenerated Boolean       @default(false)
-  quantity      Int           @default(1)
-  payments Payment[]
+  bookingCode       String        @unique @default(cuid()) // কনফার্মেশনের জন্য ছোট একটি কোড (যেমন: B-X8Y2)
 
-  user      User     @relation(fields: [userId], references: [id])
-  event     Event    @relation(fields: [eventId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // রিলেশনশিপস
+  user              User          @relation(fields: [userId], references: [id])
+  event             Event         @relation(fields: [eventId], references: [id])
+  payments          Payment[]
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   @@map("bookings")
   @@index([userId])
   @@index([eventId])
+  @@index([status]) // স্ট্যাটাস দিয়ে ফিল্টার করার জন্য এটি দ্রুত কাজ করবে
 }

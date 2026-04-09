@@ -11,20 +11,36 @@ import { IRequestUser } from "../../interfaces/requestUser.interface";
 const createEvent = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IRequestUser;
 
-    // ইমেজ হ্যান্ডলিং (Cloudinary/Multer পাথ থেকে থাম্বনেইল সেট করা)
+    // ১. ডাটা এক্সট্রাক্ট করা (Zod middleware-এর পর ডাটা req.body.body তে থাকতে পারে)
+    const payload = req.body.body ? { ...req.body.body } : { ...req.body };
+
+    // --- DEBUG LOGS: সমস্যা ধরার জন্য ---
+    console.log("🛠️ Logged User ID:", user?.userId);
+    console.log("📦 Incoming Payload:", payload);
+    // ---------------------------------
+
+    // ২. ইমেজ হ্যান্ডলিং (Cloudinary URL যদি multer ব্যবহার করেন)
     if (req.file) {
-        req.body.thumbnail = req.file.path;
+        payload.thumbnail = req.file.path; 
     }
 
-    // ডাটা কাস্টিং: FormData থেকে আসা স্ট্রিংগুলোকে সঠিক টাইপে রূপান্তর
-    const payload = {
-        ...req.body,
-        totalSeats: Number(req.body.totalSeats),
-        ticketPrice: Number(req.body.ticketPrice || 0),
-        // Boolean হ্যান্ডলিং: ফ্রন্টএন্ড চেকবক্স থেকে 'on' অথবা 'true' আসলে সেটি true হবে
-        isRefundable: req.body.isRefundable === 'true' || req.body.isRefundable === 'on',
-    };
+    // ৩. ডাটা টাইপ কনভার্সন (FormData থেকে স্ট্রিং আসে, তাই নাম্বারে রূপান্তর জরুরি)
+    if (payload.totalSeats) {
+        payload.totalSeats = Number(payload.totalSeats);
+    }
+    if (payload.ticketPrice) {
+        payload.ticketPrice = Number(payload.ticketPrice);
+    }
+    
+    // ৪. বুলিয়ান হ্যান্ডলিং
+    if (payload.isRefundable !== undefined) {
+        payload.isRefundable = 
+            payload.isRefundable === 'true' || 
+            payload.isRefundable === 'on' || 
+            payload.isRefundable === true;
+    }
 
+    // ৫. সার্ভিস কল করা (নিশ্চিত হোন আপনার সার্ভিসে এই ফাংশন নাম আছে)
     const result = await EventService.createEventIntoDB(user.userId, payload);
 
     sendResponse(res, {
@@ -36,11 +52,10 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 2. Get All Flight Offers (With Filtering)
+ * 2. Get All Flight Offers
  */
 const getAllEvents = catchAsync(async (req: Request, res: Response) => {
-    const filters = req.query;
-    const result = await EventService.getAllEventsFromDB(filters as any);
+    const result = await EventService.getAllEventsFromDB(req.query);
 
     sendResponse(res, {
         statusCode: status.OK,
@@ -51,11 +66,11 @@ const getAllEvents = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 3. Get Single Flight Details by ID
+ * 3. Get Single Flight Details
  */
 const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
-    const id = req.params.id as string; 
-    const result = await EventService.getSingleEventFromDB(id);
+    const { id } = req.params; 
+    const result = await EventService.getSingleEventFromDB(id as string);
 
     sendResponse(res, {
         statusCode: status.OK,
@@ -66,27 +81,29 @@ const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 4. Update Flight/Event Offer
+ * 4. Update Flight Offer
  */
 const updateEvent = catchAsync(async (req: Request, res: Response) => {
-    const id = req.params.id as string; 
+    const { id } = req.params; 
     const user = req.user as IRequestUser;
 
-    // যদি নতুন ইমেজ আপলোড করা হয়
-    if (req.file) {
-        req.body.thumbnail = req.file.path;
-    }
-
-    // আপডেট পেলোডে নাম্বার ভ্যালুগুলো নিশ্চিত করা
-    if (req.body.totalSeats) req.body.totalSeats = Number(req.body.totalSeats);
-    if (req.body.ticketPrice) req.body.ticketPrice = Number(req.body.ticketPrice);
+    const updateData = req.body.body ? { ...req.body.body } : { ...req.body };
     
-    // Boolean আপডেট হ্যান্ডলিং
-    if (req.body.isRefundable !== undefined) {
-        req.body.isRefundable = req.body.isRefundable === 'true' || req.body.isRefundable === 'on';
+    if (req.file) {
+        updateData.thumbnail = req.file.path;
     }
 
-    const result = await EventService.updateEventIntoDB(id, user.userId, req.body);
+    if (updateData.totalSeats) updateData.totalSeats = Number(updateData.totalSeats);
+    if (updateData.ticketPrice !== undefined) updateData.ticketPrice = Number(updateData.ticketPrice);
+    
+    if (updateData.isRefundable !== undefined) {
+        updateData.isRefundable = 
+            updateData.isRefundable === 'true' || 
+            updateData.isRefundable === 'on' || 
+            updateData.isRefundable === true;
+    }
+
+    const result = await EventService.updateEventIntoDB(id as string, user.userId, updateData);
 
     sendResponse(res, {
         statusCode: status.OK,
@@ -97,13 +114,13 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
 });
 
 /**
- * 5. Soft Delete an Offer
+ * 5. Delete an Offer
  */
 const deleteEvent = catchAsync(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
+    const { id } = req.params;
     const user = req.user as IRequestUser;
 
-    const result = await EventService.deleteEventFromDB(id, user.userId);
+    const result = await EventService.deleteEventFromDB(id as string, user.userId);
 
     sendResponse(res, {
         statusCode: status.OK,

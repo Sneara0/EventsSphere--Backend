@@ -10,7 +10,7 @@ model Event {
   thumbnail       String?     // Cloudinary Image URL
   ticketPrice     Float       @default(0)
   totalSeats      Int
-  availableSeats  Int
+  availableSeats  Int  @default(0)
   status          EventStatus @default(UPCOMING)
   isDeleted       Boolean     @default(false)
 

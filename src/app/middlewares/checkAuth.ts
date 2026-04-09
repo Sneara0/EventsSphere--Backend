@@ -6,10 +6,9 @@ import { cookieUtils } from "../utils/cookie";
 import { prisma } from "../lib/prisma";
 import AppError from "../errorHelpers/AppError";
 import { jwtUtils } from "../utils/jwt";
-import env from "src/config/env";
+import env from "../../config/env"; // পাথটি চেক করে নিন
 
-
-
+// ১. Request ইন্টারফেস এক্সটেন্ড করা (টাইপ সেফটির জন্য)
 declare global {
   namespace Express {
     interface Request {
@@ -24,76 +23,68 @@ declare global {
 
 export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
   try {
-
-    const sessionToken = cookieUtils.getCookie(req, "better-auth.session_token");
-
-    if (!sessionToken) {
-      throw new AppError(status.UNAUTHORIZED, 'Unauthorized access! No session token provided.');
+    // ২. কুকি থেকে এক্সেস টোকেন নেওয়া
+    const accessToken = cookieUtils.getCookie(req, 'accessToken');
+    
+    if (!accessToken) {
+      throw new AppError(status.UNAUTHORIZED, 'আপনি লগইন করা নেই! দয়া করে আবার লগইন করুন।');
     }
 
+    // ৩. JWT ভেরিফাই করা
+    const verifiedToken: any = jwtUtils.verifyToken(accessToken, env.ACCESS_TOKEN_SECRET as string);
 
-    const sessionExists = await prisma.session.findFirst({
-      where: {
-        token: sessionToken,
-        expiresAt: { gt: new Date() } 
-      },
-      include: { user: true }
+    if (!verifiedToken) {
+      throw new AppError(status.UNAUTHORIZED, 'আপনার সেশন শেষ হয়ে গেছে। আবার লগইন করুন।');
+    }
+
+    // ৪. টোকেন থেকে userId বের করা (সহজ এবং ক্লিন লজিক)
+    const userId = verifiedToken.userId || verifiedToken.id || (verifiedToken.data && verifiedToken.data.userId);
+
+    if (!userId) {
+      throw new AppError(status.UNAUTHORIZED, 'Invalid token payload!');
+    }
+
+    // ৫. ডাটাবেস থেকে লেটেস্ট ইউজার ডাটা চেক করা
+    // টোকেনের রোলের ওপর ভরসা না করে সরাসরি DB থেকে রোল চেক করা বেশি নিরাপদ
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
-    if (!sessionExists || !sessionExists.user) {
-      throw new AppError(status.UNAUTHORIZED, 'Session expired or invalid.');
+    if (!user) {
+      throw new AppError(status.UNAUTHORIZED, 'ইউজার খুঁজে পাওয়া যায়নি!');
     }
 
-    const user = sessionExists.user;
-
-   
-    const now = new Date();
-    const expiresAt = new Date(sessionExists.expiresAt);
-    const createdAt = new Date(sessionExists.createdAt);
-
-    const sessionLifeTime = expiresAt.getTime() - createdAt.getTime();
-    const timeRemaining = expiresAt.getTime() - now.getTime();
-    const percentRemaining = (timeRemaining / sessionLifeTime) * 100;
-
-    if (percentRemaining < 20) {
-      res.setHeader('X-Session-Refresh', 'true');
-      console.log("Session Expiring Soon!!");
+    // ৬. ইউজারের স্ট্যাটাস চেক করা
+    if (user.status === UserStatus.BLOCKED || user.isDeleted) {
+      throw new AppError(status.FORBIDDEN, 'আপনার অ্যাকাউন্টটি ব্লকড অথবা ডিলিট করা হয়েছে।');
     }
 
-    
-    if (user.status === UserStatus.BLOCKED || user.status === UserStatus.DELETED || user.isDeleted) {
-      throw new AppError(status.UNAUTHORIZED, 'Access denied! Your account is blocked or deleted.');
+    // ৭. রোল (Role) পারমিশন চেক করা (সবচেয়ে গুরুত্বপূর্ণ অংশ)
+    const userRole = user.role as Role;
+
+    if (authRoles.length > 0 && !authRoles.includes(userRole)) {
+      // এই লগটি আপনাকে টার্মিনালে দেখাবে আসলে কী সমস্যা হচ্ছে
+      console.log(`[Permission Denied] User: ${user.email}, Role: ${userRole}, Required: ${authRoles}`);
+      
+      throw new AppError(
+        status.FORBIDDEN, 
+        `আপনার এই কাজটি করার অনুমতি নেই। আপনার রোল: ${userRole}, কিন্তু প্রয়োজন: ${authRoles.join(' বা ')}`
+      );
     }
 
-   
-    if (authRoles.length > 0 && !authRoles.includes(user.role as Role)) {
-      throw new AppError(status.FORBIDDEN, 'Forbidden access! Insufficient permissions.');
-    }
-
-
-
+    // ৮. Request অবজেক্টে লেটেস্ট ইউজার ডাটা সেট করা
     req.user = {
       userId: user.id,
-      role: user.role as Role,
+      role: userRole,
       email: user.email,
     };
 
-
-
-   
-    const accessToken = cookieUtils.getCookie(req, 'accessToken');
-    if (!accessToken) {
-      throw new AppError(status.UNAUTHORIZED, 'Unauthorized access! No access token provided.');
-    }
-
-    const verifiedToken = jwtUtils.verifyToken(accessToken, env.ACCESS_TOKEN_SECRET);
-    if (!verifiedToken || !verifiedToken.success) {
-      throw new AppError(status.UNAUTHORIZED, 'Invalid access token.');
-    }
-
-
     next();
   } catch (error: any) {
+    // JWT এরর হ্যান্ডলিং
+    if (error.name === 'TokenExpiredError') {
+        return next(new AppError(status.UNAUTHORIZED, 'AccessTokenExpired'));
+    }
     next(error);
   }
 };
