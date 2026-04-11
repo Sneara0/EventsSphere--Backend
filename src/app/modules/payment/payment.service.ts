@@ -1,12 +1,13 @@
 // 📂 src/app/modules/payment/payment.service.ts
 
 import httpStatus from 'http-status';
-import env from 'src/config/env';
+import config from '../../../config/env'; // কন্ট্রোলারের সাথে পাথ সিঙ্ক করা হলো
 import { IPaymentSessionPayload, IPaymentData } from './payment.interface';
-import { stripe } from 'src/config/stripe.config';
-import AppError from 'src/app/errorHelpers/AppError';
-import { prisma } from 'src/app/lib/prisma';
-import { PaymentStatus, BookingStatus } from 'src/generated/prisma/enums';
+import { stripe } from '../../../config/stripe.config';
+import AppError from '../../errorHelpers/AppError';
+import { prisma } from '../../lib/prisma';
+import { BookingStatus, PaymentStatus } from 'src/generated/prisma/enums';
+// সরাসরি প্রিজমা ক্লায়েন্ট থেকে এনাম নিন
 
 /**
  * ১. Stripe Checkout Session তৈরি করা (BDT কারেন্সিতে)
@@ -22,21 +23,22 @@ const createCheckoutSession = async (payload: IPaymentSessionPayload) => {
           price_data: {
             currency: 'bdt', 
             product_data: {
-              name: eventName,
+              name: eventName || 'Event Booking',
               description: `Confirmation for Booking ID: ${bookingId}`,
             },
-            unit_amount: Math.round(amount * 100), // টাকা থেকে পয়সায় রূপান্তর
+            unit_amount: Math.round(Number(amount) * 100), // টাকা থেকে পয়সায় রূপান্তর
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${env.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}&bookingId=${bookingId}`,
-      cancel_url: `${env.FRONTEND_URL}/payment/cancel`,
+      // ফ্রন্টএন্ডের সাকসেস পেজের পাথ ঠিক করে নিন
+      success_url: `${config.FRONTEND_URL}/checkout/${bookingId}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${config.FRONTEND_URL}/checkout/${bookingId}?status=cancelled`,
       customer_email: userEmail,
       metadata: {
-        bookingId,
-        userId,
+        bookingId: String(bookingId),
+        userId: String(userId),
       },
     });
 
@@ -52,11 +54,11 @@ const createCheckoutSession = async (payload: IPaymentSessionPayload) => {
 const fulfillOrder = async (data: IPaymentData) => {
   return await prisma.$transaction(async (tx) => {
     
-    // ক. পেমেন্ট রেকর্ড তৈরি (আপনার নতুন স্কিমা অনুযায়ী)
+    // ক. পেমেন্ট রেকর্ড তৈরি
     await tx.payment.create({
       data: {
         transactionId: data.transactionId,
-        amount: data.amount,
+        amount: Number(data.amount),
         currency: 'bdt',
         paymentStatus: PaymentStatus.PAID,
         paymentMethod: data.paymentMethod || 'stripe',
@@ -66,33 +68,34 @@ const fulfillOrder = async (data: IPaymentData) => {
     });
 
     // খ. বুকিং আপডেট (Status & PaymentStatus)
+    // নোট: আপনার ফ্রন্টএন্ডে 'PAID' চেক করলে BookingStatus.PAID দিন (যদি এনামে থাকে)
+    // অন্যথায় BookingStatus.SUCCESS ই রাখুন কিন্তু ফ্রন্টএন্ডে এটি হ্যান্ডেল করুন
     const booking = await tx.booking.update({
       where: { id: data.bookingId },
       data: { 
         paymentStatus: PaymentStatus.PAID,
-        status: BookingStatus.SUCCESS, // বুকিং এখন সফল
-        transactionId: data.transactionId // বুকিং টেবিলেও আইডি রাখা ভালো
+        status: BookingStatus.SUCCESS, // অথবা BookingStatus.PAID আপনার এনাম অনুযায়ী
+        transactionId: data.transactionId 
       },
       include: { 
         event: {
-            select: { title: true, dateTime: true, location: true, id: true }
+          select: { title: true, dateTime: true, location: true, id: true }
         }, 
         user: {
-            select: { name: true, email: true }
+          select: { name: true, email: true }
         } 
       }
     });
 
-    /** * নোট: যদি BookingService-এ ইভেন্ট ক্রিয়েট করার সময় সিট কমিয়ে থাকেন, 
-     * তবে এখানে পুনরায় decrement করার প্রয়োজন নেই। 
-     * অন্যথায় নিচের অংশটি আনকমেন্ট করুন:
-     */
-    /*
+    // গ. ইভেন্টের সিট কমানো (Atomic Update)
     await tx.event.update({
       where: { id: booking.eventId },
-      data: { availableSeats: { decrement: booking.quantity } }
+      data: { 
+        availableSeats: { 
+          decrement: 1 // বা booking.quantity যদি থাকে
+        } 
+      }
     });
-    */
 
     return booking; 
   });

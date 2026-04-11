@@ -32,7 +32,7 @@ app.use(cookieParser());
 // --- ২. STRIPE WEBHOOK (বডি পার্সারের আগে এবং কন্ট্রোলার সহ) ---
 // গুরুত্বপূর্ণ: এখানে অবশ্যই PaymentController.handleStripeWebhook থাকতে হবে
 app.post(
-  "/api/v1/payment/webhook", 
+  "/api/v1/payments/webhook", 
   express.raw({ type: "application/json" }), 
   PaymentController.handleStripeWebhook 
 );

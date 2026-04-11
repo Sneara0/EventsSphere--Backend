@@ -7,13 +7,25 @@ import { PaymentService } from './payment.service';
 import { InvoiceService } from './invoice.service';
 import { sendEmailWithInvoice } from '../../utils/sendEmail';
 import { stripe } from '../../../config/stripe.config';
-import { catchAsync } from 'src/app/utils/catchAsync';
-import { sendResponse } from 'src/app/utils/sendResponse';
+import { catchAsync } from '../../utils/catchAsync'; // পাথ ঠিক করে নিন
+import { sendResponse } from '../../utils/sendResponse'; // পাথ ঠিক করে নিন
 
 const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
   const { bookingId, totalAmount, userEmail, userId, eventName } = req.body;
-  console.log(`⏳ Creating payment session for Booking: ${bookingId}...`);
 
+  // ১. ডিবাগিং লগ (টার্মিনালে চেক করবেন ডাটা আসছে কি না)
+  console.log(`⏳ Creating session for Booking: ${bookingId}, Amount: ${totalAmount}`);
+
+  // ২. অ্যামাউন্ট ভ্যালিডেশন (অবশ্যই নাম্বার হতে হবে)
+  const amount = Number(totalAmount);
+  if (!amount || amount <= 0) {
+    return res.status(httpStatus.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid payment amount received!",
+    });
+  }
+
+  // ৩. Stripe সেশন তৈরি
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [
@@ -24,14 +36,16 @@ const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
             name: eventName || 'Event Ticket Booking',
             description: `Booking ID: ${bookingId}`,
           },
-          unit_amount: Math.round(totalAmount * 100),
+          // ✅ Stripe সেন্ট/পয়সা হিসেবে হিসাব করে, তাই ১০০ দিয়ে গুণ
+          unit_amount: Math.round(amount * 100), 
         },
         quantity: 1,
       },
     ],
     mode: 'payment',
-    success_url: `${config.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${config.FRONTEND_URL}/payment/cancel`,
+    // ৪. ফ্রন্টএন্ডের চেকআউট পেজে ফেরত পাঠানোর জন্য সাকসেস ইউআরএল
+    success_url: `${config.FRONTEND_URL}/checkout/${bookingId}?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${config.FRONTEND_URL}/checkout/${bookingId}?status=cancelled`,
     customer_email: userEmail,
     metadata: {
       bookingId, 
@@ -51,12 +65,10 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'] as string;
   let event;
 
-  console.log("🔔 Webhook Signal Received! Checking signature...");
-
   try {
     const webhookSecret = config.STRIPE.STRIPE_WEBHOOK_SECRET; 
     
-    // সিগনেচার ভেরিফাই করা
+    // সিগনেচার ভেরিফাই (অবশ্যই raw body ব্যবহার করতে হবে app.ts এ)
     event = stripe.webhooks.constructEvent(
       req.body, 
       sig,
@@ -65,7 +77,6 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
     console.log("✅ Webhook Verified: ", event.type);
   } catch (err: any) {
     console.error(`❌ Webhook Signature Error: ${err.message}`);
-    // যদি এখানে এরর আসে, তবে বুঝবেন whsec_... কোডটি ভুল
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -73,16 +84,15 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
     const session = event.data.object as any;
     const { bookingId, userId } = session.metadata;
 
-    console.log("📦 Metadata Received:", { bookingId, userId });
-
     if (!bookingId || !userId) {
-      console.error("⚠️ Error: BookingId or UserId missing in Metadata!");
+      console.error("⚠️ Error: Missing metadata in Stripe session");
       return res.status(400).json({ error: "Missing metadata" });
     }
 
     try {
       console.log(`⏳ Processing fulfillment for Booking: ${bookingId}...`);
 
+      // ১. ডাটাবেস আপডেট (Status -> PAID)
       const bookingData = await PaymentService.fulfillOrder({
         transactionId: (session.payment_intent as string) || (session.id as string),
         amount: session.amount_total / 100, 
@@ -91,8 +101,7 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
       });
 
       if (bookingData) {
-        console.log("✅ Database Updated. Generating Invoice...");
-
+        // ২. ইনভয়েস জেনারেট
         const pdfBase64 = await InvoiceService.generateInvoicePDF({
           userName: bookingData.user.name,
           userEmail: bookingData.user.email,
@@ -103,8 +112,7 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
           date: new Date().toLocaleDateString(),
         });
 
-        console.log("📄 Invoice Generated. Sending Email to:", bookingData.user.email);
-
+        // ৩. ইমেইল পাঠানো
         await sendEmailWithInvoice(
           bookingData.user.email,
           pdfBase64,
@@ -112,10 +120,10 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
           bookingData.user.name
         );
 
-        console.log(`🚀 SUCCESS: Fulfillment completed for Booking: ${bookingId}`);
+        console.log(`🚀 SUCCESS: Fulfillment completed for ${bookingData.user.email}`);
       }
     } catch (error: any) {
-      console.error('❌ Fulfillment Error Details:', error.message);
+      console.error('❌ Fulfillment Error:', error.message);
     }
   }
 

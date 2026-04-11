@@ -18,10 +18,6 @@ router.post(
 /**
  * ২. Stripe Webhook
  */
-router.post(
-  '/webhook',
-  express.raw({ type: 'application/json' }), 
-  PaymentController.handleStripeWebhook
-);
+
 
 export const PaymentRoutes = router;
