@@ -9,13 +9,15 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "npx prisma generate && tsc",
-   "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "lint": "eslint . /src/**/*",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
     "studio": "prisma studio",
+    "vercel-build": "prisma generate && tsc",
     "push": "prisma db push",
     "pull": "prisma db pull",
+    "postinstall": "prisma generate",
     "stripe:webhook": "\"C:/Users/USER/Downloads/stripe_1.37.2_windows_x86_64/stripe.exe\" listen --forward-to localhost:5000/webhook",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
