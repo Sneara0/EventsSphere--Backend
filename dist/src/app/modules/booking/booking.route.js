@@ -1,8 +1,8 @@
 // 📂 src/app/modules/booking/booking.routes.ts
 import express from 'express';
 import { BookingController } from './booking.controller';
-import { checkAuth } from 'src/app/middlewares/checkAuth';
-import { Role } from 'src/generated/prisma/enums';
+import { checkAuth } from '../../middlewares/checkAuth';
+import { Role } from '../../../generated/prisma/enums';
 const router = express.Router();
 router.post('/create-booking', checkAuth(Role.USER, Role.PARTICIPANT, Role.ORGANIZER), // এখানে ORGANIZER যোগ করা হলো
 BookingController.createBooking);

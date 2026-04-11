@@ -11,7 +11,8 @@ import AppError from "../../errorHelpers/AppError";
 import httpStatus from "http-status";
 // এনামগুলো সরাসরি প্রিজমা থেকে নিন
 import { InvoiceService } from "../payment/invoice.service";
-import { BookingStatus, PaymentStatus } from "src/generated/prisma/enums";
+import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums";
+
 
 /**
  * 1. User: Create Initial Booking (Seat Reservation সহ)
@@ -198,7 +199,7 @@ const getAllBookingsFromDB = async () => {
     include: {
       user: { select: { name: true, email: true } },
       event: { select: { title: true, dateTime: true } },
-      payment: true, 
+      payments: true, 
     },
     orderBy: { createdAt: 'desc' },
   });

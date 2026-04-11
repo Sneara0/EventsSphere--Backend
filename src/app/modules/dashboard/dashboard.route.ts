@@ -1,7 +1,8 @@
 import { Router } from 'express';
 
 import { DashboardController } from './dashboard.controller';
-import { checkAuth } from 'src/app/middlewares/checkAuth';
+import { checkAuth } from '../../middlewares/checkAuth';
+
 
 const router = Router();
 

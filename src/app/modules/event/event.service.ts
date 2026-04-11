@@ -2,7 +2,8 @@ import status from "http-status";
 import { prisma } from "../../lib/prisma";
 import { IEventCreatePayload, IEventFilterRequest } from "./event.interface";
 import AppError from "../../errorHelpers/AppError"; 
-import { Prisma } from "src/generated/prisma/client";
+import { Prisma } from "../../../generated/prisma/client";
+
 
 /**
  * 1. নতুন ফ্লাইট/ইভেন্ট অফার তৈরি করা

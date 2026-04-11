@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { CouponController } from './coupon.controller';
 import { CouponValidation } from './coupon.validation';
-import { checkAuth } from 'src/app/middlewares/checkAuth';
-import { validateRequest } from 'src/app/middlewares/validateRequest';
+import { checkAuth } from '../../middlewares/checkAuth';
+import { validateRequest } from '../../middlewares/validateRequest';
 const router = Router();
 router.post('/', checkAuth('ADMIN'), validateRequest(CouponValidation.createCouponZodSchema), CouponController.createCoupon);
 router.post('/validate', checkAuth('PARTICIPANT', 'ADMIN'), CouponController.validateCoupon);

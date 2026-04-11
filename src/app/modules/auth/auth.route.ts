@@ -2,8 +2,9 @@ import { Router } from "express";
 import { toNodeHandler } from "better-auth/node";
 import { AuthController } from "./auth.controller";
 import { Role } from "../../../generated/prisma/enums";
-import { checkAuth } from "src/app/middlewares/checkAuth";
-import { auth } from "src/app/lib/auth";
+import { checkAuth } from "../../middlewares/checkAuth";
+import auth from "../../lib/auth";
+
 
 const router = Router();
 

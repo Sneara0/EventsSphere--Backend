@@ -6,10 +6,11 @@ import { sendResponse } from "../../utils/sendResponse";
 import { cookieUtils } from "../../utils/cookie";
 import { auth } from "../../lib/auth";
 import AppError from "../../errorHelpers/AppError";
-import env from "src/config/env";
-import { prisma } from "src/app/lib/prisma";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
+
 import httpStatus from 'http-status';
+import { prisma } from "../../lib/prisma";
+import env from "../../../config/env";
 // 1. User Registration (Fixed Enum Case Sensitivity)
 const registerUser = catchAsync(async (req: Request, res: Response) => {
     // ইউজারের পাঠানো ডাটা থেকে রোলটিকে বড় হাতের অক্ষরে রূপান্তর করা হচ্ছে

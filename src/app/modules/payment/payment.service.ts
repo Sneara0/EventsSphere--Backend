@@ -6,7 +6,8 @@ import { IPaymentSessionPayload, IPaymentData } from './payment.interface';
 import { stripe } from '../../../config/stripe.config';
 import AppError from '../../errorHelpers/AppError';
 import { prisma } from '../../lib/prisma';
-import { BookingStatus, PaymentStatus } from 'src/generated/prisma/enums';
+import { BookingStatus, PaymentStatus } from '../../../generated/prisma/enums';
+
 // সরাসরি প্রিজমা ক্লায়েন্ট থেকে এনাম নিন
 
 /**
@@ -74,7 +75,7 @@ const fulfillOrder = async (data: IPaymentData) => {
       where: { id: data.bookingId },
       data: { 
         paymentStatus: PaymentStatus.PAID,
-        status: BookingStatus.SUCCESS, // অথবা BookingStatus.PAID আপনার এনাম অনুযায়ী
+        status: BookingStatus.SUCCESS, // অথবা BookingStatus.PAID আপনার এনাম অনুযায়ী
         transactionId: data.transactionId 
       },
       include: { 

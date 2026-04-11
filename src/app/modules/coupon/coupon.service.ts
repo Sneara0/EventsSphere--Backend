@@ -2,7 +2,8 @@ import httpStatus from 'http-status';
 import { prisma } from "../../lib/prisma";
 
 import { ICouponCreatePayload, ICouponUpdatePayload } from "./coupon.interface";
-import AppError from 'src/app/errorHelpers/AppError';
+import AppError from '../../errorHelpers/AppError';
+
 
 const createCouponIntoDB = async (payload: ICouponCreatePayload) => {
   const isExists = await prisma.coupon.findUnique({ where: { code: payload.code } });

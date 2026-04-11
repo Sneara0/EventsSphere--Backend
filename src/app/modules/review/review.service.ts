@@ -2,7 +2,8 @@ import httpStatus from 'http-status';
 import { prisma } from "../../lib/prisma";
 
 import { IReviewCreatePayload, IReviewUpdatePayload } from "./review.interface";
-import AppError from 'src/app/errorHelpers/AppError';
+import AppError from '../../errorHelpers/AppError';
+
 
 /**
  * 1. Create a new review

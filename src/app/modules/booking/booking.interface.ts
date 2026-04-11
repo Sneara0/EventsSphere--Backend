@@ -1,6 +1,8 @@
 // 📂 src/app/modules/booking/booking.interface.ts
 
-import { BookingStatus, PaymentStatus } from "src/generated/prisma/enums";
+import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums";
+
+
 
 /**
  * 1. User: Booking request payload from frontend

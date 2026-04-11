@@ -1,4 +1,4 @@
-import { Role, UserStatus } from "src/generated/prisma/enums";
+import { Role, UserStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 /**
  * ১. রোল অনুযায়ী সব ইউজার পাওয়া (একটিভ ইউজারদের জন্য)

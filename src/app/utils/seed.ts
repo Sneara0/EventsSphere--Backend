@@ -4,7 +4,8 @@
 import { prisma } from "../lib/prisma";
 import env from "../../config/env"; 
 import { auth } from "../lib/auth";
-import { Role } from "src/generated/prisma/enums";
+import { Role } from "../../generated/prisma/enums";
+
 
 export const seedSuperAdmin = async () => {
     console.log("🚀 Seeding started...");

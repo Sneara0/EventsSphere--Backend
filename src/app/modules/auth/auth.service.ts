@@ -7,7 +7,8 @@ import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { jwtUtils } from "../../utils/jwt";
 import { tokenUtils } from "../../utils/token";
-import env from "src/config/env";
+import env from "../../../config/env"; // পাথটি চেক করে নিন
+
 
 import { 
     IChangePasswordPayload, 

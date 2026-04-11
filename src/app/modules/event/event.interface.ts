@@ -1,4 +1,5 @@
-import { EventStatus } from "src/generated/prisma/enums";
+import { EventStatus } from "../../../generated/prisma/enums";
+
 
 // ১. নতুন এয়ার টিকিট ফিল্ডসহ ক্রিয়েট পেলোড
 export type IEventCreatePayload = {

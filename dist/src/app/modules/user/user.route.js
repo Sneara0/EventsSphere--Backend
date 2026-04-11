@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { UserController } from "./user.controller";
 import { Role } from "../../../generated/prisma/enums";
-import { checkAuth } from "src/app/middlewares/checkAuth";
+import { checkAuth } from "../../middlewares/checkAuth";
 const router = Router();
 /**
  * ১. Get My Profile

@@ -3,7 +3,8 @@ import { ReviewController } from './review.controller';
 
 import { validateRequest } from '../../middlewares/validateRequest';
 import { ReviewValidation } from './review.validation';
-import { checkAuth } from 'src/app/middlewares/checkAuth';
+import { checkAuth } from '../../middlewares/checkAuth';
+
 
 const router = express.Router();
 
