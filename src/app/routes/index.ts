@@ -7,17 +7,19 @@ import { BookingRoutes } from "../modules/booking/booking.route";
 import { CouponRoutes } from "../modules/coupon/coupon.route";
 import { DashboardRoutes } from "../modules/dashboard/dashboard.route";
 import { PaymentRoutes } from "../modules/payment/payment.route";
+import { ContactRoutes } from "../modules/contact/contact.route";
+ // ✅ ইমপোর্ট করুন
 
 const router = Router();
-
 
 router.use("/auth", AuthRoutes);
 router.use("/users", UserRoutes);
 router.use("/events", EventRoutes); 
-router.use("/organizer",OrganizerRoutes)
-router.use("/bookings",BookingRoutes)
-router.use("/coupon",CouponRoutes)
-router.use("/dashboard",DashboardRoutes)
-router.use("/payments",PaymentRoutes)
+router.use("/organizer", OrganizerRoutes);
+router.use("/bookings", BookingRoutes);
+router.use("/coupon", CouponRoutes);
+router.use("/dashboard", DashboardRoutes);
+router.use("/payments", PaymentRoutes);
 
+router.use("/contact", ContactRoutes);
 export const IndexRoutes = router;

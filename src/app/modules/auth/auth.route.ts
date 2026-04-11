@@ -30,6 +30,7 @@ router.post(
 
 router.post(
     "/logout",
+    // সাময়িকভাবে checkAuth ছাড়া ট্রাই করে দেখুন ৪০৪ যায় কি না
     checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.ORGANIZER, Role.PARTICIPANT),
     AuthController.logoutUser
 );

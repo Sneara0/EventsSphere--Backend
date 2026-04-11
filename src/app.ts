@@ -57,7 +57,6 @@ app.use('/api/v1', IndexRoutes);
 app.all("/api/v1/auth", (req, res) => { 
     return toNodeHandler(auth)(req, res);
 });
-
 // --- ৭. এরর হ্যান্ডলিং মিডলওয়্যার ---
 app.use(globalErrorHandler);
 app.use(notFound);
