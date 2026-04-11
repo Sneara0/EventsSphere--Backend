@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { AuthRoutes } from "../modules/auth/auth.route";
-import { UserRoutes } from "../modules/user/user.route";
-import { EventRoutes } from "../modules/event/event.route"; 
-import { OrganizerRoutes } from "../modules/organizer/organizer.route";
-import { BookingRoutes } from "../modules/booking/booking.route";
-import { CouponRoutes } from "../modules/coupon/coupon.route";
-import { DashboardRoutes } from "../modules/dashboard/dashboard.route";
-import { PaymentRoutes } from "../modules/payment/payment.route";
-import { ContactRoutes } from "../modules/contact/contact.route";
+import { AuthRoutes } from "../modules/auth/auth.route.js";
+import { UserRoutes } from "../modules/user/user.route.js";
+import { EventRoutes } from "../modules/event/event.route.js"; 
+import { OrganizerRoutes } from "../modules/organizer/organizer.route.js";
+import { BookingRoutes } from "../modules/booking/booking.route.js";
+import { CouponRoutes } from "../modules/coupon/coupon.route.js";
+import { DashboardRoutes } from "../modules/dashboard/dashboard.route.js";
+import { PaymentRoutes } from "../modules/payment/payment.route.js";
+import { ContactRoutes } from "../modules/contact/contact.route.js";
  // ✅ ইমপোর্ট করুন
 
 const router = Router();

@@ -4,12 +4,12 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 // './app/routes' এর বদলে পুরো পাথ './app/routes/index' দিন
-import { IndexRoutes } from './app/routes/index'; 
-import globalErrorHandler from './app/middlewares/globalErrorHandler';
-import notFound from './app/middlewares/notFound';
+import { IndexRoutes } from './app/routes/index.js'; 
+import globalErrorHandler from './app/middlewares/globalErrorHandler.js';
+import notFound from './app/middlewares/notFound.js';
 import { toNodeHandler } from "better-auth/node";
 import { auth } from './app/lib/auth';
-import { PaymentController } from './app/modules/payment/payment.controller';
+import { PaymentController } from './app/modules/payment/payment.controller.js';
 
 const app: Application = express();
 
