@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import env from "../../../config/env";
+import env from "../../../config/env.js";
 // আপনার কনফিগ ফাইলের সঠিক পাথ দিন
 const sendEmailIntoEmailServer = async (payload) => {
     const { email, subject, message } = payload;

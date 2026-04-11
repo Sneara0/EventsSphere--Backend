@@ -2,13 +2,13 @@
 
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import config from '../../../config/env'; 
-import { PaymentService } from './payment.service';
-import { InvoiceService } from './invoice.service';
-import { sendEmailWithInvoice } from '../../utils/sendEmail';
-import { stripe } from '../../../config/stripe.config';
-import { catchAsync } from '../../utils/catchAsync'; // পাথ ঠিক করে নিন
-import { sendResponse } from '../../utils/sendResponse'; // পাথ ঠিক করে নিন
+import config from '../../../config/env.js'; 
+import { PaymentService } from './payment.service.js';
+import { InvoiceService } from './invoice.service.js';
+import { sendEmailWithInvoice } from '../../utils/sendEmail.js';
+import { stripe } from '../../../config/stripe.config.js';
+import { catchAsync } from '../../utils/catchAsync.js'; // পাথ ঠিক করে নিন
+import { sendResponse } from '../../utils/sendResponse.js'; // পাথ ঠিক করে নিন
 
 const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
   const { bookingId, totalAmount, userEmail, userId, eventName } = req.body;

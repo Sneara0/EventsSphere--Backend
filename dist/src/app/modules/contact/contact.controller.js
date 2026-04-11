@@ -1,4 +1,4 @@
-import { ContactService } from './contact.service';
+import { ContactService } from './contact.service.js';
 const sendPrivacyInquiry = async (req, res) => {
     try {
         const result = await ContactService.sendEmailIntoEmailServer(req.body);

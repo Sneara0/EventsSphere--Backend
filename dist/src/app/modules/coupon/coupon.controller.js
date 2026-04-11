@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
-import { catchAsync } from '../../utils/catchAsync';
-import { sendResponse } from '../../utils/sendResponse';
-import { CouponService } from './coupon.service';
+import { catchAsync } from '../../utils/catchAsync.js';
+import { sendResponse } from '../../utils/sendResponse.js';
+import { CouponService } from './coupon.service.js';
 const createCoupon = catchAsync(async (req, res) => {
     const result = await CouponService.createCouponIntoDB(req.body);
     sendResponse(res, { statusCode: httpStatus.CREATED, success: true, message: 'Coupon created', data: result });

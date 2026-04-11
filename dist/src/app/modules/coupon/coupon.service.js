@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
-import { prisma } from "../../lib/prisma";
-import AppError from '../../errorHelpers/AppError';
+import { prisma } from "../../lib/prisma.js";
+import AppError from '../../errorHelpers/AppError.js';
 const createCouponIntoDB = async (payload) => {
     const isExists = await prisma.coupon.findUnique({ where: { code: payload.code } });
     if (isExists)

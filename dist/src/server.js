@@ -1,5 +1,5 @@
-import app from './app';
-import config from './config/env';
+import app from './app.js';
+import config from './config/env.js';
 async function main() {
     try {
         app.listen(config.PORT, () => {

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { catchAsync } from '../../utils/catchAsync';
-import { sendResponse } from '../../utils/sendResponse';
-import { CouponService } from './coupon.service';
+import { catchAsync } from '../../utils/catchAsync.js';
+import { sendResponse } from '../../utils/sendResponse.js';
+import { CouponService } from './coupon.service.js';
 
 const createCoupon = catchAsync(async (req: Request, res: Response) => {
   const result = await CouponService.createCouponIntoDB(req.body);

@@ -1,6 +1,6 @@
 import status from "http-status";
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errorHelpers/AppError";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errorHelpers/AppError.js";
 /**
  * 1. নতুন ফ্লাইট/ইভেন্ট অফার তৈরি করা
  */

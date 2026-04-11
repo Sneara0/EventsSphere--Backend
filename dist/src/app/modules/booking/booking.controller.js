@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
-import { BookingService } from './booking.service';
-import { catchAsync } from '../../utils/catchAsync';
-import { sendResponse } from '../../utils/sendResponse';
+import { BookingService } from './booking.service.js';
+import { catchAsync } from '../../utils/catchAsync.js';
+import { sendResponse } from '../../utils/sendResponse.js';
 /**
  * 1. User: Create a new booking
  */

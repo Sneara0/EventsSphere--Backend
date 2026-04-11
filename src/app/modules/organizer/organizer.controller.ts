@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import status from "http-status";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { IRequestUser } from "../../interfaces/requestUser.interface";
-import { OrganizerService } from "./organizer.service";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { IRequestUser } from "../../interfaces/requestUser.interface.js";
+import { OrganizerService } from "./organizer.service.js";
 
 /**
  * ১. প্রোফাইল তৈরি করা

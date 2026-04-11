@@ -2,7 +2,7 @@
 import ejs from "ejs";
 import nodemailer from "nodemailer";
 import path from "path";
-import env from "../../config/env";
+import env from "../../config/env.js";
 /**
  * 🛠️ SMTP Password থেকে স্পেস সরানো এবং কনফিগারেশন।
  */

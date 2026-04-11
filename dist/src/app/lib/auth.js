@@ -2,10 +2,10 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
 // Prisma থেকে Role এবং UserStatus ইমপোর্ট নিশ্চিত করুন
-import { Role, UserStatus } from "../../generated/prisma/enums";
-import { prisma } from "./prisma";
-import { sendEmail } from "../utils/email";
-import env from "../../config/env";
+import { Role, UserStatus } from "../../generated/prisma/enums.js";
+import { prisma } from "./prisma.js";
+import { sendEmail } from "../utils/email.js";
+import env from "../../config/env.js";
 export const auth = betterAuth({
     // ১. আপনার ফ্রন্টএন্ড যদি ৩০০০ পোর্টে চলে, তবে baseURL সেটাই হওয়া উচিত
     baseURL: env.BETTER_AUTH_URL || "http://localhost:3000",

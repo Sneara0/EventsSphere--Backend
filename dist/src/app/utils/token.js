@@ -1,4 +1,4 @@
-import { jwtUtils } from "./jwt";
+import { jwtUtils } from "./jwt.js";
 import ms from "ms";
 /**
  * ১. এক্সেস টোকেন জেনারেট করা

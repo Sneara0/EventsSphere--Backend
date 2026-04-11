@@ -1,5 +1,5 @@
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errorHelpers/AppError";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errorHelpers/AppError.js";
 import status from "http-status";
 /**
  * ১. প্রথমবার প্রোফাইল তৈরি করা

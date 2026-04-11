@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { OrganizerController } from "./organizer.controller";
+import { OrganizerController } from "./organizer.controller.js";
 
-import { OrganizerValidation } from "./organizer.validation";
-import { checkAuth } from "../../middlewares/checkAuth";
-import { validateRequest } from "../../middlewares/validateRequest";
-import { Role } from "../../../generated/prisma/enums";
+import { OrganizerValidation } from "./organizer.validation.js";
+import { checkAuth } from "../../middlewares/checkAuth.js";
+import { validateRequest } from "../../middlewares/validateRequest.js";
+import { Role } from "../../../generated/prisma/enums.js";
 
 
 const router = Router();

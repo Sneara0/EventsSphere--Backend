@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { catchAsync } from '../../utils/catchAsync';
-import { sendResponse } from '../../utils/sendResponse';
-import { ReviewService } from './review.service';
-import { IReviewCreatePayload } from './review.interface';
+import { catchAsync } from '../../utils/catchAsync.js';
+import { sendResponse } from '../../utils/sendResponse.js';
+import { ReviewService } from './review.service.js';
+import { IReviewCreatePayload } from './review.interface.js';
 
 /**
  * 1. Create a new review

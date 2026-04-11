@@ -1,7 +1,7 @@
 import express from 'express';
-import { PaymentController } from './payment.controller';
-import { checkAuth } from '../../middlewares/checkAuth';
-import { Role } from '../../../generated/prisma/enums';
+import { checkAuth } from '../../middlewares/checkAuth.js';
+import { Role } from '../../../generated/prisma/enums.js';
+import { PaymentController } from './payment.controller.js';
 const router = express.Router();
 router.post('/create-session', 
 // এখানে Role.ORGANIZER যোগ করুন

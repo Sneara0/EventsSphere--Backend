@@ -1,7 +1,7 @@
 import { statusCodes } from "better-auth";
 import status from "http-status";
 import z from "zod/v3";
-import { TErrorResponse, TErrorSources } from "../interfaces/error.interfaces";
+import { TErrorResponse, TErrorSources } from "../interfaces/error.interfaces.js";
 
 
 

@@ -1,7 +1,7 @@
 import status from "http-status";
-import { UserService } from "./user.service";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
+import { UserService } from "./user.service.js";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
 // ১. সব ইউজার আনা (এডমিনের জন্য)
 const getAllUsers = catchAsync(async (req, res) => {
     const role = req.query.role;

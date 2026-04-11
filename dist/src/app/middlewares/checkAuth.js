@@ -1,10 +1,10 @@
 import status from "http-status";
-import { UserStatus } from "../../generated/prisma/enums";
-import { cookieUtils } from "../utils/cookie";
-import { prisma } from "../lib/prisma";
-import AppError from "../errorHelpers/AppError";
-import { jwtUtils } from "../utils/jwt";
-import env from "../../config/env"; // পাথটি চেক করে নিন
+import { UserStatus } from "../../generated/prisma/enums.js";
+import { cookieUtils } from "../utils/cookie.js";
+import { prisma } from "../lib/prisma.js";
+import AppError from "../errorHelpers/AppError.js";
+import { jwtUtils } from "../utils/jwt.js";
+import env from "../../config/env.js"; // পাথটি চেক করে নিন
 export const checkAuth = (...authRoles) => async (req, res, next) => {
     try {
         // ২. কুকি থেকে এক্সেস টোকেন নেওয়া

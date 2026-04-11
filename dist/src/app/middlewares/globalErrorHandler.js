@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { ZodError } from "zod";
-import AppError from "../errorHelpers/AppError";
+import AppError from "../errorHelpers/AppError.js";
 const globalErrorHandler = (err, req, res, next) => {
     console.error("🔥 Global Error Log:", err);
     // টাইপটি স্পষ্টভাবে number করে দেওয়া হলো

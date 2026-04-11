@@ -1,14 +1,14 @@
 import status from "http-status";
-import { AuthService } from "./auth.service";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { cookieUtils } from "../../utils/cookie";
-import { auth } from "../../lib/auth";
-import AppError from "../../errorHelpers/AppError";
+import { AuthService } from "./auth.service.js";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { cookieUtils } from "../../utils/cookie.js";
+import { auth } from "../../lib/auth.js";
+import AppError from "../../errorHelpers/AppError.js";
 import bcrypt from "bcrypt";
 import httpStatus from 'http-status';
-import { prisma } from "../../lib/prisma";
-import env from "../../../config/env";
+import { prisma } from "../../lib/prisma.js";
+import env from "../../../config/env.js";
 // 1. User Registration (Fixed Enum Case Sensitivity)
 const registerUser = catchAsync(async (req, res) => {
     // ইউজারের পাঠানো ডাটা থেকে রোলটিকে বড় হাতের অক্ষরে রূপান্তর করা হচ্ছে

@@ -1,7 +1,7 @@
 import status from "http-status";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { OrganizerService } from "./organizer.service";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { OrganizerService } from "./organizer.service.js";
 /**
  * ১. প্রোফাইল তৈরি করা
  */

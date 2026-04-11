@@ -1,8 +1,8 @@
 import express from 'express';
-import { ReviewController } from './review.controller';
-import { validateRequest } from '../../middlewares/validateRequest';
-import { ReviewValidation } from './review.validation';
-import { checkAuth } from '../../middlewares/checkAuth';
+import { ReviewController } from './review.controller.js';
+import { validateRequest } from '../../middlewares/validateRequest.js';
+import { ReviewValidation } from './review.validation.js';
+import { checkAuth } from '../../middlewares/checkAuth.js';
 const router = express.Router();
 /**
  * ১. নতুন রিভিউ তৈরি করা (শুধুমাত্র লগইন করা ইউজার)

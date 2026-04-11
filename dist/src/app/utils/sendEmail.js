@@ -1,6 +1,6 @@
 // 📂 src/app/utils/sendEmail.ts
 import nodemailer from 'nodemailer';
-import env from '../../config/env';
+import env from '../../config/env.js';
 export const sendEmailWithInvoice = async (to, pdfBase64, fileName = 'Invoice.pdf', userName) => {
     const transporter = nodemailer.createTransport({
         host: env.EMAIL_SENDER.SMTP_HOST,

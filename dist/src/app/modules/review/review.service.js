@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
-import { prisma } from "../../lib/prisma";
-import AppError from '../../errorHelpers/AppError';
+import { prisma } from "../../lib/prisma.js";
+import AppError from '../../errorHelpers/AppError.js';
 /**
  * 1. Create a new review
  * Logic: User must have a PAID booking for the event and can only review once.

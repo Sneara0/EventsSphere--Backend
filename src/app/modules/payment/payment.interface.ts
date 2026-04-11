@@ -1,4 +1,4 @@
-import { PaymentStatus } from "../../../generated/prisma/enums";
+import { PaymentStatus } from "../../../generated/prisma/enums.js";
 
 
 // ১. Stripe Checkout Session তৈরি করার জন্য প্রয়োজনীয় ডাটা
