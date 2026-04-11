@@ -3,17 +3,19 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { IndexRoutes } from './app/routes'; 
+// './app/routes' এর বদলে পুরো পাথ './app/routes/index' দিন
+import { IndexRoutes } from './app/routes/index'; 
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import { toNodeHandler } from "better-auth/node";
 import { auth } from './app/lib/auth';
-import { PaymentController } from './app/modules/payment/payment.controller'; // কন্ট্রোলার ইম্পোর্ট করুন
+import { PaymentController } from './app/modules/payment/payment.controller';
 
 const app: Application = express();
 
 // --- ১. মিডলওয়্যার কনফিগারেশন ---
 app.use(cors({
+    // প্রোডাকশনে আপনার ফ্রন্টএন্ড লিঙ্কটিও এখানে যোগ করতে হবে
     origin: ["http://localhost:3000"], 
     credentials: true, 
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -29,15 +31,14 @@ app.use(cors({
 
 app.use(cookieParser());
 
-// --- ২. STRIPE WEBHOOK (বডি পার্সারের আগে এবং কন্ট্রোলার সহ) ---
-// গুরুত্বপূর্ণ: এখানে অবশ্যই PaymentController.handleStripeWebhook থাকতে হবে
+// --- ২. STRIPE WEBHOOK ---
 app.post(
   "/api/v1/payments/webhook", 
   express.raw({ type: "application/json" }), 
   PaymentController.handleStripeWebhook 
 );
 
-// --- ৩. বডি পার্সার (ওয়েবহুক রাউটের পরে) ---
+// --- ৩. বডি পার্সার ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -53,10 +54,10 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/v1', IndexRoutes); 
 
 // --- ৬. BETTER-AUTH হ্যান্ডলার ---
-// নোট: সব সাব-রাউট ধরার জন্য '/api/v1/auth/*' ব্যবহার করা নিরাপদ
-app.all("/api/v1/auth", (req, res) => { 
+app.all("/api/v1/auth", (req, res) => { // এখানে '*' যোগ করা হয়েছে সব সাব-রাউট ধরার জন্য
     return toNodeHandler(auth)(req, res);
 });
+
 // --- ৭. এরর হ্যান্ডলিং মিডলওয়্যার ---
 app.use(globalErrorHandler);
 app.use(notFound);
