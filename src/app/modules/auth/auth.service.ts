@@ -1,13 +1,13 @@
 import status from "http-status";
 import { JwtPayload } from "jsonwebtoken";
-import { UserStatus, Role } from "../../../generated/prisma/enums";
-import AppError from "../../errorHelpers/AppError";
-import { IRequestUser } from "../../interfaces/requestUser.interface";
-import { auth } from "../../lib/auth";
-import { prisma } from "../../lib/prisma";
-import { jwtUtils } from "../../utils/jwt";
-import { tokenUtils } from "../../utils/token";
-import env from "../../../config/env"; // পাথটি চেক করে নিন
+import { UserStatus, Role } from "../../../generated/prisma/enums.js";
+import AppError from "../../errorHelpers/AppError.js";
+import { IRequestUser } from "../../interfaces/requestUser.interface.js";
+import { auth } from "../../lib/auth.js";
+import { prisma } from "../../lib/prisma.js";
+import { jwtUtils } from "../../utils/jwt.js";
+import { tokenUtils } from "../../utils/token.js";
+import env from "../../../config/env.js"; // পাথটি চেক করে নিন
 
 
 import { 
@@ -15,7 +15,7 @@ import {
     ILoginUserPayload, 
     IRegisterUserPayload,
     ITokenPayload 
-} from "./auth.interface";
+} from "./auth.interface.js";
 
 /**
  * 1. Register User

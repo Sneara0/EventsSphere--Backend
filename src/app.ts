@@ -8,8 +8,9 @@ import { IndexRoutes } from './app/routes/index.js';
 import globalErrorHandler from './app/middlewares/globalErrorHandler.js';
 import notFound from './app/middlewares/notFound.js';
 import { toNodeHandler } from "better-auth/node";
-import { auth } from './app/lib/auth';
+
 import { PaymentController } from './app/modules/payment/payment.controller.js';
+import auth from './app/lib/auth.js';
 
 const app: Application = express();
 

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { cloudinaryUpload } from '../../config/cloudinary.config'; // কনফিগ ফাইল থেকে ইমপোর্ট
+import { cloudinaryUpload } from '../../config/cloudinary.config.js'; // কনফিগ ফাইল থেকে ইমপোর্ট
 
 /**
  * @param filePath - লোকাল temp ফোল্ডারে থাকা ফাইলের পাথ

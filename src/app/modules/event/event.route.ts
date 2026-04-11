@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { EventController } from "./event.controller";
-import { checkAuth } from "../../middlewares/checkAuth"; // পাথ আপনার প্রজেক্ট অনুযায়ী চেক করুন
-import { Role } from "../../../generated/prisma/enums"; // পাথ চেক করুন
-import { multerUpload } from "../../../config/multer.config";
-import { validateRequest } from "../../middlewares/validateRequest";
-import { EventValidation } from "./event.validation";
+import { EventController } from "./event.controller.js";
+import { checkAuth } from "../../middlewares/checkAuth.js"; // পাথ আপনার প্রজেক্ট অনুযায়ী চেক করুন
+import { Role } from "../../../generated/prisma/enums.js"; // পাথ চেক করুন
+import { multerUpload } from "../../../config/multer.config.js";
+import { validateRequest } from "../../middlewares/validateRequest.js";
+import { EventValidation } from "./event.validation.js";
 
 const router = Router();
 

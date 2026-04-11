@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 
-import { ICouponCreatePayload, ICouponUpdatePayload } from "./coupon.interface";
-import AppError from '../../errorHelpers/AppError';
+import { ICouponCreatePayload, ICouponUpdatePayload } from "./coupon.interface.js";
+import AppError from '../../errorHelpers/AppError.js';
 
 
 const createCouponIntoDB = async (payload: ICouponCreatePayload) => {

@@ -1,8 +1,8 @@
 import httpStatus from 'http-status';
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 
-import { IReviewCreatePayload, IReviewUpdatePayload } from "./review.interface";
-import AppError from '../../errorHelpers/AppError';
+import { IReviewCreatePayload, IReviewUpdatePayload } from "./review.interface.js";
+import AppError from '../../errorHelpers/AppError.js';
 
 
 /**

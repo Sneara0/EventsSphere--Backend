@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ContactService } from './contact.service';
+import { ContactService } from './contact.service.js';
 
 const sendPrivacyInquiry = async (req: Request, res: Response) => {
   try {

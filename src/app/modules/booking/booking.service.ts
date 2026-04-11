@@ -1,17 +1,17 @@
 // 📂 src/app/modules/booking/booking.service.ts
 
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 import {
   ICreateBookingRequest,
   IPaymentFulfillmentData,
   IUpdateBookingRequest,
-} from './booking.interface';
-import { sendEmailWithInvoice } from '../../utils/sendEmail';
-import AppError from "../../errorHelpers/AppError";
+} from './booking.interface.js';
+import { sendEmailWithInvoice } from '../../utils/sendEmail.js';
+import AppError from "../../errorHelpers/AppError.js";
 import httpStatus from "http-status";
 // এনামগুলো সরাসরি প্রিজমা থেকে নিন
-import { InvoiceService } from "../payment/invoice.service";
-import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums";
+import { InvoiceService } from "../payment/invoice.service.js";
+import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums.js";
 
 
 /**

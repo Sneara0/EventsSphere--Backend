@@ -1,7 +1,8 @@
-import { prisma } from "../../lib/prisma";
-import AppError from "../../errorHelpers/AppError";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errorHelpers/AppError.js";
 import status from "http-status";
-import { IOrganizerCreatePayload, IOrganizerUpdatePayload } from "./organizer.interface";
+import { IOrganizerCreatePayload, IOrganizerUpdatePayload } from "./organizer.interface.js";
+import { Prisma } from "../../../generated/prisma/client.js";
 
 /**
  * ১. প্রথমবার প্রোফাইল তৈরি করা
@@ -77,7 +78,7 @@ const updateMyProfileIntoDB = async (userId: string, payload: IOrganizerUpdatePa
         throw new AppError(status.NOT_FOUND, "Organizer profile not found!");
     }
 
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx:Prisma.TransactionClient) => {
         const { organizationName, contactNumber, website, bio, logo, ...userData } = payload;
 
         // যদি User টেবিলের ডাটা (যেমন name বা image) আপডেট করতে হয়

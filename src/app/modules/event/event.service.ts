@@ -1,8 +1,9 @@
 import status from "http-status";
-import { prisma } from "../../lib/prisma";
-import { IEventCreatePayload, IEventFilterRequest } from "./event.interface";
-import AppError from "../../errorHelpers/AppError"; 
-import { Prisma } from "../../../generated/prisma/client";
+import { prisma } from "../../lib/prisma.js";
+import AppError from "../../errorHelpers/AppError.js";
+import { IEventCreatePayload, IEventFilterRequest } from "./event.interface.js";
+import { Prisma, PrismaClient } from "../../../generated/prisma/client.js";
+
 
 
 /**

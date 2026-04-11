@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { jwtUtils } from "./jwt";
+import { jwtUtils } from "./jwt.js";
 import ms from "ms";
 
 /**

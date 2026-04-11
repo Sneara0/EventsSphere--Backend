@@ -1,4 +1,4 @@
-import { Role, UserStatus } from "../../../generated/prisma/enums";
+import { Role, UserStatus } from "../../../generated/prisma/enums.js";
 
 // ১. ইউজারের মূল ইন্টারফেস (ডাটাবেস মডেল অনুযায়ী)
 export type IUser = {

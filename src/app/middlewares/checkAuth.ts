@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 import status from "http-status";
-import { Role, UserStatus } from "../../generated/prisma/enums"; 
-import { cookieUtils } from "../utils/cookie";
-import { prisma } from "../lib/prisma";
-import AppError from "../errorHelpers/AppError";
-import { jwtUtils } from "../utils/jwt";
-import env from "../../config/env"; // পাথটি চেক করে নিন
+import { Role, UserStatus } from "../../generated/prisma/enums.js"; 
+import { cookieUtils } from "../utils/cookie.js";
+import { prisma } from "../lib/prisma.js";
+import AppError from "../errorHelpers/AppError.js";
+import { jwtUtils } from "../utils/jwt.js";
+import env from "../../config/env.js"; // পাথটি চেক করে নিন
 
 // ১. Request ইন্টারফেস এক্সটেন্ড করা (টাইপ সেফটির জন্য)
 declare global {

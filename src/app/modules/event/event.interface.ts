@@ -1,4 +1,4 @@
-import { EventStatus } from "../../../generated/prisma/enums";
+import { EventStatus } from "../../../generated/prisma/enums.js";
 
 
 // ১. নতুন এয়ার টিকিট ফিল্ডসহ ক্রিয়েট পেলোড

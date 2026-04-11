@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import status from "http-status";
-import { UserService } from "./user.service";
-import { IRequestUser } from "../../interfaces/requestUser.interface";
-import { Role } from "../../../generated/prisma/enums";
-import { catchAsync } from "../../utils/catchAsync"; 
-import { sendResponse } from "../../utils/sendResponse"; 
+import { UserService } from "./user.service.js";
+import { IRequestUser } from "../../interfaces/requestUser.interface.js";
+import { Role } from "../../../generated/prisma/enums.js";
+import { catchAsync } from "../../utils/catchAsync.js"; 
+import { sendResponse } from "../../utils/sendResponse.js"; 
 
 // ১. সব ইউজার আনা (এডমিনের জন্য)
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {

@@ -1,7 +1,7 @@
 // 📂 src/app/utils/sendEmail.ts
 
 import nodemailer from 'nodemailer';
-import env from '../../config/env';
+import env from '../../config/env.js';
 
 export const sendEmailWithInvoice = async (
   to: string, 

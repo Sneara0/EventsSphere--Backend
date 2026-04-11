@@ -1,4 +1,4 @@
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 
 /**
  * ১. অ্যাডমিন স্ট্যাটাস: পুরো সিস্টেমের ওভারভিউ

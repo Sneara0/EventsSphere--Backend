@@ -1,6 +1,6 @@
 // 📂 src/app/modules/booking/booking.interface.ts
 
-import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums";
+import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums.js";
 
 
 

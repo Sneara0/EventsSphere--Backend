@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
 import status from "http-status";
-import { EventService } from "./event.service";
-import { IRequestUser } from "../../interfaces/requestUser.interface";
+import { EventService } from "./event.service.js";
+import { IRequestUser } from "../../interfaces/requestUser.interface.js";
 
 /**
  * 1. Create a New Flight/Event Offer

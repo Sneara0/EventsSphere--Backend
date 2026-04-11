@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 
 
-import { prisma } from "../lib/prisma";
-import env from "../../config/env"; 
-import { auth } from "../lib/auth";
-import { Role } from "../../generated/prisma/enums";
+import { prisma } from "../lib/prisma.js";
+import env from "../../config/env.js"; 
+import { auth } from "../lib/auth.js";
+import { Role } from "../../generated/prisma/enums.js";
 
 
 export const seedSuperAdmin = async () => {

@@ -1,8 +1,8 @@
 
 
 
-import { Role, UserStatus } from "../../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
+import { Role, UserStatus } from "../../../generated/prisma/enums.js";
+import { prisma } from "../../lib/prisma.js";
 
 /**
  * ১. রোল অনুযায়ী সব ইউজার পাওয়া (একটিভ ইউজারদের জন্য)
