@@ -6,8 +6,9 @@ model Coupon {
   expiryDate      DateTime
   usageLimit      Int      @default(100) 
   usedCount       Int      @default(0)   
+  isActive        Boolean  @default(true) // নতুন ফিল্ড যোগ করা হয়েছে
   
-  
+  // রিলেশনশিপ
   eventId         String?
   event           Event?   @relation(fields: [eventId], references: [id])
 

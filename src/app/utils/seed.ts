@@ -1,92 +1,98 @@
 /* eslint-disable no-console */
 
-
 import { prisma } from "../lib/prisma.js";
 import env from "../../config/env.js"; 
 import { auth } from "../lib/auth.js";
 import { Role } from "../../generated/prisma/enums.js";
 
-
 export const seedSuperAdmin = async () => {
     console.log("🚀 Seeding started...");
     
     try {
-        // ১. আগে চেক করা সুপার অ্যাডমিন আছে কি না
+        // ১. সুপার অ্যাডমিন ইউজার চেক ও তৈরি
         const isSuperAdminExist = await prisma.user.findFirst({
-            where: {
-                role: Role.SUPER_ADMIN
-            }
+            where: { role: Role.SUPER_ADMIN }
         });
 
-        if (isSuperAdminExist) {
-            console.log("ℹ️ Super admin already exists. Skipping seeding.");
-            return;
-        }
-
-        console.log("⏳ Creating Super Admin via Better-Auth API...");
-
-        // ২. Better-Auth API দিয়ে ইউজার তৈরি (যাতে পাসওয়ার্ড হ্যাশিং ঠিক থাকে)
-        const superAdminUser = await auth.api.signUpEmail({
-            body: {
-                email: env.SUPER_ADMIN_EMAIL as string,
-                password: env.SUPER_ADMIN_PASSWORD as string,
-                name: "Super Admin",
-                // @ts-ignore: Better-Auth additional fields handling
-                role: Role.SUPER_ADMIN,
-            }
-        });
-
-        if (!superAdminUser || !superAdminUser.user) {
-            throw new Error("❌ Failed to create user via Auth API");
-        }
-
-        const userId = superAdminUser.user.id;
-
-        // ৩. প্রিজমা ট্রানজেকশন: ইমেইল ভেরিফাই এবং অ্যাডমিন প্রোফাইল তৈরি
-        await prisma.$transaction(async (tx) => {
-            // ইমেইল ভেরিফাইড স্ট্যাটাস আপডেট
-            await tx.user.update({
-                where: { id: userId },
-                data: { emailVerified: true }
-            });
-
-            // অ্যাডমিন টেবিলে এন্ট্রি দেওয়া
-            await tx.admin.create({
-                data: {
-                    name: "Super Admin",
+        if (!isSuperAdminExist) {
+            console.log("⏳ Creating Super Admin via Better-Auth...");
+            const superAdminUser = await auth.api.signUpEmail({
+                body: {
                     email: env.SUPER_ADMIN_EMAIL as string,
-                    contactNumber: "01700000000",
-                    designation: "System Administrator",
-                    user: {
-                        connect: { id: userId }
-                    }
+                    password: env.SUPER_ADMIN_PASSWORD as string,
+                    name: "Super Admin",
+                    // @ts-ignore
+                    role: Role.SUPER_ADMIN,
                 }
             });
-        });
 
-        console.log("✅ Super Admin and Admin Profile created successfully!");
+            if (superAdminUser && superAdminUser.user) {
+                const userId = superAdminUser.user.id;
+                await prisma.$transaction(async (tx) => {
+                    await tx.user.update({
+                        where: { id: userId },
+                        data: { emailVerified: true }
+                    });
+
+                    await tx.admin.create({
+                        data: {
+                            name: "Super Admin",
+                            email: env.SUPER_ADMIN_EMAIL as string,
+                            contactNumber: "01700000000",
+                            designation: "System Administrator",
+                            user: { connect: { id: userId } }
+                        }
+                    });
+                });
+                console.log("✅ Super Admin profile created!");
+            }
+        } else {
+            console.log("ℹ️ Super admin already exists.");
+        }
+
+        // ২. আপনার স্কিমা অনুযায়ী কুপন কোড তৈরি (ফিক্সড)
+        console.log("⏳ Seeding Test Coupons...");
+        
+        const coupons = [
+            {
+                code: "WELCOME10",
+                discountValue: 10,       // আপনার স্কিমা অনুযায়ী discountValue
+                isPercentage: false,
+                expiryDate: new Date("2026-12-31"), // বাধ্যতামূলক ফিল্ড
+                isActive: true,
+                usageLimit: 100
+            },
+            {
+                code: "OFF50",
+                discountValue: 50,
+                isPercentage: true,
+                expiryDate: new Date("2026-12-31"),
+                isActive: true,
+                usageLimit: 50
+            }
+        ];
+
+        for (const coupon of coupons) {
+            await prisma.coupon.upsert({
+                where: { code: coupon.code },
+                update: { 
+                    isActive: coupon.isActive, 
+                    discountValue: coupon.discountValue,
+                    expiryDate: coupon.expiryDate,
+                    isPercentage: coupon.isPercentage
+                },
+                create: coupon
+            });
+        }
+
+        console.log("✅ Coupons seeded: 'WELCOME10' and 'OFF50' are ready to use!");
 
     } catch (error: any) {
         console.error("❌ Error during seeding:", error.message);
-        
-        // ক্লিনআপ: যদি ইউজার তৈরি হয় কিন্তু প্রোফাইল তৈরিতে এরর হয়
-        try {
-            const user = await prisma.user.findUnique({ 
-                where: { email: env.SUPER_ADMIN_EMAIL as string } 
-            });
-            if (user) {
-                await prisma.user.delete({ where: { id: user.id } });
-                console.log("🧹 Cleanup: Incomplete user record deleted.");
-            }
-        } catch (cleanupError) {
-            // No action needed if user doesn't exist
-        }
-        
         process.exit(1);
     }
 };
 
-// ফাইলটি সরাসরি রান করার জন্য সেলফ-ইনভোকিং ফাংশন
 const run = async () => {
     try {
         await seedSuperAdmin();

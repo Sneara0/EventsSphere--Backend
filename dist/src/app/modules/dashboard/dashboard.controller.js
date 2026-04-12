@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
-import { catchAsync } from '../../utils/catchAsync';
-import { sendResponse } from '../../utils/sendResponse';
-import { DashboardService } from './dashboard.service';
+import { catchAsync } from '../../utils/catchAsync.js';
+import { sendResponse } from '../../utils/sendResponse.js';
+import { DashboardService } from './dashboard.service.js';
 const getDashboardData = catchAsync(async (req, res) => {
     // auth middleware থেকে পাওয়া ইউজার ডাটা
     const user = req.user;
