@@ -19,7 +19,7 @@
     "seed": "tsx src/app/utils/seed.ts",
     "pull": "prisma db pull",
     "postinstall": "prisma generate",
-    "stripe:webhook": "\"C:/Users/USER/Downloads/stripe_1.37.2_windows_x86_64/stripe.exe\" listen --forward-to localhost:5000/webhook",
+   "stripe:webhook": "\"C:/Users/USER/Downloads/stripe_1.37.2_windows_x86_64/stripe.exe\" listen --forward-to localhost:5000/api/v1/payments/webhook",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
