@@ -1,4 +1,4 @@
-// 📂 src/app/modules/payment/payment.service.ts
+
 
 import httpStatus from 'http-status';
 import config from '../../../config/env.js';
@@ -6,14 +6,11 @@ import { IPaymentSessionPayload, IPaymentData } from './payment.interface.js';
 import { stripe } from '../../../config/stripe.config.js';
 import AppError from '../../errorHelpers/AppError.js';
 import { prisma } from '../../lib/prisma.js';
-
-// --- এই লাইনটি অত্যন্ত গুরুত্বপূর্ণ ---
-
 import { BookingStatus, PaymentStatus } from '../../../generated/prisma/enums.js';
 import { Prisma } from '../../../generated/prisma/client.js';
 
 /**
- * ১. Stripe Checkout Session তৈরি করা (BDT কারেন্সিতে)
+ * ১. Stripe Checkout Session তৈরি করা
  */
 const createCheckoutSession = async (payload: IPaymentSessionPayload) => {
   const { bookingId, userId, amount, eventName, userEmail } = payload;
@@ -54,7 +51,6 @@ const createCheckoutSession = async (payload: IPaymentSessionPayload) => {
  * ২. পেমেন্ট সফল হওয়ার পর অর্ডার ফুলফিল করা (Atomic Transaction)
  */
 const fulfillOrder = async (data: IPaymentData) => {
-  // এখন Prisma.TransactionClient কাজ করবে
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     
     // ক. পেমেন্ট রেকর্ড তৈরি
@@ -70,7 +66,7 @@ const fulfillOrder = async (data: IPaymentData) => {
       },
     });
 
-    // খ. বুকিং আপডেট
+    // খ. বুকিং আপডেট করা এবং প্রয়োজনীয় ডাটা include করা
     const booking = await tx.booking.update({
       where: { id: data.bookingId },
       data: { 
@@ -80,7 +76,7 @@ const fulfillOrder = async (data: IPaymentData) => {
       },
       include: { 
         event: {
-          select: { title: true, dateTime: true, location: true, id: true }
+          select: { id: true, title: true, dateTime: true, location: true }
         }, 
         user: {
           select: { name: true, email: true }
@@ -88,12 +84,12 @@ const fulfillOrder = async (data: IPaymentData) => {
       }
     });
 
-    // গ. ইভেন্টের সিট কমানো
+    // গ. ইভেন্টের সিট কমানো (সরাসরি booking.eventId ব্যবহার করুন)
     await tx.event.update({
-      where: { id: (booking as any).eventId }, 
+      where: { id: booking.eventId }, 
       data: { 
         availableSeats: { 
-          decrement: 1 
+          decrement: booking.quantity || 1 // ১টি বা বুকিং এর সমপরিমাণ সিট কমানো
         } 
       }
     });

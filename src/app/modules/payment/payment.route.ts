@@ -3,6 +3,7 @@ import { checkAuth } from '../../middlewares/checkAuth.js';
 import { Role } from '../../../generated/prisma/enums.js';
 import { PaymentController } from './payment.controller.js';
 
+
 const router = express.Router();
 
 /**
@@ -16,9 +17,17 @@ router.post(
 );
 
 /**
- * ২. Stripe Webhook (এখানে ডিফাইন করার প্রয়োজন নেই)
- * কারণ আমরা এটি app.ts এ express.raw() দিয়ে সরাসরি হ্যান্ডেল করছি।
- * এখানে দিলে সেটি express.json() এর কারণে এরর দিতে পারে।
+ * ২. ইনভয়েস ডাউনলোড করা
+ * এই রুটটি ইউজারকে তার বুকিং আইডি দিয়ে ইনভয়েস ডাউনলোড করতে দিবে
+ */
+router.get(
+  '/download-invoice/:bookingId',
+  checkAuth(Role.USER, Role.PARTICIPANT, Role.ORGANIZER, Role.ADMIN, Role.SUPER_ADMIN),
+  PaymentController.downloadInvoice
+);
+
+/**
+ * দ্রষ্টব্য: Stripe Webhook app.ts এ হ্যান্ডেল করা হচ্ছে।
  */
 
 export const PaymentRoutes = router;
