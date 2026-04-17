@@ -23,33 +23,42 @@ declare global {
 
 export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // 2. Extract Access Token from Cookies
-    const accessToken = cookieUtils.getCookie(req, 'accessToken');
+    // --- হাইব্রিড টোকেন এক্সট্রাকশন (HEADERS + COOKIES) ---
+    // ১. প্রথমে Authorization Header চেক করবে, না থাকলে Cookies চেক করবে
+    const authHeader = req.headers.authorization;
+    let accessToken = "";
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        accessToken = authHeader.split(' ')[1];
+    } else {
+        accessToken = cookieUtils.getCookie(req, 'accessToken');
+    }
     
+    // টোকেন না থাকলে এরর
     if (!accessToken) {
       return next(new AppError(status.UNAUTHORIZED, 'You are not logged in! Please login to gain access.'));
     }
 
-    // 3. Verify JWT Token
+    // ২. JWT ভেরিফাই করা
     let verifiedToken: any;
     try {
         verifiedToken = jwtUtils.verifyToken(accessToken, env.ACCESS_TOKEN_SECRET as string);
-    } catch (err) {
-        return next(new AppError(status.UNAUTHORIZED, 'Your session has expired. Please login again.'));
+    } catch (err: any) {
+        // যদি টোকেন এক্সপায়ারড হয় তবে নির্দিষ্ট মেসেজ পাঠানো যাতে ফ্রন্টএন্ড রিফ্রেশ টোকেন কল করতে পারে
+        if (err.name === 'TokenExpiredError') {
+             return next(new AppError(status.UNAUTHORIZED, 'AccessTokenExpired'));
+        }
+        return next(new AppError(status.UNAUTHORIZED, 'Your session is invalid. Please login again.'));
     }
 
-    if (!verifiedToken) {
-      return next(new AppError(status.UNAUTHORIZED, 'Your session has expired. Please login again.'));
-    }
-
-    // 4. Extract userId from Token Payload
-    const userId = verifiedToken.userId || verifiedToken.id || (verifiedToken.data && verifiedToken.data.userId);
+    // ৩. userId বের করা (Flexible structure)
+    const userId = verifiedToken.userId || verifiedToken.id;
 
     if (!userId) {
       return next(new AppError(status.UNAUTHORIZED, 'Invalid token payload!'));
     }
 
-    // 5. Fetch latest User Data from Database
+    // ৪. ডাটাবেস থেকে ইউজারের আপডেট তথ্য নেওয়া
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -58,40 +67,34 @@ export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Res
       return next(new AppError(status.UNAUTHORIZED, 'User not found!'));
     }
 
-    // 6. Check User Status
+    // ৫. অ্যাকাউন্ট স্ট্যাটাস চেক
     if (user.status === UserStatus.BLOCKED || user.isDeleted) {
       return next(new AppError(status.FORBIDDEN, 'Your account has been blocked or deleted.'));
     }
 
-    // 7. Role-based Permission Check
+    // ৬. রোল পারমিশন চেক
     const userRole = user.role as Role;
 
-    // Super Admin Bypass Logic
+    // SUPER_ADMIN হলে সব এক্সেস পাবে
     if (userRole === Role.SUPER_ADMIN) {
-        // Access granted automatically
+        // Granted
     } 
     else if (authRoles.length > 0 && !authRoles.includes(userRole)) {
-      console.log(`[Permission Denied] User: ${user.email}, Role: ${userRole}, Required: ${authRoles}`);
-      
       return next(new AppError(
         status.FORBIDDEN, 
-        `Access denied. Your role is ${userRole}, but this action requires: ${authRoles.join(' or ')}`
+        `Access denied. Required: ${authRoles.join(' or ')}`
       ));
     }
 
-    // 8. Attach latest User Data to the Request Object
+    // ৭. Request অবজেক্টে ডাটা অ্যাটাচ করা
     req.user = {
       userId: user.id,
       role: userRole,
       email: user.email,
     };
 
-    return next(); // অবশ্যই return next() ব্যবহার করবেন
+    return next(); 
   } catch (error: any) {
-    // Specific JWT Error Handling
-    if (error.name === 'TokenExpiredError') {
-        return next(new AppError(status.UNAUTHORIZED, 'AccessTokenExpired'));
-    }
     return next(error);
   }
 };

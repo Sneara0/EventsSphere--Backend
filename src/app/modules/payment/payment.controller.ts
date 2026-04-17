@@ -60,7 +60,6 @@ const createPaymentSession = catchAsync(async (req: Request, res: Response) => {
  * ২. Stripe Webhook হ্যান্ডলার (পেমেন্ট ভেরিফিকেশন)
  */
 const handleStripeWebhook = async (req: Request, res: Response) => {
-  // টাইপ এরর ফিক্স করতে 'as string' ব্যবহার করা হয়েছে
   const sig = req.headers['stripe-signature'] as string;
   let event;
 
@@ -71,6 +70,7 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
       throw new Error("Missing stripe signature or webhook secret");
     }
 
+    // গুরুত্বপূর্ণ: req.body অবশ্যই raw buffer হতে হবে (express.raw() middleware দিয়ে)
     event = stripe.webhooks.constructEvent(
       req.body, 
       sig,
@@ -89,25 +89,27 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
     try {
       console.log(`🔄 Processing fulfillment for Booking: ${bookingId}...`);
 
+      // ডাটাবেসে স্ট্যাটাস PAID করা
       const bookingData = await PaymentService.fulfillOrder({
-        transactionId: session.id,
+        transactionId: session.payment_intent as string, // সরাসরি payment_intent আইডি নেওয়া ভালো
         amount: session.amount_total / 100, 
         bookingId: bookingId,
         userId: userId,
       });
 
       if (bookingData) {
-        // ইনভয়েস জেনারেট এবং ইমেইল পাঠানো
+        // ইনভয়েস জেনারেট
         const pdfBase64 = await InvoiceService.generateInvoicePDF({
           userName: (bookingData as any).user.name,
           userEmail: (bookingData as any).user.email,
           bookingId: (bookingData as any).id,
           eventName: (bookingData as any).event.title,
           amount: (bookingData as any).totalAmount,
-          transactionId: session.id,
+          transactionId: session.payment_intent as string,
           date: new Date().toLocaleDateString(),
         });
 
+        // ইমেইল পাঠানো
         await sendEmailWithInvoice(
           (bookingData as any).user.email,
           pdfBase64,
@@ -115,7 +117,7 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
           (bookingData as any).user.name
         );
 
-        console.log(`🚀 SUCCESS: Database Updated and Email Sent to ${(bookingData as any).user.email}`);
+        console.log(`🚀 SUCCESS: Database Updated and Email Sent.`);
       }
     } catch (error: any) {
       console.error('❌ Fulfillment Error:', error.message);
@@ -126,15 +128,20 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
 };
 
 /**
- * ৩. ইনভয়েস ডাউনলোড করা (ড্যাশবোর্ড থেকে)
+ * ৩. ইনভয়েস ডাউনলোড করা
  */
 const downloadInvoice = catchAsync(async (req: Request, res: Response) => {
   const { bookingId } = req.params;
   
-  const id = Array.isArray(bookingId) ? bookingId[0] : bookingId;
+  // 'string | string[]' টাইপ এরর ফিক্সিং
+  const safeBookingId = Array.isArray(bookingId) ? bookingId[0] : bookingId;
+
+  if (!safeBookingId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Booking ID is required!");
+  }
 
   const bookingData = await prisma.booking.findUnique({
-    where: { id },
+    where: { id: safeBookingId },
     include: { 
       user: { select: { name: true, email: true } }, 
       event: { select: { title: true } } 
@@ -145,7 +152,6 @@ const downloadInvoice = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(httpStatus.NOT_FOUND, "Booking not found!");
   }
   
-  // পেমেন্ট পেইড না হলে ডাউনলোড করতে দিবে না
   if (bookingData.paymentStatus !== 'PAID') {
     throw new AppError(httpStatus.BAD_REQUEST, "Invoice is only available for paid bookings!");
   }
@@ -162,9 +168,8 @@ const downloadInvoice = catchAsync(async (req: Request, res: Response) => {
 
   const pdfBuffer = Buffer.from(pdfBase64, 'base64');
 
-  // সরাসরি ফাইল ডাউনলোড করার জন্য হেডার
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename=invoice_${bookingId}.pdf`);
+  res.setHeader('Content-Disposition', `attachment; filename=invoice_${safeBookingId}.pdf`);
   res.send(pdfBuffer);
 });
 

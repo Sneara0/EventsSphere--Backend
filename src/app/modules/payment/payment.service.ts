@@ -1,4 +1,4 @@
-
+// 📂 src/app/modules/payment/payment.service.ts
 
 import httpStatus from 'http-status';
 import config from '../../../config/env.js';
@@ -53,22 +53,28 @@ const createCheckoutSession = async (payload: IPaymentSessionPayload) => {
 const fulfillOrder = async (data: IPaymentData) => {
   return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     
-    // ক. পেমেন্ট রেকর্ড তৈরি
+    // --- গুরুত্বপূর্ণ: ID টাইপ চেক ---
+    // আপনার Schema-তে ID যদি Int হয় তবে Number(data.bookingId) করুন
+    // যদি MongoDB বা String ID হয় তবে সরাসরি data.bookingId থাকবে।
+    // আমরা নিরাপদ থাকতে data.bookingId-ই ব্যবহার করছি।
+    const targetBookingId = data.bookingId; 
+
+    // ১. পেমেন্ট রেকর্ড তৈরি (Prisma Enum ব্যবহার করে)
     await tx.payment.create({
       data: {
         transactionId: data.transactionId,
         amount: Number(data.amount),
         currency: 'bdt',
-        paymentStatus: PaymentStatus.PAID,
+        paymentStatus: PaymentStatus.PAID, // এনাম থেকে PAID
         paymentMethod: data.paymentMethod || 'stripe',
-        bookingId: data.bookingId,
+        bookingId: targetBookingId,
         userId: data.userId,
       },
     });
 
-    // খ. বুকিং আপডেট করা এবং প্রয়োজনীয় ডাটা include করা
+    // ২. বুকিং আপডেট করা (Status -> SUCCESS, Payment -> PAID)
     const booking = await tx.booking.update({
-      where: { id: data.bookingId },
+      where: { id: targetBookingId },
       data: { 
         paymentStatus: PaymentStatus.PAID,
         status: BookingStatus.SUCCESS, 
@@ -84,16 +90,19 @@ const fulfillOrder = async (data: IPaymentData) => {
       }
     });
 
-    // গ. ইভেন্টের সিট কমানো (সরাসরি booking.eventId ব্যবহার করুন)
-    await tx.event.update({
-      where: { id: booking.eventId }, 
-      data: { 
-        availableSeats: { 
-          decrement: booking.quantity || 1 // ১টি বা বুকিং এর সমপরিমাণ সিট কমানো
-        } 
-      }
-    });
+    // ৩. ইভেন্টের সিট কমানো
+    if (booking && booking.eventId) {
+      await tx.event.update({
+        where: { id: booking.eventId }, 
+        data: { 
+          availableSeats: { 
+            decrement: booking.quantity || 1 
+          } 
+        }
+      });
+    }
 
+    console.log(`✅ Order Fulfilled: ${targetBookingId}`);
     return booking; 
   });
 };
