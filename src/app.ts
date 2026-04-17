@@ -16,13 +16,11 @@ const app: Application = express();
 const allowedOrigins = [
   "http://localhost:3000", 
   "https://eventspehere-frontend.vercel.app",
-  // আপনার বর্তমান ভার্সেল প্রিভিউ লিঙ্কটিও যোগ করে দিচ্ছি যাতে এরর না আসে
   "https://eventspehere-frontend-54isxxop6.vercel.app" 
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // ডোমেইন চেক: লিস্টে থাকলে অথবা .vercel.app দিয়ে শেষ হলে অনুমতি দাও
     if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
       callback(null, true);
     } else {
@@ -31,7 +29,9 @@ app.use(cors({
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  // 📱 মোবাইলের সেশন প্রবলেম ফিক্স করার জন্য নিচে "Cookie" এবং "exposedHeaders" রাখা হলো
+  allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+  exposedHeaders: ["set-cookie"] 
 }));
 
 app.use(cookieParser());
@@ -58,11 +58,12 @@ app.get('/', (req: Request, res: Response) => {
 // --- ৫. আপনার মেইন এপিআই রাউটস (প্রথমে রাখা হলো) ---
 app.use('/api/v1', IndexRoutes); 
 
-// --- ৬. BETTER-AUTH হ্যান্ডলার (মেইন রাউটের পরে) ---
-// /* যোগ করা হয়েছে যাতে সাব-রাউটগুলো (get-session, login) কাজ করে
+// --- ৬. BETTER-AUTH হ্যান্ডলার ---
+// আপনার দেওয়া Regex পাথটিই রাখা হলো
 app.all(/\/api\/v1\/auth($|\/.*)/, (req, res) => {
     return toNodeHandler(auth)(req, res);
 });
+
 // --- ৭. এরর হ্যান্ডলিং মিডলওয়্যার ---
 app.use(globalErrorHandler);
 app.use(notFound);

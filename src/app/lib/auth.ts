@@ -7,9 +7,9 @@ import { sendEmail } from "../utils/email.js";
 import env from "../../config/env.js"; 
 
 export const auth = betterAuth({
-    // ⚠️ baseURL প্রোডাকশনে অবশ্যই ডাইনামিক হতে হবে
+    // baseURL প্রোডাকশনে অবশ্যই আপনার ব্যাকএন্ডের ফুল এপিআই পাথ হতে হবে
     baseURL: process.env.NODE_ENV === "production" 
-        ? "https://eventspehere-backend.onrender.app" // আপনার লাইভ ব্যাকএন্ড ইউআরএল
+        ? "https://eventspehere-backend.onrender.app" 
         : "http://localhost:5000",
     
     secret: env.BETTER_AUTH_SECRET,
@@ -82,17 +82,24 @@ export const auth = betterAuth({
         })
     ],
 
-    // 🔐 প্রোডাকশনে 403 এরর ঠেকাতে এটি অত্যন্ত গুরুত্বপূর্ণ
+    // 🔐 মোবাইলের জন্য এটি অত্যন্ত গুরুত্বপূর্ণ (CORS Whitelist)
     trustedOrigins: [
         "http://localhost:3000", 
         "https://eventspehere-frontend.vercel.app",
-        "https://eventspehere-frontend-54isxxop6-sanzid-islaam-nabil-projects.vercel.app" // ভার্সেল প্রিভিউ লিঙ্ক
+        "https://eventspehere-frontend-54isxxop6-sanzid-islaam-nabil-projects.vercel.app"
     ],
 
     advanced: {
-        // ক্রস-সাইট কুকি প্রোডাকশনে কাজ করার জন্য এটি প্রয়োজন
+        // প্রোডাকশনে Secure Cookies অবশ্যই true
         useSecureCookies: process.env.NODE_ENV === "production",
-        // আপনি যদি ডোমেইন আলাদা রাখেন (Render vs Vercel), তবে এটি ট্রু রাখুন
+        
+        // 📱 মোবাইলে ব্রাউজারের থার্ড-পার্টি কুকি ব্লক এড়ানোর জন্য ফাইনাল সেটিংস
+        cookie: {
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+        },
+
         crossSubdomainCookies: {
             enabled: process.env.NODE_ENV === "production",
         }
@@ -103,6 +110,7 @@ export const auth = betterAuth({
             enabled: true,
         },
         expiresIn: 60 * 60 * 24 * 7, // ৭ দিন
+        freshAge: 0, // সেশন সবসময় রিফ্রেশ রাখার জন্য
     }
 });
 
