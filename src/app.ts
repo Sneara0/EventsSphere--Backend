@@ -12,29 +12,28 @@ import auth from './app/lib/auth.js';
 
 const app: Application = express();
 
-// --- ১. মিডলওয়্যার কনফিগারেশন ---
-// প্রোডাকশনে Vercel URL ব্যবহার করতে হবে
+// --- ১. মিডলওয়্যার কনফিগারেশন (CORS) ---
 const allowedOrigins = [
   "http://localhost:3000", 
-  "https://eventspehere-frontend.vercel.app" // আপনার ফ্রন্টএন্ড URL
+  "https://eventspehere-frontend.vercel.app" 
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(cookieParser());
 
-// --- ২. STRIPE WEBHOOK (json parsing এর আগে থাকতে হবে) ---
+// --- ২. STRIPE WEBHOOK (JSON parsing এর আগে থাকতে হবে) ---
 app.post(
   "/api/v1/payments/webhook", 
   express.raw({ type: "application/json" }), 
@@ -52,15 +51,15 @@ app.get('/', (req: Request, res: Response) => {
     message: 'EventSphere Server is running perfectly! 🚀' 
   });
 });
-// --- ৬. মেইন এপিআই রাউটস ---
+
+// --- ৫. মেইন এপিআই রাউটস (আপনার ইচ্ছা অনুযায়ী আগে রাখা হলো) ---
 app.use('/api/v1', IndexRoutes); 
 
-// --- ৫. BETTER-AUTH হ্যান্ডলার (মেইন রাউটের আগে রাখা ভালো) ---
-// /api/v1/auth/* এভাবে দিন যাতে সব সাব-রাউট (login, callback, session) কাজ করে
+// --- ৬. BETTER-AUTH হ্যান্ডলার (মেইন রাউটের পরে) ---
+// /api/v1/auth/* এর মাধ্যমে সব অথ রাউট হ্যান্ডেল হবে
 app.all("/api/v1/auth", (req, res) => {
     return toNodeHandler(auth)(req, res);
 });
-
 
 // --- ৭. এরর হ্যান্ডলিং মিডলওয়্যার ---
 app.use(globalErrorHandler);
