@@ -1,5 +1,3 @@
-// 📂 src/app/lib/auth.ts
-
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
@@ -9,8 +7,11 @@ import { sendEmail } from "../utils/email.js";
 import env from "../../config/env.js"; 
 
 export const auth = betterAuth({
-    // baseURL অবশ্যই আপনার ব্যাকএন্ডের ফুল এপিআই পাথ হতে হবে
-    baseURL: env.BETTER_AUTH_URL || "https://eventsphere-backend-seven.vercel.app/api/v1/auth", 
+    // ⚠️ baseURL প্রোডাকশনে অবশ্যই ডাইনামিক হতে হবে
+    baseURL: process.env.NODE_ENV === "production" 
+        ? "https://eventspehere-backend.onrender.app" // আপনার লাইভ ব্যাকএন্ড ইউআরএল
+        : "http://localhost:5000",
+    
     secret: env.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
@@ -81,24 +82,26 @@ export const auth = betterAuth({
         })
     ],
 
-    // --- প্রোডাকশন সিকিউরিটি সেটিংস ---
-    // টাইপ এরর এড়াতে trustedOrigins সরাসরি এখানে দিন
+    // 🔐 প্রোডাকশনে 403 এরর ঠেকাতে এটি অত্যন্ত গুরুত্বপূর্ণ
     trustedOrigins: [
         "http://localhost:3000", 
-        "https://eventspehere-frontend.vercel.app" 
+        "https://eventspehere-frontend.vercel.app",
+        "https://eventspehere-frontend-54isxxop6-sanzid-islaam-nabil-projects.vercel.app" // ভার্সেল প্রিভিউ লিঙ্ক
     ],
 
     advanced: {
-        // প্রোডাকশনে Secure Cookies অটোমেটিক হ্যান্ডেল করার জন্য
+        // ক্রস-সাইট কুকি প্রোডাকশনে কাজ করার জন্য এটি প্রয়োজন
         useSecureCookies: process.env.NODE_ENV === "production",
+        // আপনি যদি ডোমেইন আলাদা রাখেন (Render vs Vercel), তবে এটি ট্রু রাখুন
+        crossSubdomainCookies: {
+            enabled: process.env.NODE_ENV === "production",
+        }
     },
 
-    // সেশন কনফিগারেশন যা ক্রস-ডোমেইন কুকি হ্যান্ডেল করবে
     session: {
         cookieCache: {
             enabled: true,
         },
-        // সেশনের স্থায়িত্ব
         expiresIn: 60 * 60 * 24 * 7, // ৭ দিন
     }
 });
