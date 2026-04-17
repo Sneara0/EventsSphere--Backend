@@ -1,15 +1,16 @@
+// 📂 src/app/lib/auth.ts
+
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
-// Prisma থেকে Role এবং UserStatus ইমপোর্ট নিশ্চিত করুন
 import { Role, UserStatus } from "../../generated/prisma/enums.js"; 
 import { prisma } from "./prisma.js";
 import { sendEmail } from "../utils/email.js";
 import env from "../../config/env.js"; 
 
 export const auth = betterAuth({
-    // ১. আপনার ফ্রন্টএন্ড যদি ৩০০০ পোর্টে চলে, তবে baseURL সেটাই হওয়া উচিত
-    baseURL: env.BETTER_AUTH_URL || "http://localhost:3000", 
+    // baseURL অবশ্যই আপনার ব্যাকএন্ডের ফুল এপিআই পাথ হতে হবে
+    baseURL: env.BETTER_AUTH_URL || "https://eventsphere-backend-seven.vercel.app/api/v1/auth", 
     secret: env.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
@@ -22,37 +23,23 @@ export const auth = betterAuth({
         },
     },
 
-    // --- DATABASE HOOKS (FIXED) ---
+    // --- DATABASE HOOKS ---
     databaseHooks: {
         user: {
             create: {
                 after: async (user) => {
-                    console.log(`👤 Creating profile for User: ${user.email}`);
                     try {
-                        // BetterAuth এ অতিরিক্ত ফিল্ডগুলো সরাসরি user অবজেক্টে থাকে
                         const userRole = (user as any).role;
-
                         if (userRole === Role.PARTICIPANT) {
                             await prisma.participant.create({
-                                data: {
-                                    userId: user.id,
-                                    email: user.email,
-                                    name: user.name || "New Participant",
-                                },
+                                data: { userId: user.id, email: user.email, name: user.name || "New Participant" },
                             });
                         } else if (userRole === Role.ORGANIZER) {
                             await prisma.organizer.create({
-                                data: {
-                                    userId: user.id,
-                                    email: user.email,
-                                    name: user.name || "New Organizer",
-                                    contactNumber: "01XXXXXXXXX", 
-                                },
+                                data: { userId: user.id, email: user.email, name: user.name || "New Organizer", contactNumber: "01XXXXXXXXX" },
                             });
                         }
-                        console.log("✅ Profile linked successfully.");
                     } catch (error) {
-                        // হুক এরর দিলে রেজিস্ট্রেশন ফেইল করবে না যদি আমরা এখানে হ্যান্ডেল করি
                         console.error("❌ Profile Creation Hook Error:", error);
                     }
                 },
@@ -62,34 +49,15 @@ export const auth = betterAuth({
 
     emailAndPassword: {
         enabled: true,
-        // ২. OTP প্লাগিন থাকলে এটি false রাখা নিরাপদ যাতে কনফ্লিক্ট না হয়
         requireEmailVerification: false, 
     },
 
     user: {
         additionalFields: {
-            role: {
-                type: "string",
-                required: true,
-                defaultValue: Role.PARTICIPANT,
-                input: true, 
-            },
-            status: {
-                type: "string",
-                required: true,
-                defaultValue: UserStatus.ACTIVE,
-                input: true,
-            },
-            needPasswordChange: {
-                type: "boolean",
-                defaultValue: false,
-                input: true,
-            },
-            isDeleted: {
-                type: "boolean",
-                defaultValue: false,
-                input: true,
-            }
+            role: { type: "string", required: true, defaultValue: Role.PARTICIPANT, input: true },
+            status: { type: "string", required: true, defaultValue: UserStatus.ACTIVE, input: true },
+            needPasswordChange: { type: "boolean", defaultValue: false, input: true },
+            isDeleted: { type: "boolean", defaultValue: false, input: true }
         }
     },
 
@@ -97,22 +65,15 @@ export const auth = betterAuth({
         bearer(),
         emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
-                console.log(`📩 OTP generated for ${email}: ${otp}`);
                 try {
                     await sendEmail({
                         to: email,
-                        subject: type === "email-verification" 
-                            ? "Verify your Event Sphere account" 
-                            : "Password Reset OTP",
+                        subject: type === "email-verification" ? "Verify Account" : "Reset Password",
                         templateName: "otp",
-                        templateData: { 
-                            name: "User", 
-                            otp: otp 
-                        }
+                        templateData: { name: "User", otp: otp }
                     });
-                    console.log(`✅ OTP Email sent successfully to ${email}`);
                 } catch (error) {
-                    console.error("❌ Email sending failed in Auth Plugin:", error);
+                    console.error("❌ Email failed:", error);
                 }
             },
             expiresIn: 300,
@@ -120,10 +81,25 @@ export const auth = betterAuth({
         })
     ],
 
-    // ৩. অরিজিনগুলো নিশ্চিত করুন যাতে CORS এরর না আসে
-    trustedOrigins: ["http://localhost:3000", "http://localhost:5000"],
+    // --- প্রোডাকশন সিকিউরিটি সেটিংস ---
+    // টাইপ এরর এড়াতে trustedOrigins সরাসরি এখানে দিন
+    trustedOrigins: [
+        "http://localhost:3000", 
+        "https://eventspehere-frontend.vercel.app" 
+    ],
+
     advanced: {
-        useSecureCookies: false, 
+        // প্রোডাকশনে Secure Cookies অটোমেটিক হ্যান্ডেল করার জন্য
+        useSecureCookies: process.env.NODE_ENV === "production",
+    },
+
+    // সেশন কনফিগারেশন যা ক্রস-ডোমেইন কুকি হ্যান্ডেল করবে
+    session: {
+        cookieCache: {
+            enabled: true,
+        },
+        // সেশনের স্থায়িত্ব
+        expiresIn: 60 * 60 * 24 * 7, // ৭ দিন
     }
 });
 
