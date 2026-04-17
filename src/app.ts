@@ -1,5 +1,3 @@
-// 📂 src/app.ts
-
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -21,15 +19,16 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
+    // ডোমেইন চেক: লিস্টে থাকলে অথবা .vercel.app দিয়ে শেষ হলে অনুমতি দাও
     if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true,
+  credentials: true, // মোবাইলে সেশন কুকি পাস করার জন্য এটি মাস্ট
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  // 📱 মোবাইলের সেশন প্রবলেম ফিক্স করার জন্য নিচে "Cookie" এবং "exposedHeaders" রাখা হলো
+  // 📱 মোবাইলের সেশন প্রবলেম ফিক্স করার জন্য Cookie এবং exposedHeaders রাখা হয়েছে
   allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
   exposedHeaders: ["set-cookie"] 
 }));
