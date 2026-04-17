@@ -9,13 +9,11 @@ import {
 import { sendEmailWithInvoice } from '../../utils/sendEmail.js';
 import AppError from "../../errorHelpers/AppError.js";
 import httpStatus from "http-status";
-// এনামগুলো সরাসরি প্রিজমা থেকে নিন
 import { InvoiceService } from "../payment/invoice.service.js";
 import { BookingStatus, PaymentStatus } from "../../../generated/prisma/enums.js";
 
-
 /**
- * 1. User: Create Initial Booking (Seat Reservation সহ)
+ * 1. Create Initial Booking
  */
 const createBookingIntoDB = async (userId: string, payload: ICreateBookingRequest) => {
   return await prisma.$transaction(async (tx) => {
@@ -31,17 +29,13 @@ const createBookingIntoDB = async (userId: string, payload: ICreateBookingReques
       throw new AppError(httpStatus.BAD_REQUEST, "Insufficient seats available!");
     }
 
-    // ইভেন্টের অ্যাভেইলঅ্যাবল সিট কমিয়ে দেওয়া
     await tx.event.update({
       where: { id: payload.eventId },
       data: {
-        availableSeats: {
-          decrement: payload.quantity,
-        },
+        availableSeats: { decrement: payload.quantity },
       },
     });
 
-    // বুকিং রেকর্ড তৈরি (PENDING অবস্থায়)
     const booking = await tx.booking.create({
       data: {
         userId,
@@ -51,9 +45,7 @@ const createBookingIntoDB = async (userId: string, payload: ICreateBookingReques
         status: BookingStatus.PENDING,
         paymentStatus: PaymentStatus.UNPAID,
       },
-      include: {
-        event: true
-      }
+      include: { event: true }
     });
 
     return booking;
@@ -61,19 +53,15 @@ const createBookingIntoDB = async (userId: string, payload: ICreateBookingReques
 };
 
 /**
- * 2. Get Single Booking (Security Check সহ)
+ * 2. Get Single Booking (FIXED: Access Denied Issue)
  */
 const getSingleBookingFromDB = async (id: string, user: any) => {
   const result = await prisma.booking.findUnique({
     where: { id },
     include: {
       event: {
-        select: {
-          title: true,
-          ticketPrice: true,
-          dateTime: true,
-          location: true,
-          thumbnail: true
+        include: {
+          organizer: true, // অর্গানাইজার চেক করার জন্য এটি দরকার
         }
       },
       user: {
@@ -90,19 +78,25 @@ const getSingleBookingFromDB = async (id: string, user: any) => {
     throw new AppError(httpStatus.NOT_FOUND, "Booking details not found!");
   }
 
-  // 🔐 Access Control
+  // --- 🔐 শক্তিশালী এক্সেস কন্ট্রোল ---
+  const currentUserId = user.userId || user.id; // বিভিন্ন সোর্স থেকে আইডি হ্যান্ডেল করা
   const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
-  const isOwner = result.userId === user.userId;
+  const isOwner = result.userId === currentUserId;
+  const isOrganizerOfThisEvent = result.event.organizer?.userId === currentUserId;
 
-  if (!isAdmin && !isOwner) {
-    throw new AppError(httpStatus.FORBIDDEN, "Access Denied!");
+  // Debugging (Console-এ চেক করার জন্য)
+  console.log(`🔐 Access Check for Booking: ${id}`);
+  console.log(`User: ${currentUserId}, Role: ${user.role}, isOwner: ${isOwner}, isOrg: ${isOrganizerOfThisEvent}`);
+
+  if (!isAdmin && !isOwner && !isOrganizerOfThisEvent) {
+    throw new AppError(httpStatus.FORBIDDEN, "Access Denied! You are not authorized to view this booking.");
   }
 
   return result;
 };
 
 /**
- * 3. Payment Fulfillment (পেমেন্ট সফল হওয়ার পর)
+ * 3. Payment Fulfillment
  */
 const fulfillBookingAfterPayment = async (data: IPaymentFulfillmentData) => {
   const result = await prisma.$transaction(async (tx) => {
@@ -118,7 +112,6 @@ const fulfillBookingAfterPayment = async (data: IPaymentFulfillmentData) => {
       throw new AppError(httpStatus.BAD_REQUEST, "Payment already completed!");
     }
 
-    // ১. বুকিং স্ট্যাটাস আপডেট
     const updatedBooking = await tx.booking.update({
       where: { id: data.bookingId },
       data: {
@@ -132,7 +125,6 @@ const fulfillBookingAfterPayment = async (data: IPaymentFulfillmentData) => {
       }
     });
 
-    // ২. পেমেন্ট রেকর্ড তৈরি
     await tx.payment.create({
       data: {
         transactionId: data.transactionId,
@@ -149,7 +141,6 @@ const fulfillBookingAfterPayment = async (data: IPaymentFulfillmentData) => {
     return updatedBooking;
   });
 
-  // ৩. ইনভয়েস জেনারেশন ও ইমেইল (Background Task)
   if (result) {
     const invoiceData = {
       userName: result.user.name,
@@ -177,7 +168,7 @@ const fulfillBookingAfterPayment = async (data: IPaymentFulfillmentData) => {
 };
 
 /**
- * 4. User: নিজের বুকিং হিস্ট্রি
+ * 4. User: Booking History
  */
 const getMyBookingsFromDB = async (userId: string) => {
   return await prisma.booking.findMany({
@@ -192,7 +183,7 @@ const getMyBookingsFromDB = async (userId: string) => {
 };
 
 /**
- * 5. Admin: সব বুকিং লিস্ট
+ * 5. Admin: All Bookings
  */
 const getAllBookingsFromDB = async () => {
   return await prisma.booking.findMany({
@@ -206,18 +197,24 @@ const getAllBookingsFromDB = async () => {
 };
 
 /**
- * 6. Cancel Booking (User/Admin)
+ * 6. Cancel Booking
  */
 const cancelBookingFromDB = async (id: string, user: any) => {
+  const currentUserId = user.userId || user.id;
+
   return await prisma.$transaction(async (tx) => {
     const booking = await tx.booking.findUnique({ where: { id } });
     if (!booking) throw new AppError(httpStatus.NOT_FOUND, "Booking not found!");
+
+    // Permission check for cancel
+    if (booking.userId !== currentUserId && user.role !== 'ADMIN') {
+        throw new AppError(httpStatus.FORBIDDEN, "You cannot cancel someone else's booking!");
+    }
 
     if (booking.paymentStatus === PaymentStatus.PAID) {
       throw new AppError(httpStatus.BAD_REQUEST, "Paid bookings cannot be canceled!");
     }
 
-    // সিট ফিরিয়ে দেওয়া
     await tx.event.update({
       where: { id: booking.eventId },
       data: { availableSeats: { increment: booking.quantity } },
@@ -231,14 +228,13 @@ const cancelBookingFromDB = async (id: string, user: any) => {
 };
 
 /**
- * 7. Admin: ডিলিট বুকিং
+ * 7. Admin: Delete Booking
  */
 const deleteBookingByAdmin = async (id: string) => {
   return await prisma.$transaction(async (tx) => {
     const booking = await tx.booking.findUnique({ where: { id } });
     if (!booking) throw new AppError(httpStatus.NOT_FOUND, "Booking not found!");
 
-    // ক্যানসেলড না হলে সিট ফেরত দিয়ে ডিলিট করা
     if (booking.status !== BookingStatus.CANCELLED) {
       await tx.event.update({
         where: { id: booking.eventId },
@@ -251,7 +247,7 @@ const deleteBookingByAdmin = async (id: string) => {
 };
 
 /**
- * 8. Admin: ম্যানুয়াল আপডেট
+ * 8. Admin: Update Status
  */
 const updateBookingStatusByAdmin = async (id: string, payload: IUpdateBookingRequest) => {
   const isExist = await prisma.booking.findUnique({ where: { id } });
