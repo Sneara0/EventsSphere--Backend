@@ -5,29 +5,42 @@ import { auth } from "../../lib/auth.js";
 import { prisma } from "../../lib/prisma.js";
 import { jwtUtils } from "../../utils/jwt.js";
 import { tokenUtils } from "../../utils/token.js";
-import env from "../../../config/env.js"; // পাথটি চেক করে নিন
+import env from "../../../config/env.js";
 /**
- * 1. Register User
- * প্রোফাইল এখন auth.ts এর databaseHooks এর মাধ্যমে অটোমেটিক তৈরি হবে।
+ * 1. Register User (Fully Fixed)
  */
 const registerUser = async (payload) => {
     const { name, email, password, role } = payload;
     // Better-Auth API call
-    // এটি ইন্টারনালি ইউজার তৈরি করবে এবং আমাদের সেট করা Hook প্রোফাইল তৈরি করে দিবে।
     const data = await auth.api.signUpEmail({
-        body: { name, email, password, role }
+        body: {
+            name,
+            email,
+            password,
+            role: role?.toUpperCase() || Role.PARTICIPANT
+        }
     });
     if (!data || !data.user) {
-        throw new AppError(status.BAD_REQUEST, "Failed to register user in auth system");
+        throw new AppError(status.BAD_REQUEST, "Failed to register user");
     }
+    const user = data.user;
+    // 🔥 এপিআই দিয়ে রেজিস্ট্রেশন করার পর স্ট্যাটাস ACTIVE নিশ্চিত করা
+    // এটি না করলে আপনার মিডলওয়্যার ইউজারকে ব্লক করে দিবে
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            status: UserStatus.ACTIVE,
+            isDeleted: false
+        }
+    });
     const tokenPayload = {
-        userId: data.user.id,
-        role: data.user.role,
-        name: data.user.name,
-        email: data.user.email,
-        status: data.user.status,
-        isDeleted: data.user.isDeleted,
-        emailVerified: data.user.emailVerified,
+        userId: user.id,
+        role: user.role || Role.PARTICIPANT,
+        name: user.name,
+        email: user.email,
+        status: UserStatus.ACTIVE,
+        isDeleted: false,
+        emailVerified: user.emailVerified,
     };
     return {
         ...data,
@@ -36,7 +49,7 @@ const registerUser = async (payload) => {
     };
 };
 /**
- * 2. Login User
+ * 2. Login User (Fully Fixed)
  */
 const loginUser = async (payload) => {
     const { email, password } = payload;
@@ -46,20 +59,25 @@ const loginUser = async (payload) => {
     if (!data || !data.user) {
         throw new AppError(status.UNAUTHORIZED, "Invalid email or password");
     }
-    if (data.user.status === UserStatus.BLOCKED) {
+    const user = data.user;
+    // ১. স্ট্যাটাস এবং রোল চেকিং (Fallbacks included)
+    const currentUserStatus = user.status || UserStatus.ACTIVE;
+    const currentUserRole = user.role || Role.PARTICIPANT;
+    if (currentUserStatus === UserStatus.BLOCKED) {
         throw new AppError(status.FORBIDDEN, "User is blocked");
     }
-    if (data.user.isDeleted || data.user.status === UserStatus.DELETED) {
+    if (user.isDeleted || currentUserStatus === UserStatus.DELETED) {
         throw new AppError(status.NOT_FOUND, "User not found");
     }
+    // ২. টোকেন পেলোড (সুপার অ্যাডমিনের মতো সব ফিল্ড এখানে নিশ্চিত করা হয়েছে)
     const tokenPayload = {
-        userId: data.user.id,
-        role: data.user.role,
-        name: data.user.name,
-        email: data.user.email,
-        status: data.user.status,
-        isDeleted: data.user.isDeleted,
-        emailVerified: data.user.emailVerified,
+        userId: user.id,
+        role: currentUserRole,
+        name: user.name,
+        email: user.email,
+        status: currentUserStatus,
+        isDeleted: user.isDeleted || false,
+        emailVerified: user.emailVerified || false,
     };
     return {
         ...data,
@@ -96,14 +114,15 @@ const getNewToken = async (refreshToken, sessionToken) => {
     const verified = jwtUtils.verifyToken(refreshToken, env.REFRESH_TOKEN_SECRET);
     if (!verified)
         throw new AppError(status.UNAUTHORIZED, "Invalid refresh token");
+    const user = isSessionExists.user;
     const tokenPayload = {
-        userId: verified.userId,
-        role: verified.role,
-        name: verified.name,
-        email: verified.email,
-        status: verified.status,
-        isDeleted: verified.isDeleted,
-        emailVerified: verified.emailVerified,
+        userId: user.id,
+        role: user.role,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+        isDeleted: user.isDeleted || false,
+        emailVerified: user.emailVerified,
     };
     const updatedSession = await prisma.session.update({
         where: { token: sessionToken },
@@ -117,29 +136,27 @@ const getNewToken = async (refreshToken, sessionToken) => {
 };
 /**
  * 5. Google Login Success Logic
- * প্রোফাইল ক্রিয়েশন এখন এখানেও লাগবে না, কারণ Hook সব হ্যান্ডেল করবে।
  */
 const googleLoginSuccess = async (session) => {
     if (!session || !session.user) {
         throw new AppError(status.UNAUTHORIZED, "Invalid Google Session");
     }
+    const user = session.user;
     const tokenPayload = {
-        userId: session.user.id,
-        role: session.user.role || Role.PARTICIPANT,
-        name: session.user.name,
-        email: session.user.email,
-        status: session.user.status || UserStatus.ACTIVE,
-        isDeleted: session.user.isDeleted || false,
-        emailVerified: session.user.emailVerified,
+        userId: user.id,
+        role: user.role || Role.PARTICIPANT,
+        name: user.name,
+        email: user.email,
+        status: user.status || UserStatus.ACTIVE,
+        isDeleted: user.isDeleted || false,
+        emailVerified: user.emailVerified,
     };
     return {
         accessToken: tokenUtils.getAccessToken(tokenPayload),
         refreshToken: tokenUtils.getRefreshToken(tokenPayload),
     };
 };
-/**
- * 6. Change Password
- */
+// --- নিচের ফাংশনগুলো আগের মতোই থাকবে ---
 const changePassword = async (payload, sessionToken) => {
     return await auth.api.changePassword({
         body: {
@@ -150,62 +167,29 @@ const changePassword = async (payload, sessionToken) => {
         headers: new Headers({ Authorization: `Bearer ${sessionToken}` })
     });
 };
-/**
- * 7. Logout User
- */
 const logoutUser = async (sessionToken) => {
     return await auth.api.signOut({
         headers: new Headers({ Authorization: `Bearer ${sessionToken}` })
     });
 };
-/**
- * 8. Forget Password
- */
 const forgetPassword = async (email) => {
-    // ১. ইউজার আছে কি না এবং ডিলিট করা কি না চেক করুন
-    const user = await prisma.user.findUnique({
-        where: { email }
-    });
-    if (!user) {
-        throw new AppError(status.NOT_FOUND, "User not found with this email!");
-    }
-    if (user.isDeleted) {
-        throw new AppError(status.FORBIDDEN, "This account has been deleted!");
-    }
-    // ২. Better-Auth এর মাধ্যমে OTP রিকোয়েস্ট পাঠানো
-    // এটি আপনার auth.ts-এ সেট করা ইমেইল সেন্ডারের মাধ্যমে OTP পাঠাবে
-    return await auth.api.requestPasswordResetEmailOTP({
-        body: { email }
-    });
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user)
+        throw new AppError(status.NOT_FOUND, "User not found!");
+    if (user.isDeleted)
+        throw new AppError(status.FORBIDDEN, "Account deleted!");
+    return await auth.api.requestPasswordResetEmailOTP({ body: { email } });
 };
-/**
- * 9. Reset Password
- */
 const resetPassword = async (email, otp, newPassword) => {
-    // ১. Better-Auth এর মাধ্যমে OTP ভেরিফাই এবং পাসওয়ার্ড আপডেট
     const result = await auth.api.resetPasswordEmailOTP({
-        body: {
-            email,
-            otp,
-            password: newPassword
-        }
+        body: { email, otp, password: newPassword }
     });
-    // ২. সেশন ক্লিনিং (Security Best Practice)
-    // Better-Auth এর রেজাল্ট থেকে ইউজার আইডি চেক করা হচ্ছে
     const userResult = result;
     if (userResult?.user?.id) {
-        // এই ইউজারের সব পুরনো সেশন ডাটাবেজ থেকে মুছে ফেলা হচ্ছে
-        await prisma.session.deleteMany({
-            where: {
-                userId: userResult.user.id
-            }
-        });
+        await prisma.session.deleteMany({ where: { userId: userResult.user.id } });
     }
     return result;
 };
-/**
- * 10. Verify Email
- */
 const verifyEmail = async (email, otp) => {
     const result = await auth.api.verifyEmailOTP({ body: { email, otp } });
     if (result) {

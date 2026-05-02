@@ -1270,6 +1270,7 @@ export declare const CouponScalarFieldEnum: {
     readonly expiryDate: "expiryDate";
     readonly usageLimit: "usageLimit";
     readonly usedCount: "usedCount";
+    readonly isActive: "isActive";
     readonly eventId: "eventId";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";

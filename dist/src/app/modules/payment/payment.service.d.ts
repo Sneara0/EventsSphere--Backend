@@ -19,6 +19,7 @@ export declare const PaymentService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -26,6 +27,5 @@ export declare const PaymentService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     }>;
 };

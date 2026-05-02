@@ -1,14 +1,15 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
-// Prisma থেকে Role এবং UserStatus ইমপোর্ট নিশ্চিত করুন
 import { Role, UserStatus } from "../../generated/prisma/enums.js";
 import { prisma } from "./prisma.js";
 import { sendEmail } from "../utils/email.js";
 import env from "../../config/env.js";
 export const auth = betterAuth({
-    // ১. আপনার ফ্রন্টএন্ড যদি ৩০০০ পোর্টে চলে, তবে baseURL সেটাই হওয়া উচিত
-    baseURL: env.BETTER_AUTH_URL || "http://localhost:3000",
+    // baseURL প্রোডাকশনে অবশ্যই আপনার ব্যাকএন্ডের ফুল এপিআই পাথ হতে হবে
+    baseURL: process.env.NODE_ENV === "production"
+        ? "https://eventspehere-backend.onrender.app"
+        : "http://localhost:5000",
     secret: env.BETTER_AUTH_SECRET,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
@@ -19,38 +20,25 @@ export const auth = betterAuth({
             clientSecret: env.GOOGLE_CLIENT_SECRET,
         },
     },
-    // --- DATABASE HOOKS (FIXED) ---
+    // --- DATABASE HOOKS ---
     databaseHooks: {
         user: {
             create: {
                 after: async (user) => {
-                    console.log(`👤 Creating profile for User: ${user.email}`);
                     try {
-                        // BetterAuth এ অতিরিক্ত ফিল্ডগুলো সরাসরি user অবজেক্টে থাকে
                         const userRole = user.role;
                         if (userRole === Role.PARTICIPANT) {
                             await prisma.participant.create({
-                                data: {
-                                    userId: user.id,
-                                    email: user.email,
-                                    name: user.name || "New Participant",
-                                },
+                                data: { userId: user.id, email: user.email, name: user.name || "New Participant" },
                             });
                         }
                         else if (userRole === Role.ORGANIZER) {
                             await prisma.organizer.create({
-                                data: {
-                                    userId: user.id,
-                                    email: user.email,
-                                    name: user.name || "New Organizer",
-                                    contactNumber: "01XXXXXXXXX",
-                                },
+                                data: { userId: user.id, email: user.email, name: user.name || "New Organizer", contactNumber: "01XXXXXXXXX" },
                             });
                         }
-                        console.log("✅ Profile linked successfully.");
                     }
                     catch (error) {
-                        // হুক এরর দিলে রেজিস্ট্রেশন ফেইল করবে না যদি আমরা এখানে হ্যান্ডেল করি
                         console.error("❌ Profile Creation Hook Error:", error);
                     }
                 },
@@ -59,66 +47,61 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
-        // ২. OTP প্লাগিন থাকলে এটি false রাখা নিরাপদ যাতে কনফ্লিক্ট না হয়
         requireEmailVerification: false,
     },
     user: {
         additionalFields: {
-            role: {
-                type: "string",
-                required: true,
-                defaultValue: Role.PARTICIPANT,
-                input: true,
-            },
-            status: {
-                type: "string",
-                required: true,
-                defaultValue: UserStatus.ACTIVE,
-                input: true,
-            },
-            needPasswordChange: {
-                type: "boolean",
-                defaultValue: false,
-                input: true,
-            },
-            isDeleted: {
-                type: "boolean",
-                defaultValue: false,
-                input: true,
-            }
+            role: { type: "string", required: true, defaultValue: Role.PARTICIPANT, input: true },
+            status: { type: "string", required: true, defaultValue: UserStatus.ACTIVE, input: true },
+            needPasswordChange: { type: "boolean", defaultValue: false, input: true },
+            isDeleted: { type: "boolean", defaultValue: false, input: true }
         }
     },
     plugins: [
         bearer(),
         emailOTP({
             async sendVerificationOTP({ email, otp, type }) {
-                console.log(`📩 OTP generated for ${email}: ${otp}`);
                 try {
                     await sendEmail({
                         to: email,
-                        subject: type === "email-verification"
-                            ? "Verify your Event Sphere account"
-                            : "Password Reset OTP",
+                        subject: type === "email-verification" ? "Verify Account" : "Reset Password",
                         templateName: "otp",
-                        templateData: {
-                            name: "User",
-                            otp: otp
-                        }
+                        templateData: { name: "User", otp: otp }
                     });
-                    console.log(`✅ OTP Email sent successfully to ${email}`);
                 }
                 catch (error) {
-                    console.error("❌ Email sending failed in Auth Plugin:", error);
+                    console.error("❌ Email failed:", error);
                 }
             },
             expiresIn: 300,
             otpLength: 6,
         })
     ],
-    // ৩. অরিজিনগুলো নিশ্চিত করুন যাতে CORS এরর না আসে
-    trustedOrigins: ["http://localhost:3000", "http://localhost:5000"],
+    // 🔐 মোবাইলের জন্য এটি অত্যন্ত গুরুত্বপূর্ণ (CORS Whitelist)
+    trustedOrigins: [
+        "http://localhost:3000",
+        "https://eventspehere-frontend.vercel.app",
+        "https://eventspehere-frontend-54isxxop6-sanzid-islaam-nabil-projects.vercel.app"
+    ],
     advanced: {
-        useSecureCookies: false,
+        // প্রোডাকশনে Secure Cookies অবশ্যই true
+        useSecureCookies: process.env.NODE_ENV === "production",
+        // 📱 মোবাইলে ব্রাউজারের থার্ড-পার্টি কুকি ব্লক এড়ানোর জন্য ফাইনাল সেটিংস
+        cookie: {
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+        },
+        crossSubdomainCookies: {
+            enabled: process.env.NODE_ENV === "production",
+        }
+    },
+    session: {
+        cookieCache: {
+            enabled: true,
+        },
+        expiresIn: 60 * 60 * 24 * 7, // ৭ দিন
+        freshAge: 0, // সেশন সবসময় রিফ্রেশ রাখার জন্য
     }
 });
 export default auth;

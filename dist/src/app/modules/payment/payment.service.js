@@ -4,10 +4,9 @@ import config from '../../../config/env.js';
 import { stripe } from '../../../config/stripe.config.js';
 import AppError from '../../errorHelpers/AppError.js';
 import { prisma } from '../../lib/prisma.js';
-// --- এই লাইনটি অত্যন্ত গুরুত্বপূর্ণ ---
 import { BookingStatus, PaymentStatus } from '../../../generated/prisma/enums.js';
 /**
- * ১. Stripe Checkout Session তৈরি করা (BDT কারেন্সিতে)
+ * ১. Stripe Checkout Session তৈরি করা
  */
 const createCheckoutSession = async (payload) => {
     const { bookingId, userId, amount, eventName, userEmail } = payload;
@@ -46,23 +45,27 @@ const createCheckoutSession = async (payload) => {
  * ২. পেমেন্ট সফল হওয়ার পর অর্ডার ফুলফিল করা (Atomic Transaction)
  */
 const fulfillOrder = async (data) => {
-    // এখন Prisma.TransactionClient কাজ করবে
     return await prisma.$transaction(async (tx) => {
-        // ক. পেমেন্ট রেকর্ড তৈরি
+        // --- গুরুত্বপূর্ণ: ID টাইপ চেক ---
+        // আপনার Schema-তে ID যদি Int হয় তবে Number(data.bookingId) করুন
+        // যদি MongoDB বা String ID হয় তবে সরাসরি data.bookingId থাকবে।
+        // আমরা নিরাপদ থাকতে data.bookingId-ই ব্যবহার করছি।
+        const targetBookingId = data.bookingId;
+        // ১. পেমেন্ট রেকর্ড তৈরি (Prisma Enum ব্যবহার করে)
         await tx.payment.create({
             data: {
                 transactionId: data.transactionId,
                 amount: Number(data.amount),
                 currency: 'bdt',
-                paymentStatus: PaymentStatus.PAID,
+                paymentStatus: PaymentStatus.PAID, // এনাম থেকে PAID
                 paymentMethod: data.paymentMethod || 'stripe',
-                bookingId: data.bookingId,
+                bookingId: targetBookingId,
                 userId: data.userId,
             },
         });
-        // খ. বুকিং আপডেট
+        // ২. বুকিং আপডেট করা (Status -> SUCCESS, Payment -> PAID)
         const booking = await tx.booking.update({
-            where: { id: data.bookingId },
+            where: { id: targetBookingId },
             data: {
                 paymentStatus: PaymentStatus.PAID,
                 status: BookingStatus.SUCCESS,
@@ -70,22 +73,25 @@ const fulfillOrder = async (data) => {
             },
             include: {
                 event: {
-                    select: { title: true, dateTime: true, location: true, id: true }
+                    select: { id: true, title: true, dateTime: true, location: true }
                 },
                 user: {
                     select: { name: true, email: true }
                 }
             }
         });
-        // গ. ইভেন্টের সিট কমানো
-        await tx.event.update({
-            where: { id: booking.eventId },
-            data: {
-                availableSeats: {
-                    decrement: 1
+        // ৩. ইভেন্টের সিট কমানো
+        if (booking && booking.eventId) {
+            await tx.event.update({
+                where: { id: booking.eventId },
+                data: {
+                    availableSeats: {
+                        decrement: booking.quantity || 1
+                    }
                 }
-            }
-        });
+            });
+        }
+        console.log(`✅ Order Fulfilled: ${targetBookingId}`);
         return booking;
     });
 };

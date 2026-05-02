@@ -1,77 +1,80 @@
 import status from "http-status";
 import { prisma } from "../../lib/prisma.js";
 import AppError from "../../errorHelpers/AppError.js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+// এআই কনফিগ
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 /**
- * 1. নতুন ফ্লাইট/ইভেন্ট অফার তৈরি করা
+ * ১. ইভেন্ট তৈরি (Create Event)
  */
 const createEventIntoDB = async (userId, payload) => {
-    // --- DEBUG LOG ---
-    console.log("🔍 Checking Organizer for UserId:", userId);
-    // অর্গানাইজার প্রোফাইল চেক
+    // ইউজারের অর্গানাইজার প্রোফাইল আছে কি না চেক করা
     const organizer = await prisma.organizer.findUnique({
-        where: { userId },
+        where: { userId: userId }
     });
     if (!organizer) {
-        console.error("❌ Organizer not found in DB for UserId:", userId);
-        throw new AppError(status.NOT_FOUND, "Organizer profile not found! Please create an organizer profile first.");
+        throw new AppError(status.NOT_FOUND, "Organizer profile not found!");
     }
-    console.log("✅ Organizer Found:", organizer.id);
-    // ডাটা কাস্টিং নিশ্চিত করা
-    const totalSeatsCount = Number(payload.totalSeats);
-    const ticketPriceAmount = Number(payload.ticketPrice);
-    // ডেট ফরম্যাট চেক করা (যদি ভুল ফরম্যাট আসে তবে NaN হ্যান্ডেল করা)
-    const eventDate = new Date(payload.dateTime);
-    if (isNaN(eventDate.getTime())) {
-        throw new AppError(status.BAD_REQUEST, "Invalid date and time format!");
-    }
+    // নতুন ইভেন্ট তৈরি
+    const result = await prisma.event.create({
+        data: {
+            ...payload,
+            organizerId: organizer.id,
+            ticketPrice: Number(payload.ticketPrice), // টাইপ সেফটি নিশ্চিত করা
+        }
+    });
+    return result;
+};
+/**
+ * ২. এডমিন ড্যাশবোর্ড স্ট্যাটস
+ */
+const getEventStatsFromDB = async () => {
+    const totalEvents = await prisma.event.count({ where: { isDeleted: false } });
+    const totalBookings = await prisma.booking.count();
+    const bookings = await prisma.booking.findMany({
+        select: { createdAt: true, totalPrice: true }
+    });
+    const chartData = bookings.reduce((acc, curr) => {
+        const month = curr.createdAt.toLocaleString('default', { month: 'short' });
+        const existing = acc.find((item) => item.name === month);
+        if (existing) {
+            existing.bookings += 1;
+            existing.revenue += curr.totalPrice;
+        }
+        else {
+            acc.push({ name: month, bookings: 1, revenue: curr.totalPrice });
+        }
+        return acc;
+    }, []);
+    return { totalEvents, totalBookings, chartData };
+};
+/**
+ * ৩. এআই সার্চ সাজেশন
+ */
+const getAISuggestionsFromDB = async (searchTerm) => {
     try {
-        const result = await prisma.event.create({
-            data: {
-                title: payload.title,
-                description: payload.description,
-                category: payload.category,
-                location: payload.location,
-                venue: payload.venue,
-                time: payload.time,
-                thumbnail: payload.thumbnail || null,
-                ticketPrice: ticketPriceAmount || 0,
-                totalSeats: totalSeatsCount,
-                availableSeats: totalSeatsCount,
-                dateTime: eventDate,
-                organizerId: organizer.id,
-                status: "UPCOMING",
-                // এয়ার টিকিট স্পেসিফিক ডাটা
-                airlineName: payload.airlineName || null,
-                flightNumber: payload.flightNumber || null,
-                flightClass: payload.flightClass || "ECONOMY",
-                baggageAllowance: payload.baggageAllowance || null,
-                isRefundable: payload.isRefundable === true || payload.isRefundable === 'true',
-            },
-        });
-        console.log("🚀 Event Created Successfully:", result.id);
-        return result;
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const prompt = `Suggest 3 professional search keywords for an event management platform related to "${searchTerm}". Output should be a single string with keywords separated by commas only. No numbering or extra text.`;
+        const result = await model.generateContent(prompt);
+        const response = result.response.text();
+        return response.split(',').map((s) => s.trim()).filter(Boolean);
     }
     catch (error) {
-        // 🔥 এই লগটি আপনাকে বলে দিবে আসলে প্রিজমা কেন এরর দিচ্ছে
-        console.error("🔥 Prisma Create Error:", error);
-        throw new AppError(status.INTERNAL_SERVER_ERROR, "Failed to create event in database!");
+        return ["Upcoming Events", "Trending Workshops", "Top Seminars"];
     }
 };
 /**
- * 2. সার্চ এবং ফিল্টারসহ সব ফ্লাইট অফার পাওয়া
+ * ৪. সার্চ, অ্যাডভান্সড ফিল্টার এবং পেজিনেশন
  */
 const getAllEventsFromDB = async (filters) => {
-    const { searchTerm, category, minPrice, maxPrice, status: eventStatus, airlineName, flightClass } = filters;
+    const { searchTerm, category, minPrice, maxPrice, status: eventStatus, page = 1, limit = 10 } = filters;
     const andConditions = [];
     if (searchTerm) {
         andConditions.push({
             OR: [
                 { title: { contains: searchTerm, mode: 'insensitive' } },
-                { description: { contains: searchTerm, mode: 'insensitive' } },
-                { venue: { contains: searchTerm, mode: 'insensitive' } },
                 { location: { contains: searchTerm, mode: 'insensitive' } },
-                { airlineName: { contains: searchTerm, mode: 'insensitive' } },
-                { flightNumber: { contains: searchTerm, mode: 'insensitive' } },
+                { category: { contains: searchTerm, mode: 'insensitive' } },
             ],
         });
     }
@@ -79,14 +82,6 @@ const getAllEventsFromDB = async (filters) => {
         andConditions.push({ category });
     if (eventStatus)
         andConditions.push({ status: eventStatus });
-    if (airlineName) {
-        andConditions.push({
-            airlineName: { contains: airlineName, mode: 'insensitive' }
-        });
-    }
-    if (flightClass) {
-        andConditions.push({ flightClass: flightClass });
-    }
     if (minPrice || maxPrice) {
         andConditions.push({
             ticketPrice: {
@@ -96,90 +91,79 @@ const getAllEventsFromDB = async (filters) => {
         });
     }
     andConditions.push({ isDeleted: false });
-    return await prisma.event.findMany({
-        where: { AND: andConditions },
-        include: {
-            organizer: {
-                include: {
-                    user: { select: { name: true, image: true } }
+    const skip = (Number(page) - 1) * Number(limit);
+    const take = Number(limit);
+    const [result, total] = await Promise.all([
+        prisma.event.findMany({
+            where: { AND: andConditions },
+            include: {
+                organizer: {
+                    include: { user: { select: { name: true, image: true } } }
                 }
-            }
+            },
+            skip,
+            take,
+            orderBy: { dateTime: 'asc' },
+        }),
+        prisma.event.count({ where: { AND: andConditions } })
+    ]);
+    return {
+        meta: {
+            page: Number(page),
+            limit: Number(limit),
+            total,
+            totalPage: Math.ceil(total / take)
         },
-        orderBy: { dateTime: 'asc' },
-    });
+        data: result
+    };
 };
 /**
- * 3. সিঙ্গেল ফ্লাইট ডিটেইলস পাওয়া
+ * ৫. সিঙ্গেল ইভেন্ট ভিউ
  */
 const getSingleEventFromDB = async (id) => {
     const result = await prisma.event.findUnique({
         where: { id },
         include: {
             organizer: {
-                include: { user: { select: { name: true, email: true, image: true } } }
-            },
-            reviews: {
-                include: { user: { select: { name: true, image: true } } }
+                include: {
+                    user: { select: { name: true, email: true, image: true } }
+                }
             }
-        },
+        }
     });
     if (!result || result.isDeleted) {
-        throw new AppError(status.NOT_FOUND, "Flight offer not found!");
+        throw new AppError(status.NOT_FOUND, "Event not found!");
     }
     return result;
 };
 /**
- * 4. ফ্লাইট তথ্য আপডেট করা
+ * ৬. আপডেট ইভেন্ট
  */
 const updateEventIntoDB = async (eventId, userId, payload) => {
-    const isExist = await prisma.event.findFirst({
-        where: { id: eventId, organizer: { userId }, isDeleted: false }
-    });
-    if (!isExist) {
-        throw new AppError(status.FORBIDDEN, "Unauthorized or flight not found!");
-    }
-    const { dateTime, totalSeats, ticketPrice, isRefundable, ...rest } = payload;
-    const updateData = { ...rest };
-    if (dateTime)
-        updateData.dateTime = new Date(dateTime);
-    if (ticketPrice !== undefined)
-        updateData.ticketPrice = Number(ticketPrice);
-    if (isRefundable !== undefined) {
-        updateData.isRefundable = isRefundable === true || isRefundable === 'true';
-    }
-    if (totalSeats !== undefined) {
-        const newTotalSeats = Number(totalSeats);
-        const bookedSeats = isExist.totalSeats - isExist.availableSeats;
-        updateData.totalSeats = newTotalSeats;
-        updateData.availableSeats = newTotalSeats - bookedSeats;
-        if (updateData.availableSeats < 0) {
-            throw new AppError(status.BAD_REQUEST, "Total seats cannot be less than already booked seats!");
-        }
-    }
+    const event = await prisma.event.findUnique({ where: { id: eventId } });
+    if (!event)
+        throw new AppError(status.NOT_FOUND, "Event not found!");
     return await prisma.event.update({
         where: { id: eventId },
-        data: updateData
+        data: payload
     });
 };
 /**
- * 5. ফ্লাইট ডিলিট (Soft Delete)
+ * ৭. ডিলিট ইভেন্ট
  */
 const deleteEventFromDB = async (eventId, userId) => {
-    const event = await prisma.event.findFirst({
-        where: { id: eventId, organizer: { userId }, isDeleted: false }
-    });
-    if (!event) {
-        throw new AppError(status.FORBIDDEN, "Unauthorized or flight not found!");
-    }
     return await prisma.event.update({
         where: { id: eventId },
         data: { isDeleted: true },
     });
 };
+// ফাইনাল এক্সপোর্ট
 export const EventService = {
     createEventIntoDB,
     getAllEventsFromDB,
     getSingleEventFromDB,
     updateEventIntoDB,
-    deleteEventFromDB
+    deleteEventFromDB,
+    getEventStatsFromDB,
+    getAISuggestionsFromDB
 };

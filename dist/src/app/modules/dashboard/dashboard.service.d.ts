@@ -68,6 +68,7 @@ export declare const DashboardService: {
             updatedAt: Date;
             status: import("../../../generated/prisma/enums.js").BookingStatus;
             userId: string;
+            eventId: string;
             paymentStatus: import("../../../generated/prisma/enums.js").PaymentStatus;
             quantity: number;
             totalAmount: number;
@@ -75,7 +76,6 @@ export declare const DashboardService: {
             ticketUrl: string | null;
             isTicketGenerated: boolean;
             bookingCode: string;
-            eventId: string;
         })[];
         pastEvents: ({
             event: {
@@ -108,6 +108,7 @@ export declare const DashboardService: {
             updatedAt: Date;
             status: import("../../../generated/prisma/enums.js").BookingStatus;
             userId: string;
+            eventId: string;
             paymentStatus: import("../../../generated/prisma/enums.js").PaymentStatus;
             quantity: number;
             totalAmount: number;
@@ -115,7 +116,6 @@ export declare const DashboardService: {
             ticketUrl: string | null;
             isTicketGenerated: boolean;
             bookingCode: string;
-            eventId: string;
         })[];
         totalSpent: number;
         myReviews: ({

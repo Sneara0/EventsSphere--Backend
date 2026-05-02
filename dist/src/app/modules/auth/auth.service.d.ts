@@ -64,11 +64,11 @@ export declare const AuthService: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            userId: string;
             profileImage: string | null;
             contactNumber: string | null;
             address: string | null;
             interests: string[];
-            userId: string;
         } | null;
         organizer: {
             name: string | null;
@@ -76,8 +76,8 @@ export declare const AuthService: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            contactNumber: string;
             userId: string;
+            contactNumber: string;
             organizationName: string | null;
             website: string | null;
             bio: string | null;
@@ -91,9 +91,9 @@ export declare const AuthService: {
             createdAt: Date;
             updatedAt: Date;
             isDeleted: boolean;
+            userId: string;
             profileImage: string | null;
             contactNumber: string;
-            userId: string;
             designation: string;
         } | null;
     } & {

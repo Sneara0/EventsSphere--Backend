@@ -11,6 +11,7 @@ export declare const CouponService: {
         expiryDate: Date;
         usageLimit: number;
         usedCount: number;
+        isActive: boolean;
     }>;
     validateAndCalculateDiscount: (code: string, eventId: string, originalAmount: number) => Promise<{
         isValid: boolean;
@@ -30,6 +31,7 @@ export declare const CouponService: {
         expiryDate: Date;
         usageLimit: number;
         usedCount: number;
+        isActive: boolean;
     }>;
     deleteCouponFromDB: (id: string) => Promise<{
         id: string;
@@ -42,6 +44,7 @@ export declare const CouponService: {
         expiryDate: Date;
         usageLimit: number;
         usedCount: number;
+        isActive: boolean;
     }>;
     getAllCouponsFromDB: () => Promise<{
         id: string;
@@ -54,5 +57,6 @@ export declare const CouponService: {
         expiryDate: Date;
         usageLimit: number;
         usedCount: number;
+        isActive: boolean;
     }[]>;
 };

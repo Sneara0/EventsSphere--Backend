@@ -5,21 +5,19 @@ import { PaymentService } from './payment.service.js';
 import { InvoiceService } from './invoice.service.js';
 import { sendEmailWithInvoice } from '../../utils/sendEmail.js';
 import { stripe } from '../../../config/stripe.config.js';
-import { catchAsync } from '../../utils/catchAsync.js'; // পাথ ঠিক করে নিন
-import { sendResponse } from '../../utils/sendResponse.js'; // পাথ ঠিক করে নিন
+import { catchAsync } from '../../utils/catchAsync.js';
+import { sendResponse } from '../../utils/sendResponse.js';
+import { prisma } from '../../lib/prisma.js';
+import AppError from '../../errorHelpers/AppError.js';
+/**
+ * ১. Stripe Checkout Session তৈরি করা
+ */
 const createPaymentSession = catchAsync(async (req, res) => {
     const { bookingId, totalAmount, userEmail, userId, eventName } = req.body;
-    // ১. ডিবাগিং লগ (টার্মিনালে চেক করবেন ডাটা আসছে কি না)
-    console.log(`⏳ Creating session for Booking: ${bookingId}, Amount: ${totalAmount}`);
-    // ২. অ্যামাউন্ট ভ্যালিডেশন (অবশ্যই নাম্বার হতে হবে)
     const amount = Number(totalAmount);
     if (!amount || amount <= 0) {
-        return res.status(httpStatus.BAD_REQUEST).json({
-            success: false,
-            message: "Invalid payment amount received!",
-        });
+        throw new AppError(httpStatus.BAD_REQUEST, "Invalid payment amount!");
     }
-    // ৩. Stripe সেশন তৈরি
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -30,20 +28,18 @@ const createPaymentSession = catchAsync(async (req, res) => {
                         name: eventName || 'Event Ticket Booking',
                         description: `Booking ID: ${bookingId}`,
                     },
-                    // ✅ Stripe সেন্ট/পয়সা হিসেবে হিসাব করে, তাই ১০০ দিয়ে গুণ
                     unit_amount: Math.round(amount * 100),
                 },
                 quantity: 1,
             },
         ],
         mode: 'payment',
-        // ৪. ফ্রন্টএন্ডের চেকআউট পেজে ফেরত পাঠানোর জন্য সাকসেস ইউআরএল
         success_url: `${config.FRONTEND_URL}/checkout/${bookingId}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${config.FRONTEND_URL}/checkout/${bookingId}?status=cancelled`,
         customer_email: userEmail,
         metadata: {
-            bookingId,
-            userId,
+            bookingId: String(bookingId),
+            userId: String(userId),
         },
     });
     sendResponse(res, {
@@ -53,12 +49,18 @@ const createPaymentSession = catchAsync(async (req, res) => {
         data: { id: session.id, url: session.url },
     });
 });
+/**
+ * ২. Stripe Webhook হ্যান্ডলার (পেমেন্ট ভেরিফিকেশন)
+ */
 const handleStripeWebhook = async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
     try {
         const webhookSecret = config.STRIPE.STRIPE_WEBHOOK_SECRET;
-        // সিগনেচার ভেরিফাই (অবশ্যই raw body ব্যবহার করতে হবে app.ts এ)
+        if (!sig || !webhookSecret) {
+            throw new Error("Missing stripe signature or webhook secret");
+        }
+        // গুরুত্বপূর্ণ: req.body অবশ্যই raw buffer হতে হবে (express.raw() middleware দিয়ে)
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
         console.log("✅ Webhook Verified: ", event.type);
     }
@@ -69,33 +71,29 @@ const handleStripeWebhook = async (req, res) => {
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         const { bookingId, userId } = session.metadata;
-        if (!bookingId || !userId) {
-            console.error("⚠️ Error: Missing metadata in Stripe session");
-            return res.status(400).json({ error: "Missing metadata" });
-        }
         try {
-            console.log(`⏳ Processing fulfillment for Booking: ${bookingId}...`);
-            // ১. ডাটাবেস আপডেট (Status -> PAID)
+            console.log(`🔄 Processing fulfillment for Booking: ${bookingId}...`);
+            // ডাটাবেসে স্ট্যাটাস PAID করা
             const bookingData = await PaymentService.fulfillOrder({
-                transactionId: session.payment_intent || session.id,
+                transactionId: session.payment_intent, // সরাসরি payment_intent আইডি নেওয়া ভালো
                 amount: session.amount_total / 100,
                 bookingId: bookingId,
                 userId: userId,
             });
             if (bookingData) {
-                // ২. ইনভয়েস জেনারেট
+                // ইনভয়েস জেনারেট
                 const pdfBase64 = await InvoiceService.generateInvoicePDF({
                     userName: bookingData.user.name,
                     userEmail: bookingData.user.email,
                     bookingId: bookingData.id,
                     eventName: bookingData.event.title,
                     amount: bookingData.totalAmount,
-                    transactionId: session.payment_intent || "N/A",
+                    transactionId: session.payment_intent,
                     date: new Date().toLocaleDateString(),
                 });
-                // ৩. ইমেইল পাঠানো
+                // ইমেইল পাঠানো
                 await sendEmailWithInvoice(bookingData.user.email, pdfBase64, `Invoice_${bookingData.id}.pdf`, bookingData.user.name);
-                console.log(`🚀 SUCCESS: Fulfillment completed for ${bookingData.user.email}`);
+                console.log(`🚀 SUCCESS: Database Updated and Email Sent.`);
             }
         }
         catch (error) {
@@ -104,7 +102,45 @@ const handleStripeWebhook = async (req, res) => {
     }
     res.json({ received: true });
 };
+/**
+ * ৩. ইনভয়েস ডাউনলোড করা
+ */
+const downloadInvoice = catchAsync(async (req, res) => {
+    const { bookingId } = req.params;
+    // 'string | string[]' টাইপ এরর ফিক্সিং
+    const safeBookingId = Array.isArray(bookingId) ? bookingId[0] : bookingId;
+    if (!safeBookingId) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Booking ID is required!");
+    }
+    const bookingData = await prisma.booking.findUnique({
+        where: { id: safeBookingId },
+        include: {
+            user: { select: { name: true, email: true } },
+            event: { select: { title: true } }
+        }
+    });
+    if (!bookingData) {
+        throw new AppError(httpStatus.NOT_FOUND, "Booking not found!");
+    }
+    if (bookingData.paymentStatus !== 'PAID') {
+        throw new AppError(httpStatus.BAD_REQUEST, "Invoice is only available for paid bookings!");
+    }
+    const pdfBase64 = await InvoiceService.generateInvoicePDF({
+        userName: bookingData.user.name,
+        userEmail: bookingData.user.email,
+        bookingId: bookingData.id,
+        eventName: bookingData.event.title,
+        amount: bookingData.totalAmount,
+        transactionId: bookingData.transactionId || 'N/A',
+        date: new Date(bookingData.updatedAt).toLocaleDateString(),
+    });
+    const pdfBuffer = Buffer.from(pdfBase64, 'base64');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice_${safeBookingId}.pdf`);
+    res.send(pdfBuffer);
+});
 export const PaymentController = {
     createPaymentSession,
     handleStripeWebhook,
+    downloadInvoice,
 };

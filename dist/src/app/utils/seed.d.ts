@@ -1,1 +1,4 @@
-export declare const seedSuperAdmin: () => Promise<void>;
+/**
+ * মেইন সিডিং ফাংশন
+ */
+export declare const runSeeding: () => Promise<never>;

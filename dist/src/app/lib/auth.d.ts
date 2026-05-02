@@ -603,7 +603,22 @@ export declare const auth: import("better-auth").Auth<{
     }];
     trustedOrigins: string[];
     advanced: {
-        useSecureCookies: false;
+        useSecureCookies: boolean;
+        cookie: {
+            sameSite: string;
+            secure: boolean;
+            httpOnly: boolean;
+        };
+        crossSubdomainCookies: {
+            enabled: boolean;
+        };
+    };
+    session: {
+        cookieCache: {
+            enabled: true;
+        };
+        expiresIn: number;
+        freshAge: number;
     };
 }>;
 export default auth;

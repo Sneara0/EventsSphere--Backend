@@ -6,8 +6,8 @@ export declare const OrganizerService: {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        contactNumber: string;
         userId: string;
+        contactNumber: string;
         organizationName: string | null;
         website: string | null;
         bio: string | null;
@@ -28,8 +28,8 @@ export declare const OrganizerService: {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        contactNumber: string;
         userId: string;
+        contactNumber: string;
         organizationName: string | null;
         website: string | null;
         bio: string | null;
@@ -60,8 +60,8 @@ export declare const OrganizerService: {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        contactNumber: string;
         userId: string;
+        contactNumber: string;
         organizationName: string | null;
         website: string | null;
         bio: string | null;
@@ -79,8 +79,8 @@ export declare const OrganizerService: {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        contactNumber: string;
         userId: string;
+        contactNumber: string;
         organizationName: string | null;
         website: string | null;
         bio: string | null;
@@ -122,8 +122,8 @@ export declare const OrganizerService: {
         id: string;
         createdAt: Date;
         updatedAt: Date;
-        contactNumber: string;
         userId: string;
+        contactNumber: string;
         organizationName: string | null;
         website: string | null;
         bio: string | null;

@@ -1,59 +1,72 @@
 import status from "http-status";
-import { UserStatus } from "../../generated/prisma/enums.js";
+import { Role, UserStatus } from "../../generated/prisma/enums.js";
 import { cookieUtils } from "../utils/cookie.js";
 import { prisma } from "../lib/prisma.js";
 import AppError from "../errorHelpers/AppError.js";
 import { jwtUtils } from "../utils/jwt.js";
-import env from "../../config/env.js"; // পাথটি চেক করে নিন
+import env from "../../config/env.js";
 export const checkAuth = (...authRoles) => async (req, res, next) => {
     try {
-        // ২. কুকি থেকে এক্সেস টোকেন নেওয়া
-        const accessToken = cookieUtils.getCookie(req, 'accessToken');
+        // --- হাইব্রিড টোকেন এক্সট্রাকশন (HEADERS + COOKIES) ---
+        // ১. প্রথমে Authorization Header চেক করবে, না থাকলে Cookies চেক করবে
+        const authHeader = req.headers.authorization;
+        let accessToken = "";
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            accessToken = authHeader.split(' ')[1];
+        }
+        else {
+            accessToken = cookieUtils.getCookie(req, 'accessToken');
+        }
+        // টোকেন না থাকলে এরর
         if (!accessToken) {
-            throw new AppError(status.UNAUTHORIZED, 'আপনি লগইন করা নেই! দয়া করে আবার লগইন করুন।');
+            return next(new AppError(status.UNAUTHORIZED, 'You are not logged in! Please login to gain access.'));
         }
-        // ৩. JWT ভেরিফাই করা
-        const verifiedToken = jwtUtils.verifyToken(accessToken, env.ACCESS_TOKEN_SECRET);
-        if (!verifiedToken) {
-            throw new AppError(status.UNAUTHORIZED, 'আপনার সেশন শেষ হয়ে গেছে। আবার লগইন করুন।');
+        // ২. JWT ভেরিফাই করা
+        let verifiedToken;
+        try {
+            verifiedToken = jwtUtils.verifyToken(accessToken, env.ACCESS_TOKEN_SECRET);
         }
-        // ৪. টোকেন থেকে userId বের করা (সহজ এবং ক্লিন লজিক)
-        const userId = verifiedToken.userId || verifiedToken.id || (verifiedToken.data && verifiedToken.data.userId);
+        catch (err) {
+            // যদি টোকেন এক্সপায়ারড হয় তবে নির্দিষ্ট মেসেজ পাঠানো যাতে ফ্রন্টএন্ড রিফ্রেশ টোকেন কল করতে পারে
+            if (err.name === 'TokenExpiredError') {
+                return next(new AppError(status.UNAUTHORIZED, 'AccessTokenExpired'));
+            }
+            return next(new AppError(status.UNAUTHORIZED, 'Your session is invalid. Please login again.'));
+        }
+        // ৩. userId বের করা (Flexible structure)
+        const userId = verifiedToken.userId || verifiedToken.id;
         if (!userId) {
-            throw new AppError(status.UNAUTHORIZED, 'Invalid token payload!');
+            return next(new AppError(status.UNAUTHORIZED, 'Invalid token payload!'));
         }
-        // ৫. ডাটাবেস থেকে লেটেস্ট ইউজার ডাটা চেক করা
-        // টোকেনের রোলের ওপর ভরসা না করে সরাসরি DB থেকে রোল চেক করা বেশি নিরাপদ
+        // ৪. ডাটাবেস থেকে ইউজারের আপডেট তথ্য নেওয়া
         const user = await prisma.user.findUnique({
             where: { id: userId },
         });
         if (!user) {
-            throw new AppError(status.UNAUTHORIZED, 'ইউজার খুঁজে পাওয়া যায়নি!');
+            return next(new AppError(status.UNAUTHORIZED, 'User not found!'));
         }
-        // ৬. ইউজারের স্ট্যাটাস চেক করা
+        // ৫. অ্যাকাউন্ট স্ট্যাটাস চেক
         if (user.status === UserStatus.BLOCKED || user.isDeleted) {
-            throw new AppError(status.FORBIDDEN, 'আপনার অ্যাকাউন্টটি ব্লকড অথবা ডিলিট করা হয়েছে।');
+            return next(new AppError(status.FORBIDDEN, 'Your account has been blocked or deleted.'));
         }
-        // ৭. রোল (Role) পারমিশন চেক করা (সবচেয়ে গুরুত্বপূর্ণ অংশ)
+        // ৬. রোল পারমিশন চেক
         const userRole = user.role;
-        if (authRoles.length > 0 && !authRoles.includes(userRole)) {
-            // এই লগটি আপনাকে টার্মিনালে দেখাবে আসলে কী সমস্যা হচ্ছে
-            console.log(`[Permission Denied] User: ${user.email}, Role: ${userRole}, Required: ${authRoles}`);
-            throw new AppError(status.FORBIDDEN, `আপনার এই কাজটি করার অনুমতি নেই। আপনার রোল: ${userRole}, কিন্তু প্রয়োজন: ${authRoles.join(' বা ')}`);
+        // SUPER_ADMIN হলে সব এক্সেস পাবে
+        if (userRole === Role.SUPER_ADMIN) {
+            // Granted
         }
-        // ৮. Request অবজেক্টে লেটেস্ট ইউজার ডাটা সেট করা
+        else if (authRoles.length > 0 && !authRoles.includes(userRole)) {
+            return next(new AppError(status.FORBIDDEN, `Access denied. Required: ${authRoles.join(' or ')}`));
+        }
+        // ৭. Request অবজেক্টে ডাটা অ্যাটাচ করা
         req.user = {
             userId: user.id,
             role: userRole,
             email: user.email,
         };
-        next();
+        return next();
     }
     catch (error) {
-        // JWT এরর হ্যান্ডলিং
-        if (error.name === 'TokenExpiredError') {
-            return next(new AppError(status.UNAUTHORIZED, 'AccessTokenExpired'));
-        }
-        next(error);
+        return next(error);
     }
 };

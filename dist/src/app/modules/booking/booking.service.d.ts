@@ -32,6 +32,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -39,7 +40,6 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     }>;
     getSingleBookingFromDB: (id: string, user: any) => Promise<{
         user: {
@@ -48,11 +48,43 @@ export declare const BookingService: {
             id: string;
         };
         event: {
+            organizer: {
+                name: string | null;
+                email: string;
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                userId: string;
+                contactNumber: string;
+                organizationName: string | null;
+                website: string | null;
+                bio: string | null;
+                logo: string | null;
+                isVerified: boolean;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("../../../generated/prisma/enums.js").EventStatus;
+            isDeleted: boolean;
+            time: string;
             title: string;
+            description: string;
+            category: string;
             dateTime: Date;
             location: string;
+            venue: string;
             thumbnail: string | null;
             ticketPrice: number;
+            totalSeats: number;
+            availableSeats: number;
+            airlineName: string | null;
+            flightNumber: string | null;
+            flightClass: string | null;
+            baggageAllowance: string | null;
+            isRefundable: boolean;
+            organizerId: string;
         };
     } & {
         id: string;
@@ -60,6 +92,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -67,7 +100,6 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     }>;
     fulfillBookingAfterPayment: (data: IPaymentFulfillmentData) => Promise<{
         user: {
@@ -85,6 +117,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -92,7 +125,6 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     }>;
     getMyBookingsFromDB: (userId: string) => Promise<({
         event: {
@@ -107,6 +139,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -114,7 +147,6 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     })[]>;
     getAllBookingsFromDB: () => Promise<({
         user: {
@@ -144,6 +176,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -151,7 +184,6 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     })[]>;
     cancelBookingFromDB: (id: string, user: any) => Promise<{
         id: string;
@@ -159,6 +191,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -166,7 +199,6 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     }>;
     deleteBookingByAdmin: (id: string) => Promise<{
         id: string;
@@ -174,6 +206,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -181,7 +214,6 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     }>;
     updateBookingStatusByAdmin: (id: string, payload: IUpdateBookingRequest) => Promise<{
         id: string;
@@ -189,6 +221,7 @@ export declare const BookingService: {
         updatedAt: Date;
         status: BookingStatus;
         userId: string;
+        eventId: string;
         paymentStatus: PaymentStatus;
         quantity: number;
         totalAmount: number;
@@ -196,6 +229,5 @@ export declare const BookingService: {
         ticketUrl: string | null;
         isTicketGenerated: boolean;
         bookingCode: string;
-        eventId: string;
     }>;
 };

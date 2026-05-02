@@ -15,7 +15,7 @@ router.use("/users", UserRoutes);
 router.use("/events", EventRoutes);
 router.use("/organizer", OrganizerRoutes);
 router.use("/bookings", BookingRoutes);
-router.use("/coupon", CouponRoutes);
+router.use("/coupons", CouponRoutes);
 router.use("/dashboard", DashboardRoutes);
 router.use("/payments", PaymentRoutes);
 router.use("/contact", ContactRoutes);

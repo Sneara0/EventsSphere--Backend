@@ -37,5 +37,7 @@ const config = {
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
         STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     },
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    GEMINI_API_SECRET: process.env.GEMINI_API_SECRET,
 };
 export default config;

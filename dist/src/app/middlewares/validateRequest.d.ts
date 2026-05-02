@@ -1,3 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import z from "zod";
-export declare const validateRequest: (ZodSchema: z.ZodObject) => (req: Request, res: Response, next: NextFunction) => void;
+/**
+ * ZodSchema এর টাইপ 'any' রাখা হয়েছে যাতে আপনার ভার্সন জনিত
+ * 'AnyZodObject' বা 'ZodObject' এর টাইপ এররটি আর না আসে।
+ */
+export declare const validateRequest: (ZodSchema: any) => (req: Request, res: Response, next: NextFunction) => Promise<void>;

@@ -32,6 +32,8 @@ export interface EnvConfig {
         STRIPE_SECRET_KEY: string;
         STRIPE_WEBHOOK_SECRET: string;
     };
+    GEMINI_API_KEY?: string;
+    GEMINI_API_SECRET?: string;
 }
 declare const config: EnvConfig;
 export default config;

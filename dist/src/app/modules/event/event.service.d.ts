@@ -24,50 +24,58 @@ export declare const EventService: {
         isRefundable: boolean;
         organizerId: string;
     }>;
-    getAllEventsFromDB: (filters: IEventFilterRequest) => Promise<({
-        organizer: {
-            user: {
-                name: string;
-                image: string | null;
+    getAllEventsFromDB: (filters: IEventFilterRequest) => Promise<{
+        meta: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPage: number;
+        };
+        data: ({
+            organizer: {
+                user: {
+                    name: string;
+                    image: string | null;
+                };
+            } & {
+                name: string | null;
+                email: string;
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                userId: string;
+                contactNumber: string;
+                organizationName: string | null;
+                website: string | null;
+                bio: string | null;
+                logo: string | null;
+                isVerified: boolean;
             };
         } & {
-            name: string | null;
-            email: string;
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            contactNumber: string;
-            userId: string;
-            organizationName: string | null;
-            website: string | null;
-            bio: string | null;
-            logo: string | null;
-            isVerified: boolean;
-        };
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        status: import("../../../generated/prisma/enums.js").EventStatus;
-        isDeleted: boolean;
-        time: string;
-        title: string;
-        description: string;
-        category: string;
-        dateTime: Date;
-        location: string;
-        venue: string;
-        thumbnail: string | null;
-        ticketPrice: number;
-        totalSeats: number;
-        availableSeats: number;
-        airlineName: string | null;
-        flightNumber: string | null;
-        flightClass: string | null;
-        baggageAllowance: string | null;
-        isRefundable: boolean;
-        organizerId: string;
-    })[]>;
+            status: import("../../../generated/prisma/enums.js").EventStatus;
+            isDeleted: boolean;
+            time: string;
+            title: string;
+            description: string;
+            category: string;
+            dateTime: Date;
+            location: string;
+            venue: string;
+            thumbnail: string | null;
+            ticketPrice: number;
+            totalSeats: number;
+            availableSeats: number;
+            airlineName: string | null;
+            flightNumber: string | null;
+            flightClass: string | null;
+            baggageAllowance: string | null;
+            isRefundable: boolean;
+            organizerId: string;
+        })[];
+    }>;
     getSingleEventFromDB: (id: string) => Promise<{
         organizer: {
             user: {
@@ -81,28 +89,14 @@ export declare const EventService: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            contactNumber: string;
             userId: string;
+            contactNumber: string;
             organizationName: string | null;
             website: string | null;
             bio: string | null;
             logo: string | null;
             isVerified: boolean;
         };
-        reviews: ({
-            user: {
-                name: string;
-                image: string | null;
-            };
-        } & {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            userId: string;
-            eventId: string;
-            rating: number;
-            comment: string;
-        })[];
     } & {
         id: string;
         createdAt: Date;
@@ -175,4 +169,10 @@ export declare const EventService: {
         isRefundable: boolean;
         organizerId: string;
     }>;
+    getEventStatsFromDB: () => Promise<{
+        totalEvents: number;
+        totalBookings: number;
+        chartData: any[];
+    }>;
+    getAISuggestionsFromDB: (searchTerm: string) => Promise<string[]>;
 };
