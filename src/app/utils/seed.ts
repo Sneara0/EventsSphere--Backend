@@ -1,21 +1,23 @@
 /* eslint-disable no-console */
-
 import { prisma } from "../lib/prisma.js";
 import env from "../../config/env.js"; 
 import { auth } from "../lib/auth.js";
 import { Role } from "../../generated/prisma/enums.js";
 
-export const seedSuperAdmin = async () => {
-    console.log("🚀 Seeding started...");
+/**
+ * মেইন সিডিং ফাংশন
+ */
+export const runSeeding = async () => {
+    console.log("🚀 Seeding process started...");
     
     try {
-        // ১. সুপার অ্যাডমিন ইউজার চেক ও তৈরি
+        // --- ১. সুপার অ্যাডমিন তৈরি (Better-Auth এর মাধ্যমে) ---
         const isSuperAdminExist = await prisma.user.findFirst({
             where: { role: Role.SUPER_ADMIN }
         });
 
         if (!isSuperAdminExist) {
-            console.log("⏳ Creating Super Admin via Better-Auth...");
+            console.log("⏳ Creating Super Admin...");
             const superAdminUser = await auth.api.signUpEmail({
                 body: {
                     email: env.SUPER_ADMIN_EMAIL as string,
@@ -29,11 +31,13 @@ export const seedSuperAdmin = async () => {
             if (superAdminUser && superAdminUser.user) {
                 const userId = superAdminUser.user.id;
                 await prisma.$transaction(async (tx) => {
+                    // ইমেইল ভেরিফাইড করা
                     await tx.user.update({
                         where: { id: userId },
                         data: { emailVerified: true }
                     });
 
+                    // অ্যাডমিন প্রোফাইল তৈরি
                     await tx.admin.create({
                         data: {
                             name: "Super Admin",
@@ -44,21 +48,53 @@ export const seedSuperAdmin = async () => {
                         }
                     });
                 });
-                console.log("✅ Super Admin profile created!");
+                console.log("✅ Super Admin and Profile created!");
             }
         } else {
             console.log("ℹ️ Super admin already exists.");
         }
 
-        // ২. আপনার স্কিমা অনুযায়ী কুপন কোড তৈরি (ফিক্সড)
+        // --- ২. ডেমো অ্যাডমিন ও ইউজার তৈরি (টেস্টিং এর জন্য) ---
+        console.log("⏳ Seeding Demo Credentials...");
+        const demoUsers = [
+            { 
+                email: "admin@demo.com", 
+                name: "Demo Admin", 
+                role: Role.ADMIN, 
+                password: "password123" 
+            },
+            { 
+                email: "user@demo.com", 
+                name: "Demo User", 
+                role: Role.PARTICIPANT, 
+                password: "password123" 
+            }
+        ];
+
+        for (const u of demoUsers) {
+            const exists = await prisma.user.findUnique({ where: { email: u.email } });
+            if (!exists) {
+                await auth.api.signUpEmail({
+                    body: {
+                        email: u.email,
+                        password: u.password,
+                        name: u.name,
+                        // @ts-ignore
+                        role: u.role,
+                    }
+                });
+                console.log(`✅ Created ${u.role}: ${u.email} (Pass: ${u.password})`);
+            }
+        }
+
+        // --- ৩. কুপন কোড তৈরি ---
         console.log("⏳ Seeding Test Coupons...");
-        
         const coupons = [
             {
                 code: "WELCOME10",
-                discountValue: 10,       // আপনার স্কিমা অনুযায়ী discountValue
+                discountValue: 10,
                 isPercentage: false,
-                expiryDate: new Date("2026-12-31"), // বাধ্যতামূলক ফিল্ড
+                expiryDate: new Date("2026-12-31"),
                 isActive: true,
                 usageLimit: 100
             },
@@ -77,27 +113,18 @@ export const seedSuperAdmin = async () => {
                 where: { code: coupon.code },
                 update: { 
                     isActive: coupon.isActive, 
-                    discountValue: coupon.discountValue,
-                    expiryDate: coupon.expiryDate,
-                    isPercentage: coupon.isPercentage
+                    discountValue: coupon.discountValue 
                 },
                 create: coupon
             });
         }
+        console.log("✅ Coupons seeded successfully!");
 
-        console.log("✅ Coupons seeded: 'WELCOME10' and 'OFF50' are ready to use!");
+        console.log("✨ All seeding tasks completed successfully!");
 
     } catch (error: any) {
         console.error("❌ Error during seeding:", error.message);
         process.exit(1);
-    }
-};
-
-const run = async () => {
-    try {
-        await seedSuperAdmin();
-    } catch (err) {
-        console.error(err);
     } finally {
         await prisma.$disconnect();
         console.log("🔌 Database disconnected.");
@@ -105,4 +132,5 @@ const run = async () => {
     }
 };
 
-run();
+// স্ক্রিপ্টটি রান করা
+runSeeding();

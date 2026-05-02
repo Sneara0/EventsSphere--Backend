@@ -6,53 +6,67 @@ import { EventService } from "./event.service.js";
 import { IRequestUser } from "../../interfaces/requestUser.interface.js";
 
 /**
- * 1. Create a New Flight/Event Offer
+ * ১. ড্যাশবোর্ড স্ট্যাটস (Admin Only)
  */
-const createEvent = catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IRequestUser;
-
-    // ১. ডাটা এক্সট্রাক্ট করা (Zod middleware-এর পর ডাটা req.body.body তে থাকতে পারে)
-    const payload = req.body.body ? { ...req.body.body } : { ...req.body };
-
-    // --- DEBUG LOGS: সমস্যা ধরার জন্য ---
-    console.log("🛠️ Logged User ID:", user?.userId);
-    console.log("📦 Incoming Payload:", payload);
-    // ---------------------------------
-
-    // ২. ইমেজ হ্যান্ডলিং (Cloudinary URL যদি multer ব্যবহার করেন)
-    if (req.file) {
-        payload.thumbnail = req.file.path; 
-    }
-
-    // ৩. ডাটা টাইপ কনভার্সন (FormData থেকে স্ট্রিং আসে, তাই নাম্বারে রূপান্তর জরুরি)
-    if (payload.totalSeats) {
-        payload.totalSeats = Number(payload.totalSeats);
-    }
-    if (payload.ticketPrice) {
-        payload.ticketPrice = Number(payload.ticketPrice);
-    }
-    
-    // ৪. বুলিয়ান হ্যান্ডলিং
-    if (payload.isRefundable !== undefined) {
-        payload.isRefundable = 
-            payload.isRefundable === 'true' || 
-            payload.isRefundable === 'on' || 
-            payload.isRefundable === true;
-    }
-
-    // ৫. সার্ভিস কল করা (নিশ্চিত হোন আপনার সার্ভিসে এই ফাংশন নাম আছে)
-    const result = await EventService.createEventIntoDB(user.userId, payload);
+const getEventStats = catchAsync(async (req: Request, res: Response) => {
+    const result = await EventService.getEventStatsFromDB();
 
     sendResponse(res, {
-        statusCode: status.CREATED,
+        statusCode: status.OK,
         success: true,
-        message: "Flight offer launched successfully! ✈️",
+        message: "Dashboard statistics fetched successfully! 📊",
         data: result,
     });
 });
 
 /**
- * 2. Get All Flight Offers
+ * ২. এআই সার্চ সাজেশন
+ */
+const getAISuggestions = catchAsync(async (req: Request, res: Response) => {
+    const { searchTerm } = req.query;
+    
+    // searchTerm না থাকলে আমরা ফাঁকা অ্যারে পাঠাবো
+    const result = await EventService.getAISuggestionsFromDB(searchTerm as string || "");
+
+    sendResponse(res, {
+        statusCode: status.OK,
+        success: true,
+        message: "AI suggestions fetched successfully! ✨",
+        data: result,
+    });
+});
+
+/**
+ * ৩. নতুন ইভেন্ট তৈরি করা
+ */
+const createEvent = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IRequestUser;
+    const payload = req.body.body ? { ...req.body.body } : { ...req.body };
+
+    if (req.file) {
+        payload.thumbnail = req.file.path; 
+    }
+
+    // ডাটা কনভার্সন
+    if (payload.totalSeats) payload.totalSeats = Number(payload.totalSeats);
+    if (payload.ticketPrice) payload.ticketPrice = Number(payload.ticketPrice);
+    
+    if (payload.isRefundable !== undefined) {
+        payload.isRefundable = payload.isRefundable === 'true' || payload.isRefundable === 'on' || payload.isRefundable === true;
+    }
+
+    const result = await EventService.createEventIntoDB(user.userId, payload);
+
+    sendResponse(res, {
+        statusCode: status.CREATED,
+        success: true,
+        message: "Event offer launched successfully! ✈️",
+        data: result,
+    });
+});
+
+/**
+ * ৪. সার্চ এবং ফিল্টারসহ সব ইভেন্ট পাওয়া
  */
 const getAllEvents = catchAsync(async (req: Request, res: Response) => {
     const result = await EventService.getAllEventsFromDB(req.query);
@@ -60,13 +74,13 @@ const getAllEvents = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Flight offers fetched successfully",
+        message: "Event offers fetched successfully",
         data: result,
     });
 });
 
 /**
- * 3. Get Single Flight Details
+ * ৫. সিঙ্গেন্ট ইভেন্ট ডিটেইলস
  */
 const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params; 
@@ -75,32 +89,26 @@ const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Flight details fetched successfully",
+        message: "Event details fetched successfully",
         data: result,
     });
 });
 
 /**
- * 4. Update Flight Offer
+ * ৬. ইভেন্ট আপডেট করা
  */
 const updateEvent = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params; 
     const user = req.user as IRequestUser;
-
     const updateData = req.body.body ? { ...req.body.body } : { ...req.body };
     
-    if (req.file) {
-        updateData.thumbnail = req.file.path;
-    }
+    if (req.file) updateData.thumbnail = req.file.path;
 
     if (updateData.totalSeats) updateData.totalSeats = Number(updateData.totalSeats);
     if (updateData.ticketPrice !== undefined) updateData.ticketPrice = Number(updateData.ticketPrice);
     
     if (updateData.isRefundable !== undefined) {
-        updateData.isRefundable = 
-            updateData.isRefundable === 'true' || 
-            updateData.isRefundable === 'on' || 
-            updateData.isRefundable === true;
+        updateData.isRefundable = updateData.isRefundable === 'true' || updateData.isRefundable === 'on' || updateData.isRefundable === true;
     }
 
     const result = await EventService.updateEventIntoDB(id as string, user.userId, updateData);
@@ -108,13 +116,13 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Flight offer updated successfully",
+        message: "Event offer updated successfully",
         data: result,
     });
 });
 
 /**
- * 5. Delete an Offer
+ * ৭. ইভেন্ট ডিলিট করা
  */
 const deleteEvent = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -125,7 +133,7 @@ const deleteEvent = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
-        message: "Flight offer deleted successfully",
+        message: "Event offer deleted successfully",
         data: result,
     });
 });
@@ -136,4 +144,6 @@ export const EventController = {
     getSingleEvent,
     updateEvent,
     deleteEvent,
+    getEventStats,    // New
+    getAISuggestions, // New
 };
