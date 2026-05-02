@@ -39,6 +39,8 @@ export interface EnvConfig {
         STRIPE_SECRET_KEY: string;
         STRIPE_WEBHOOK_SECRET: string;
     };
+    GEMINI_API_KEY?: string; // Optional, যদি ব্যবহার করা হয়
+    GEMINI_API_SECRET?: string; // Optional, যদি ব্যবহার করা হয়
 }
 
 // ২. ইন্টারফেস অনুযায়ী কনফিগ অবজেক্ট তৈরি করা
@@ -80,6 +82,8 @@ const config: EnvConfig = {
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
         STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
     },
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    GEMINI_API_SECRET: process.env.GEMINI_API_SECRET,
 };
 
 export default config;
