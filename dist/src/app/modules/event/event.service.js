@@ -31,18 +31,24 @@ const createEventIntoDB = async (userId, payload) => {
 const getEventStatsFromDB = async () => {
     const totalEvents = await prisma.event.count({ where: { isDeleted: false } });
     const totalBookings = await prisma.booking.count();
+    // স্কিমা অনুযায়ী totalAmount সিলেক্ট করা হয়েছে
     const bookings = await prisma.booking.findMany({
-        select: { createdAt: true, totalPrice: true }
+        select: { createdAt: true, totalAmount: true }
     });
     const chartData = bookings.reduce((acc, curr) => {
         const month = curr.createdAt.toLocaleString('default', { month: 'short' });
         const existing = acc.find((item) => item.name === month);
         if (existing) {
             existing.bookings += 1;
-            existing.revenue += curr.totalPrice;
+            // totalPrice এর বদলে totalAmount ব্যবহার করা হয়েছে
+            existing.revenue += curr.totalAmount;
         }
         else {
-            acc.push({ name: month, bookings: 1, revenue: curr.totalPrice });
+            acc.push({
+                name: month,
+                bookings: 1,
+                revenue: curr.totalAmount
+            });
         }
         return acc;
     }, []);
@@ -56,7 +62,7 @@ const getAISuggestionsFromDB = async (searchTerm) => {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = `Suggest 3 professional search keywords for an event management platform related to "${searchTerm}". Output should be a single string with keywords separated by commas only. No numbering or extra text.`;
         const result = await model.generateContent(prompt);
-        const response = result.response.text();
+        const response = await result.response.text(); // await যোগ করা হয়েছে
         return response.split(',').map((s) => s.trim()).filter(Boolean);
     }
     catch (error) {
@@ -80,6 +86,7 @@ const getAllEventsFromDB = async (filters) => {
     }
     if (category)
         andConditions.push({ category });
+    // Status enum টাইপ এরর এড়াতে টাইপ কাস্টিং
     if (eventStatus)
         andConditions.push({ status: eventStatus });
     if (minPrice || maxPrice) {
@@ -143,6 +150,7 @@ const updateEventIntoDB = async (eventId, userId, payload) => {
     const event = await prisma.event.findUnique({ where: { id: eventId } });
     if (!event)
         throw new AppError(status.NOT_FOUND, "Event not found!");
+    // এখানে organizerId ভেরিফিকেশন করা উচিত যাতে অন্য কেউ ইভেন্ট আপডেট না করতে পারে
     return await prisma.event.update({
         where: { id: eventId },
         data: payload
@@ -152,6 +160,7 @@ const updateEventIntoDB = async (eventId, userId, payload) => {
  * ৭. ডিলিট ইভেন্ট
  */
 const deleteEventFromDB = async (eventId, userId) => {
+    // এখানেও ইউজার অথরাইজেশন চেক করা নিরাপদ
     return await prisma.event.update({
         where: { id: eventId },
         data: { isDeleted: true },

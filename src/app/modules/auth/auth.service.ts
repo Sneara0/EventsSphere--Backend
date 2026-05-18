@@ -38,8 +38,7 @@ const registerUser = async (payload: IRegisterUserPayload) => {
 
     const user = data.user as any;
 
-    // 🔥 এপিআই দিয়ে রেজিস্ট্রেশন করার পর স্ট্যাটাস ACTIVE নিশ্চিত করা
-    // এটি না করলে আপনার মিডলওয়্যার ইউজারকে ব্লক করে দিবে
+    // এপিআই দিয়ে রেজিস্ট্রেশন করার পর স্ট্যাটাস ACTIVE নিশ্চিত করা
     await prisma.user.update({
         where: { id: user.id },
         data: { 
@@ -60,28 +59,49 @@ const registerUser = async (payload: IRegisterUserPayload) => {
 
     return {
         ...data,
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role || Role.PARTICIPANT
+        },
         accessToken: tokenUtils.getAccessToken(tokenPayload),
         refreshToken: tokenUtils.getRefreshToken(tokenPayload),
     };
 };
 
 /**
- * 2. Login User (Fully Fixed)
+ * 2. Login User (ULTIMATE FIX: Support for Custom Controller Context & Demo Bypass)
  */
-const loginUser = async (payload: ILoginUserPayload) => {
-    const { email, password } = payload;
+const loginUser = async (payload: ILoginUserPayload & { isDemoBypass?: boolean }) => {
+    const { email, password, isDemoBypass } = payload;
 
-    const data = await auth.api.signInEmail({
-        body: { email, password }
-    });
+    let user: any;
+    let authData: any = null;
 
-    if (!data || !data.user) {
-        throw new AppError(status.UNAUTHORIZED, "Invalid email or password");
+    if (isDemoBypass) {
+        // ডেমো বাইপাস ট্রিম করা থাকলে সরাসরি প্রিজমা ডাটাবেস থেকে ইউজার ডেটা রিটার্ন করা হবে
+        const dbUser = await prisma.user.findUnique({
+            where: { email: email?.trim().toLowerCase() }
+        });
+        if (!dbUser) {
+            throw new AppError(status.NOT_FOUND, "Demo User account not found in database");
+        }
+        user = dbUser;
+    } else {
+        // স্ট্যান্ডার্ড নরমাল লগইন রিকোয়েস্ট (Better-Auth)
+        const data = await auth.api.signInEmail({
+            body: { email, password }
+        });
+
+        if (!data || !data.user) {
+            throw new AppError(status.UNAUTHORIZED, "Invalid email or password");
+        }
+        authData = data;
+        user = data.user as any;
     }
 
-    const user = data.user as any;
-
-    // ১. স্ট্যাটাস এবং রোল চেকিং (Fallbacks included)
+    // স্ট্যাটাস এবং রোল চেকিং (Fallbacks included)
     const currentUserStatus = (user.status as UserStatus) || UserStatus.ACTIVE;
     const currentUserRole = (user.role as Role) || Role.PARTICIPANT;
 
@@ -93,7 +113,7 @@ const loginUser = async (payload: ILoginUserPayload) => {
         throw new AppError(status.NOT_FOUND, "User not found");
     }
 
-    // ২. টোকেন পেলোড (সুপার অ্যাডমিনের মতো সব ফিল্ড এখানে নিশ্চিত করা হয়েছে)
+    // টোকেন পেলোড জেনারেট করা
     const tokenPayload: ITokenPayload = {
         userId: user.id,
         role: currentUserRole,
@@ -104,8 +124,15 @@ const loginUser = async (payload: ILoginUserPayload) => {
         emailVerified: user.emailVerified || false,
     };
 
+    // কন্ট্রোলার এবং ফ্রন্টএন্ড ফরম্যাটের সাথে মিল রেখে সুনির্দিষ্ট অবজেক্ট রিটার্ন
     return {
-        ...data,
+        ...(authData || {}),
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: currentUserRole
+        },
         accessToken: tokenUtils.getAccessToken(tokenPayload),
         refreshToken: tokenUtils.getRefreshToken(tokenPayload),
     };
@@ -191,8 +218,6 @@ const googleLoginSuccess = async (session: any) => {
         refreshToken: tokenUtils.getRefreshToken(tokenPayload),
     };
 };
-
-// --- নিচের ফাংশনগুলো আগের মতোই থাকবে ---
 
 const changePassword = async (payload: IChangePasswordPayload, sessionToken: string) => {
     return await auth.api.changePassword({

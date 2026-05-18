@@ -13,7 +13,7 @@ const app: Application = express();
 // --- ১. মিডলওয়্যার কনফিগারেশন (CORS) ---
 const allowedOrigins = [
   "http://localhost:3000", 
-  "https://eventspehere-frontend.vercel.app",
+  "https://evnetsphere-advanced.vercel.app",
   "https://eventspehere-frontend-54isxxop6.vercel.app" 
 ];
 

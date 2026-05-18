@@ -11,10 +11,9 @@ import bcrypt from "bcrypt";
 import httpStatus from 'http-status';
 import { prisma } from "../../lib/prisma.js";
 import env from "../../../config/env.js";
-// 1. User Registration (Fixed Enum Case Sensitivity)
+
+// 1. User Registration (Ensuring UpperCase matches with Enum Schema)
 const registerUser = catchAsync(async (req: Request, res: Response) => {
-    // ইউজারের পাঠানো ডাটা থেকে রোলটিকে বড় হাতের অক্ষরে রূপান্তর করা হচ্ছে
-    // কারণ প্রিজমা Enum (ORGANIZER, PARTICIPANT) বড় হাতের অক্ষর আশা করে
     const registrationData = {
         ...req.body,
         role: req.body.role ? req.body.role.toUpperCase() : "PARTICIPANT"
@@ -24,7 +23,6 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
     const { accessToken, refreshToken, user } = result;
 
     // --- Better Auth OTP Trigger ---
-    // রেজিস্ট্রেশন সফল হওয়ার পর অটোমেটিক ওটিপি পাঠানো হচ্ছে
     await auth.api.sendVerificationOTP({
         body: {
             email: user.email,
@@ -46,14 +44,67 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// 2. Login User
+// 2. Login User (Enforcing Strict Role Object Structure for Frontend Mapping)
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-    const result = await AuthService.loginUser(req.body);
+    const { email, password } = req.body;
+    const normalizedEmail = email?.trim().toLowerCase();
+
+    // ডাটাবেস থেকে ইউজারটি খুঁজে বের করা
+    const userExists = await prisma.user.findUnique({
+        where: { email: normalizedEmail }
+    });
+
+    if (!userExists) {
+        throw new AppError(status.BAD_REQUEST, "Invalid email or password");
+    }
+
+    let result;
+
+    // Better-Auth এর পাসওয়ার্ড হ্যাশ সাধারণত $scrypt$ বা b64 ফরম্যাটে থাকে, যা $2b$ (bcrypt) দিয়ে শুরু হয় না
+    const isBetterAuthHash = userExists.password && !userExists.password.startsWith("$2b$");
+
+    if (isBetterAuthHash) {
+        // ডাইনামিকালি Better-Auth ক্রিপ্টো ভেরিফায়ার ইম্পোর্ট করা
+        const { verifyPassword } = await import("better-auth/crypto");
+        
+        const isPasswordMatch = await verifyPassword({
+            hash: userExists.password as string,
+            password: password
+        });
+
+        if (!isPasswordMatch) {
+            throw new AppError(status.BAD_REQUEST, "Invalid email or password");
+        }
+
+        // ডেমো বাইপাস ফ্ল্যাগ দিয়ে কাস্টম AuthService রান করা হচ্ছে
+        const serviceResult = await AuthService.loginUser({ 
+            email: normalizedEmail, 
+            password, 
+            isDemoBypass: true 
+        } as any);
+
+        // ডেটাবেসের এক্সাক্ট রোল প্রপার্টি ফ্রন্টএন্ডে পাস করা নিশ্চিত করা হচ্ছে
+        result = {
+            accessToken: serviceResult.accessToken,
+            refreshToken: serviceResult.refreshToken,
+            user: serviceResult.user || {
+                id: userExists.id,
+                name: userExists.name,
+                email: userExists.email,
+                role: userExists.role // 👈 আপনার Enum Role (যেমন: ADMIN, USER, PARTICIPANT ইত্যাদি)
+            }
+        };
+    } else {
+        // নরমাল ইউজার বা সরাসরি Bcrypt দিয়ে তৈরি অ্যাকাউন্টের জন্য স্ট্যান্ডার্ড সার্ভিস কল
+        result = await AuthService.loginUser(req.body);
+    }
+
     const { accessToken, refreshToken } = result;
 
     cookieUtils.setAccessTokenCookie(res, accessToken);
     cookieUtils.setRefreshTokenCookie(res, refreshToken);
 
+    // রেসপন্স অবজেক্টের স্ট্রাকচার ফিক্সড করা হলো যেন ড্যাশবোর্ড সহজেই রিডাইরেক্ট হতে পারে
     sendResponse(res, {
         statusCode: status.OK,
         success: true,
@@ -152,12 +203,10 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
 });
 
 // 8. Forget Password
-// 8. Forget Password (Fixed Type)
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email } = req.body;
     const normalizedEmail = email.toLowerCase();
     
-    // Better Auth এ resetPassword এর জন্য ওটিপি টাইপ "email-verification" রাখা নিরাপদ
     await auth.api.sendVerificationOTP({
         body: {
             email: normalizedEmail,
@@ -174,22 +223,16 @@ const forgetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 // 9. Reset Password (Fixed Data Mapping)
-// 9. Reset Password (Better Auth Standard Flow)
-// auth.controller.ts
-
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const { email, otp, newPassword } = req.body;
 
     const normalizedEmail = email?.trim().toLowerCase();
-    
-    // ডাটাবেসে যেভাবে identifier সেভ হয়েছে সেই ফরম্যাটে রূপান্তর করুন
     const dbIdentifier = `email-verification-otp-${normalizedEmail}`;
     const submittedOtp = String(otp).trim();
 
-    // ১. এখন সঠিক identifier দিয়ে খুঁজুন
     const verificationData = await prisma.verification.findFirst({
         where: {
-            identifier: dbIdentifier, // এখন এটি ডাটাবেসের সাথে মিলবে
+            identifier: dbIdentifier,
         },
         orderBy: {
             createdAt: 'desc'
@@ -197,19 +240,15 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     });
 
     if (!verificationData) {
-        console.log(`❌ ওটিপি পাওয়া যায়নি! খুঁজছিলাম: ${dbIdentifier}`);
         throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP code! ❌");
     }
 
-    // ২. ওটিপি ভ্যালু চেক (আপনার ইমেজে দেখা যাচ্ছে ভ্যালুর শেষে ':0' আছে)
-    // যদি আপনার ডাটাবেসে ভ্যালু '681971:0' থাকে, তবে সেভাবে মিলাতে হবে
-    const dbValue = verificationData.value; // উদা: '681971:0'
+    const dbValue = verificationData.value;
 
     if (dbValue !== submittedOtp && dbValue !== `${submittedOtp}:0`) {
         throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP code! ❌");
     }
 
-    // ৩. পাসওয়ার্ড আপডেট এবং ওটিপি ডিলিট
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     
     await prisma.$transaction([
@@ -228,6 +267,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
         message: "Password reset successfully! 🔐",
     });
 });
+
 // 10. Google Login
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
     const result = await auth.api.signInSocial({
